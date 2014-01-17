@@ -2,32 +2,79 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.modules.reactivemongo.json.BSONFormats._
+import play.modules.reactivemongo.MongoController
+import reactivemongo.api.collections.default.BSONCollection
+import reactivemongo.bson.BSONDocument
+import reactivemongo.bson.BSONObjectID
+import scala.concurrent.Future
 
 import models.Task
+import models.Task._
 
-object Application extends Controller {
+object Application extends Controller with MongoController {
+
+  implicit val reader = Task.TaskBSONReader
+
+  val collection = db[BSONCollection]("tasks")
 
   def index = Action {
     Redirect(routes.Application.tasks)
   }
 
-  def tasks = Action {
-    Ok(views.html.index(Task.all(), taskForm))
+  def tasks = Action.async { implicit request =>
+    findAllTasks.map {
+      tasks => Ok(views.html.index(tasks, taskForm))
+    }
   }
 
-  def newTask = Action { implicit request =>
+  def newTask = Action.async { implicit request =>
     taskForm.bindFromRequest.fold (
-      errors => BadRequest(views.html.index(Task.all(), errors)),
+      errors => {
+        findAllTasks.map {
+          tasks => BadRequest(views.html.index(tasks, errors))
+        }
+      },
       label => {
-        Task.create(label)
-        Redirect(routes.Application.tasks)
+        collection.insert(new Task(Some(BSONObjectID.generate), label)).map(_ => Redirect(routes.Application.tasks))
       }
     )
   }
 
-  def deleteTask(id: Long) = Action {
-    Task.delete(id)
-    Redirect(routes.Application.tasks)
+  def findAllTasks = {
+    val query = BSONDocument()
+    collection.find(query).cursor[Task].collect[List]()
+  }
+
+  def echo = Action.async(parse.json) { implicit request =>
+    Future.successful(
+      request.body.validate[Task].fold(
+        valid = {
+          task => Ok(Json.toJson[Task](task))
+        },
+        invalid = {
+          errors => BadRequest(JsError.toFlatJson(errors))
+        }
+      )
+    )
+  }
+
+  def createTask = Action.async(parse.json) { implicit request =>
+    request.body.validate[Task].fold(
+      valid = {
+        task => collection.insert(task).map(_ => Ok(Json.toJson(task)))
+      },
+      invalid = {
+        errors => Future.successful(BadRequest(JsError.toFlatJson(errors)))
+      }
+    )
+  }
+
+  def deleteTask(id: String) = Action.async {
+    collection.remove(BSONDocument("_id" -> new BSONObjectID(id))).map(_ => Redirect(routes.Application.tasks))
   }
 
   import play.api.data._
@@ -35,5 +82,5 @@ object Application extends Controller {
 
   val taskForm = Form(
     "label" -> nonEmptyText
-  )}
-
+  )
+}
