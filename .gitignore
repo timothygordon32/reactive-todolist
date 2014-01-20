@@ -1,15 +1,21 @@
+# Ignore all dotfiles...
+.*
+# except for .gitignore
+!.gitignore
+
+# Ignore Play! working directory #
+db
+dist
+eclipse
+lib
+log
 logs
+modules
+precompiled
 project/project
 project/target
 target
 tmp
-.history
-dist
-/.idea
-/*.iml
-/out
-/.idea_modules
-/.classpath
-/.project
+test-result
+server.pid
 /RUNNING_PID
-/.settings
