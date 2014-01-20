@@ -6,6 +6,8 @@
 
     <h1>@tasks.size task(s)</h1>
 
+    <p>My secret is @play.Play.application().configuration().getString("application.secret")
+
     <ul>
     @tasks.map { task =>
         <li>
