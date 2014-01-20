@@ -1,12 +1,9 @@
-name := "todolist"
+name := "reactive-todolist"
 
 version := "1.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
-  jdbc,
-  anorm,
-  cache,
-  "postgresql" % "postgresql" % "8.4-702.jdbc4"
+  "org.reactivemongo" %% "reactivemongo" % "0.10.0"
 )     
 
 play.Project.playScalaSettings
