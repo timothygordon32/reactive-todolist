@@ -1,14 +1,10 @@
-import org.junit.runner.RunWith
-import org.specs2.mutable.Specification
-import org.specs2.runner.JUnitRunner
-import play.api.libs.functional.syntax._
+import org.specs2.mutable._
 import play.api.libs.json._
 import reactivemongo.bson.BSONObjectID
 
 import models.Task
 import models.Task._
 
-@RunWith(classOf[JUnitRunner])
 class TaskSpec extends Specification {
 
   val task = Task(Some(BSONObjectID.generate), "I'm new")

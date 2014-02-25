@@ -19,7 +19,7 @@ object Application extends Controller with MongoController {
 
   implicit val reader = Task.TaskBSONReader
 
-  val collection = db[BSONCollection]("tasks")
+  lazy val collection = db[BSONCollection]("tasks")
 
   def index = Action {
     Redirect(routes.Application.tasks)
