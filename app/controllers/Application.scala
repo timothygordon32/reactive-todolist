@@ -73,6 +73,14 @@ object Application extends Controller with MongoController {
     )
   }
 
+  def getTask(id: String) = Action.async {
+    val query = BSONDocument("_id" -> new BSONObjectID(id))
+    collection.find(query).cursor[Task].headOption.map {
+      case Some(task) => Ok(Json.toJson(task))
+      case None => NotFound
+    }
+  }
+
   def deleteTask(id: String) = Action.async {
     collection.remove(BSONDocument("_id" -> new BSONObjectID(id))).map(_ => Redirect(routes.Application.tasks))
   }
