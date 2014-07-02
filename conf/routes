@@ -16,3 +16,4 @@ POST        /tasks/:id/delete        controllers.Application.deleteTask(id: Stri
 POST        /json/tasks              controllers.Application.createTask
 GET         /json/tasks/:id          controllers.Application.getTask(id: String)
 POST        /json/tasks/echo         controllers.Application.echo
+DELETE      /json/tasks/:id          controllers.Application.deleteTaskJson(id: String)

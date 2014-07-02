@@ -8,3 +8,11 @@ libraryDependencies ++= Seq(
 )     
 
 play.Project.playScalaSettings
+
+unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base =>  Seq(base / "it"))
+
+lazy val root =
+  Project("root", file("."))
+    .configs( IntegrationTest )
+    .settings( Defaults.itSettings : _*)
+    .settings(libraryDependencies += "com.typesafe.play" %% "play-test" % "2.2.2" % "it")
