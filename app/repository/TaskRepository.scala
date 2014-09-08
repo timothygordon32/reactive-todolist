@@ -49,7 +49,7 @@ object TaskRepository {
   }
 
   def find(id: String): Future[Option[Task]] = {
-    val byId = Json.obj("_id" -> new BSONObjectID(id))
+    val byId = Json.obj("_id" -> BSONObjectID(id))
     collection.find(byId).cursor[Task].headOption
   }
 
@@ -62,5 +62,5 @@ object TaskRepository {
     }
   }
 
-  private def by(id: String): JsObject = Json.obj("_id" -> new BSONObjectID(id))
+  private def by(id: String): JsObject = Json.obj("_id" -> BSONObjectID(id))
 }
