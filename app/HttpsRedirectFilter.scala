@@ -20,8 +20,8 @@ object HttpsRedirectFilter extends Filter {
   val hostnameMatcher = ".*(?=:[0-9]*)".r
   val portMatcher = "(?<=:)[0-9]*".r
 
-  def apply(nextFilter: (RequestHeader) => Future[SimpleResult])
-           (requestHeader: RequestHeader): Future[SimpleResult] =
+  def apply(nextFilter: (RequestHeader) => Future[Result])
+           (requestHeader: RequestHeader): Future[Result] =
     if (httpsRequired && !isHttps(requestHeader)) redirectToHttps(requestHeader)
     else nextFilter(requestHeader)
 
@@ -34,7 +34,7 @@ object HttpsRedirectFilter extends Filter {
   private def httpsPortSpecified(requestHeader: RequestHeader) =
     portMatcher.findFirstIn(requestHeader.host) == Some(requiredHttpsPort)
 
-  private def redirectToHttps(requestHeader: RequestHeader): Future[SimpleResult] = {
+  private def redirectToHttps(requestHeader: RequestHeader): Future[Result] = {
     val hostname = hostnameMatcher.findFirstIn(requestHeader.host).getOrElse(requestHeader.host)
     val url = s"https://$hostname$httpsPortSuffix${requestHeader.uri}"
     Future.successful(redirect(url))
