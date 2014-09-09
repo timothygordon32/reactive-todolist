@@ -2,12 +2,20 @@
 
 <!DOCTYPE html>
 
-<html>
+<html ng-app="todo">
     <head>
         <title>@title</title>
+        <meta charset="utf-8"/>
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js" type="text/javascript"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular-resource.min.js" type="text/javascript"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/controllers.js")" type="text/javascript"></script>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"
+              type="text/css">
+
     </head>
     <body>
         @content
