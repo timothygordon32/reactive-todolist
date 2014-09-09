@@ -1,0 +1,35 @@
+@main("AngularJS Todo List") {
+
+<div ng-controller="TodoCtrl">
+    <div class="container-fluid">
+        <fieldset>
+            <legend>
+                <span>Total tasks {{ getTodosCount() }}, remaining {{ getRemainingCount() }}</span>
+            </legend>
+            <div>
+                <form class="form-horizontal">
+                    <input type="text" ng-model="search" placeholder="Filter tasks"/>
+                </form>
+                <ul class="unstyled">
+                    <li ng-repeat="todo in todos | filter:search">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="todo.done"/>
+                            <span class="done-{{ todo.done }}">{{ todo.text }}</span>
+                        </label>
+                    </li>
+                </ul>
+                <form class="form-horizontal">
+                    <label>
+                        <input type="text" ng-model="formTodoText" ng-model-instant placeholder="Enter new task"/>
+                        <button class="btn" ng-click="addTodo()"><i class="icon-plus"></i>Add</button>
+                    </label>
+                </form>
+
+                <button class="btn" ng-click="clearCompleted()"><i class="icon-trash"></i>Clear Completed</button>
+            </div>
+        </fieldset>
+        <br/>
+    </div>
+</div>
+
+}

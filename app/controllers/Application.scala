@@ -58,6 +58,10 @@ object Application extends Controller {
     )
   }
 
+  def list = Action.async {
+    TaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
+  }
+
   def getTask(id: String) = Action.async {
     TaskRepository.find(id).map {
       case Some(task) => Ok(Json.toJson(task))
