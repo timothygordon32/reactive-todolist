@@ -11,7 +11,7 @@ Initial target platform is Heroku PaaS.
 
 Pre-requisites
 --------------
-- Play 2.2.x, Scala version should be bundled.
+- Play 2.3.x, Scala version should be bundled.
 - MongoDB - any recent version should work.
 
 Deploying to Heroku
