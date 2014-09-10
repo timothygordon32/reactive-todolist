@@ -2,12 +2,18 @@
 
 angular.module('todo.controllers', ['ngResource']);
 
-angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $q) {
+angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $q) {
 
-    $scope.todos = [
-        {text: "Learn AngularJS", done: false},
-        {text: "Build an app", done: false}
-    ];
+    $scope.loaded = false;
+
+    $scope.todos = [];
+
+    $resource("/json/tasks").query(function(data) {
+        $scope.todos = _.map(data, function(task) {
+            return {text: task.label, done: false };
+        });
+        $scope.loaded = true;
+    });
 
     $scope.getTodosCount = function () {
         return $scope.todos.length;
