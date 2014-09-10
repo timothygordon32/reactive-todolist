@@ -35,14 +35,16 @@ object ApplicationBuild extends Build with Application {
       "-encoding", "UTF-8"))
 
   def testSettings() = Seq(
+    unmanagedResourceDirectories in Test <<= (baseDirectory in IntegrationTest)(base => Seq(base / "target" / "web" / "public" / "test")),
     fork in Test := false,
     parallelExecution in Test := false,
     addTestReportOption(Test)
   )
 
   def integrationTestSettings() = Seq(
-    fork in IntegrationTest := false,
     unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "it")),
+    unmanagedResourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "target" / "web" / "public" / "test")),
+    fork in IntegrationTest := false,
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
     parallelExecution in IntegrationTest := false)
@@ -71,6 +73,9 @@ object ApplicationBuild extends Build with Application {
 trait Application {
 
   lazy val targetJvm = settingKey[String]("The version of the JVM the build targets")
+
+  val allPhases = "tt->test;test->test;test->compile;compile->compile"
+  val allItPhases = "tit->it;it->it;it->compile;compile->compile"
 
   lazy val TemplateTest = config("tt") extend Test
   lazy val TemplateItTest = config("tit") extend IntegrationTest
