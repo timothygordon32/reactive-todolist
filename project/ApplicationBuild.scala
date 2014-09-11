@@ -11,6 +11,7 @@ object ApplicationBuild extends Build with Application {
   val appDependencies = Seq(
     "org.reactivemongo" %% "reactivemongo" % "0.10.5.akka23-SNAPSHOT",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
+    "com.typesafe.play" %% "play-ws" % "2.3.3" % IntegrationTest,
     "com.typesafe.play" %% "play-test" % "2.3.3" % IntegrationTest)
 
   val appResolvers = Seq(
@@ -35,7 +36,6 @@ object ApplicationBuild extends Build with Application {
       "-encoding", "UTF-8"))
 
   def testSettings() = Seq(
-    unmanagedResourceDirectories in Test <<= (baseDirectory in IntegrationTest)(base => Seq(base / "target" / "web" / "public" / "test")),
     fork in Test := false,
     parallelExecution in Test := false,
     addTestReportOption(Test)
