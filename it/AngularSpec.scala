@@ -17,7 +17,7 @@ class AngularSpec extends PlaySpecification {
 
       val page = browser.goTo("http://localhost:" + port + "/app")
 
-      page.await().until("ul li label span").hasText(label)
+      page.await until "ul li label span" hasText label
     }
   }
 
