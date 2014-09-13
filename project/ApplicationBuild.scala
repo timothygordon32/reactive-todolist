@@ -1,3 +1,4 @@
+import com.joescii.SbtJasminePlugin._
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
@@ -35,6 +36,16 @@ object ApplicationBuild extends Build with Application {
       "-Xmax-classfile-name", "100",
       "-encoding", "UTF-8"))
 
+  def jasmineAdditionalSettings() = Seq(
+    appJsDir <+= baseDirectory / "app/assets/javascripts",
+    appJsLibDir <+= baseDirectory / "public/javascripts",
+    jasmineTestDir <+= baseDirectory / "test/assets/javascripts",
+    jasmineConfFile <+= baseDirectory / "test/assets/javascripts/test.dependencies.js",
+    // link jasmine to the standard 'sbt test' action. Now when running 'test' jasmine tests will be run, and if they pass
+    // then other Play tests will be executed.
+    (test in Test) <<= (test in Test) dependsOn (jasmine)
+  )
+
   def testSettings() = Seq(
     fork in Test := false,
     parallelExecution in Test := false,
@@ -50,7 +61,7 @@ object ApplicationBuild extends Build with Application {
     parallelExecution in IntegrationTest := false)
 
   lazy val project = Project(appName, file("."))
-    .enablePlugins(plugins : _*)
+    .enablePlugins(play.PlayScala)
     .settings(
       name := appName,
       version := appVersion,
@@ -60,6 +71,8 @@ object ApplicationBuild extends Build with Application {
     .settings(scalaSettings: _*)
     .settings(
       libraryDependencies ++= appDependencies)
+    .settings(jasmineSettings : _*)
+    .settings(jasmineAdditionalSettings() : _*)
     .settings(inConfig(TemplateTest)(Defaults.testSettings): _*)
     .settings(testSettings(): _*)
     .configs(IntegrationTest)
