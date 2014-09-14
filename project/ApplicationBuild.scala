@@ -1,3 +1,5 @@
+import com.typesafe.sbt.web.Import._
+import com.typesafe.sbt.web.Import.WebKeys._
 import com.joescii.SbtJasminePlugin._
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
@@ -37,13 +39,11 @@ object ApplicationBuild extends Build with Application {
       "-encoding", "UTF-8"))
 
   def jasmineAdditionalSettings() = Seq(
-    appJsDir <+= baseDirectory / "app/assets/javascripts",
-    appJsLibDir <+= baseDirectory / "public/javascripts",
-    jasmineTestDir <+= baseDirectory / "test/assets/javascripts",
-    jasmineConfFile <+= baseDirectory / "test/assets/javascripts/test.dependencies.js",
-    // link jasmine to the standard 'sbt test' action. Now when running 'test' jasmine tests will be run, and if they pass
-    // then other Play tests will be executed.
-    (test in Test) <<= (test in Test) dependsOn (jasmine)
+    appJsDir := Seq(baseDirectory.value / "app/assets/javascripts"),
+    appJsLibDir := Seq(baseDirectory.value  / "public/javascripts"),
+    jasmineTestDir := Seq(baseDirectory.value  / "test/assets/javascripts"),
+    jasmineConfFile := Seq(baseDirectory.value  / "test/assets/javascripts/test.dependencies.js"),
+    (test in Test) <<= (test in Test) dependsOn jasmine
   )
 
   def testSettings() = Seq(
