@@ -2,6 +2,7 @@ package controllers
 
 import models.Task
 import models.Task._
+import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
@@ -13,6 +14,22 @@ object Application extends Controller {
 
   def index = Action {
     Redirect(routes.Application.tasks)
+  }
+
+  def login(username: Option[String]) = Action { implicit request =>
+    val result = Ok.withNewSession
+    username.map {
+      username =>
+        Logger.info(s"User name $username is logging on")
+        result.addingToSession(Security.username -> username)
+    }.getOrElse {
+      Logger.info(s"Nobody logging on")
+      result
+    }
+  }
+
+  def hello = Authenticated { implicit request =>
+    Ok(request.user)
   }
 
   def tasks = Action.async { implicit request =>
