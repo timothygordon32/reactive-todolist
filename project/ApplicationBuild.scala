@@ -14,8 +14,7 @@ object ApplicationBuild extends Build with Application {
   val appDependencies = Seq(
     "org.reactivemongo" %% "reactivemongo" % "0.10.5.akka23-SNAPSHOT",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
-    "com.typesafe.play" %% "play-ws" % "2.3.3" % IntegrationTest,
-    "com.typesafe.play" %% "play-test" % "2.3.3" % IntegrationTest)
+    "com.typesafe.play" %% "play-ws" % "2.3.3")
 
   val appResolvers = Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
@@ -58,7 +57,9 @@ object ApplicationBuild extends Build with Application {
     fork in IntegrationTest := false,
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false)
+    parallelExecution in IntegrationTest := false,
+    (compile in IntegrationTest) <<= (compile in IntegrationTest).dependsOn(assets in TestAssets)
+  )
 
   lazy val project = Project(appName, file("."))
     .enablePlugins(play.PlayScala)
