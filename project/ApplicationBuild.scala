@@ -14,7 +14,8 @@ object ApplicationBuild extends Build with Application {
   val appDependencies = Seq(
     "org.reactivemongo" %% "reactivemongo" % "0.10.5.akka23-SNAPSHOT",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
-    "com.typesafe.play" %% "play-ws" % "2.3.3")
+    "com.typesafe.play" %% "play-ws" % "2.3.3",
+    "com.typesafe.play" %% "play-test" % "2.3.3" % "it")
 
   val appResolvers = Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
