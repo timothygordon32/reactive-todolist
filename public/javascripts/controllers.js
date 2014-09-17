@@ -2,7 +2,9 @@
 
 angular.module('todo.controllers', ['ngResource']);
 
-angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $q) {
+angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource) {
+
+    $scope.identity = $resource("/username").get();
 
     $scope.loaded = false;
 
@@ -37,4 +39,27 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
     $scope.clearCompleted = function () {
         $scope.todos = $scope.getRemaining();
     };
+});
+
+angular.module('todo.controllers').controller('LandingCtrl', function ($rootScope, $scope, $http, $location) {
+
+    $scope.formData = {};
+
+    $scope.setUsername = function() {
+        $http({
+            method  : 'POST',
+            url     : '/username',
+            data    : $scope.formData,
+            headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+            transformRequest: function(obj) {
+                var str = [];
+                angular.forEach(Object.keys(obj), function(p) {
+                    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                });
+                return str.join("&");
+            }
+        }).success(function () {
+            $location.path("/tasks");
+        });
+    }
 });

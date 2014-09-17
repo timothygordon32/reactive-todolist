@@ -17,6 +17,13 @@ class AngularSpec extends PlaySpecification {
 
       val page = browser.goTo("http://localhost:" + port + "/app")
 
+      page.await until "input" hasName "username"
+
+      page.fill("#username").`with`("bob")
+
+      page.find("#login").click()
+
+      page.await until "#headline" containsText "bob"
       page.await until "ul li label span" hasText label
     }
   }

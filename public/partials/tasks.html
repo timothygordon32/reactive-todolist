@@ -1,7 +1,7 @@
 <div class="container-fluid" ng-show="loaded">
     <fieldset>
-        <legend>
-            <span>Total tasks {{ getTodosCount() }}, remaining {{ getRemainingCount() }}</span>
+        <legend id="headline">
+            <span>Hello {{ identity.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span>
         </legend>
         <div>
             <form class="form-horizontal">

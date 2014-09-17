@@ -14,6 +14,8 @@ GET         /app                     controllers.Angular.tasks
 # Security
 GET         /login                   controllers.Application.login(username: Option[String])
 GET         /hello                   controllers.Application.hello
+GET         /username                controllers.Application.getUsername
+POST        /username                controllers.Application.setUsername
 
 # Tasks
 GET         /tasks                   controllers.Application.tasks

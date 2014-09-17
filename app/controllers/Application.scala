@@ -16,7 +16,17 @@ object Application extends Controller {
     Redirect(routes.Application.tasks)
   }
 
-  def login(username: Option[String]) = Action { implicit request =>
+  def login(username: Option[String]) = Action { implicit request => loginWith(username) }
+
+  def getUsername = Action { request =>
+    Ok(Json.obj(Security.username -> request.session.get(Security.username)))
+  }
+
+  def setUsername = Action(parse.urlFormEncoded) { implicit request =>
+    loginWith(request.body.get("username").map(_.head))
+  }
+
+  def loginWith(username: Option[String])(implicit request: Request[_]) = {
     val result = Ok.withNewSession
     username.map {
       username =>
