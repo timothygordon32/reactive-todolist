@@ -54,11 +54,8 @@ object TaskRepository {
   }
 
   def deleteTask(id: String): Future[Boolean] = {
-    val byId = BSONFormats.toBSON(by(id)).get.asInstanceOf[BSONDocument]
-    val command = FindAndModify(collection.name, byId, Remove)
-    db.command(command).map {
-      case Some(_) => true
-      case None => false
+    collection.remove(Json.obj("_id" -> BSONObjectID(id))).map {
+      lastError => lastError.updatedExisting
     }
   }
 
