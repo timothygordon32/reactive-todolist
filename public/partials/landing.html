@@ -1,11 +1,37 @@
+<!--<div class="container-fluid">-->
+    <!--<fieldset>-->
+        <!--<legend>-->
+            <!--<span>Hello! Who are you?</span>-->
+        <!--</legend>-->
+        <!--<form class="form-signin">-->
+            <!--<h2 class="form-signin-heading">Please sign in</h2>-->
+            <!--<input id="username" type="text" class="input-block-level" placeholder="Username" autocomplete="off">-->
+            <!--<input id="password" type="password" class="input-block-level" placeholder="Password" autocomplete="off">-->
+            <!--<button id="login" class="btn btn-large btn-primary" type="submit" ng-click="setUsername()"><i class="icon-user"></i>Sign in</button>-->
+        <!--</form>-->
+    <!--</fieldset>-->
+<!--</div>-->
+
 <div class="container-fluid">
     <fieldset>
         <legend>
             <span>Hello! Who are you?</span>
         </legend>
-        <form class="form-horizontal">
-            <input id="username" name="username" type="text" ng-model="formData.username" placeholder="Your name"/>
-        </form>
-        <button id="login" class="btn" ng-click="setUsername()"><i class="icon-user"></i>That's me!</button>
+        <div class="account-wall">
+            <form class="form-vertical">
+                <div class="form-group">
+                    <input id="username" autofocus name="username" type="text" ng-model="formData.username" class="form-control"
+                           placeholder="Your username"/>
+                </div>
+                <div class="form-group">
+                    <input id="password" name="password" type="password" ng-model="formData.password"
+                           class="form-control"
+                           autocomplete="off" placeholder="And password"/>
+                </div>
+                <div class="form-group">
+                    <button id="login" class="btn" ng-click="setUsername()"><i class="icon-user"></i>That's me!</button>
+                </div>
+            </form>
+        </div>
     </fieldset>
 </div>

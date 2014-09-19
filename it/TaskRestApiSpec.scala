@@ -11,7 +11,7 @@ import play.api.test._
  */
 class TaskRestApiSpec extends PlaySpecification {
 
-  "REST API" should {
+  "Task REST API" should {
 
     "respond 404 for an unknown URL" in new WithApplication {
       route(FakeRequest(GET, "/boum")) must beNone

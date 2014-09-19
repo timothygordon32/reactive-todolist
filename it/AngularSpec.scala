@@ -20,6 +20,7 @@ class AngularSpec extends PlaySpecification {
       page.await until "input" hasName "username"
 
       page.fill("#username").`with`("bob")
+      page.fill("#password").`with`("secret")
 
       page.find("#login").click()
 

@@ -12,10 +12,8 @@ GET         /assets/*file            controllers.Assets.at(path="/public", file)
 GET         /app                     controllers.Angular.tasks
 
 # Security
-GET         /login                   controllers.Application.login(username: Option[String])
-GET         /hello                   controllers.Application.hello
 GET         /username                controllers.Application.getUsername
-POST        /username                controllers.Application.setUsername
+POST        /login                   controllers.Application.login
 
 # Tasks
 GET         /tasks                   controllers.Application.tasks

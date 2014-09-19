@@ -48,7 +48,7 @@ angular.module('todo.controllers').controller('LandingCtrl', function ($rootScop
     $scope.setUsername = function() {
         $http({
             method  : 'POST',
-            url     : '/username',
+            url     : '/login',
             data    : $scope.formData,
             headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
             transformRequest: function(obj) {

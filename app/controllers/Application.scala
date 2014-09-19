@@ -2,7 +2,9 @@ package controllers
 
 import models.Task
 import models.Task._
-import play.api.Logger
+import play.api.Play
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
@@ -16,30 +18,22 @@ object Application extends Controller {
     Redirect(routes.Application.tasks)
   }
 
-  def login(username: Option[String]) = Action { implicit request => loginWith(username) }
+  val loginForm = Form(
+    tuple(
+      "username" -> text,
+      "password" -> text
+    )
+  )
+
+  def isValid(username: String, password: String) = Play.current.configuration.getString(s"users.$username") == Some(password)
+
+  def login = Action { implicit request =>
+    val (username, password) = loginForm.bindFromRequest.get
+    if (isValid(username, password)) Ok.withNewSession.withSession(Security.username -> username) else Unauthorized
+  }
 
   def getUsername = Action { request =>
     Ok(Json.obj(Security.username -> request.session.get(Security.username)))
-  }
-
-  def setUsername = Action(parse.urlFormEncoded) { implicit request =>
-    loginWith(request.body.get("username").map(_.head))
-  }
-
-  def loginWith(username: Option[String])(implicit request: Request[_]) = {
-    val result = Ok.withNewSession
-    username.map {
-      username =>
-        Logger.info(s"User name $username is logging on")
-        result.addingToSession(Security.username -> username)
-    }.getOrElse {
-      Logger.info(s"Nobody logging on")
-      result
-    }
-  }
-
-  def hello = Authenticated { implicit request =>
-    Ok(request.user)
   }
 
   def tasks = Action.async { implicit request =>
