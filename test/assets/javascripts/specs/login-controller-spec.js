@@ -17,12 +17,12 @@ describe('Login controller', function () {
     }));
 
     it('should submit the user credentials', inject(function($location) {
-        $httpBackend.expectPOST('/login', 'username=bob&password=secret', function(headers) {
+        $httpBackend.expectPOST('/login', 'username=testuser&password=secret', function(headers) {
             expect(headers['Content-Type']).toBe('application/x-www-form-urlencoded');
             return true;
         }).respond(200);
 
-        scope.formData.username = 'bob';
+        scope.formData.username = 'testuser';
         scope.formData.password = 'secret';
         scope.setUsername();
         $httpBackend.flush();

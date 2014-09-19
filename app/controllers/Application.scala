@@ -3,6 +3,7 @@ package controllers
 import models.Task
 import models.Task._
 import play.api.Play
+import play.api.Play.current
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -25,11 +26,16 @@ object Application extends Controller {
     )
   )
 
-  def isValid(username: String, password: String) = Play.current.configuration.getString(s"users.$username") == Some(password)
+  def validate(username: String, password: String) = {
+    Play.current.configuration.getString(s"users.$username") match {
+      case Some(hash) => PasswordHash.verify(password, hash)
+      case None => !Play.isProd && username == "testuser" && password == "secret"
+    }
+  }
 
   def login = Action { implicit request =>
     val (username, password) = loginForm.bindFromRequest.get
-    if (isValid(username, password)) Ok.withNewSession.withSession(Security.username -> username) else Unauthorized
+    if (validate(username, password)) Ok.withNewSession.withSession(Security.username -> username) else Unauthorized
   }
 
   def getUsername = Action { request =>

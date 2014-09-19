@@ -9,7 +9,7 @@ describe('Todo controller', function () {
 
     beforeEach(inject(function(_$httpBackend_, $controller, $rootScope) {
         $httpBackend = _$httpBackend_;
-        $httpBackend.expectGET("/username").respond({username: "bob"});
+        $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/json/tasks").respond([
             {id: 1, label: 'task1'},
             {id: 2, label: 'task2'}

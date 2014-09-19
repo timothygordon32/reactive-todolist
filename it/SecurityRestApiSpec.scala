@@ -12,14 +12,14 @@ class SecurityRestApiSpec extends PlaySpecification {
 
     "validate the user" in new WithApplication {
 
-      val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("username" -> "bob", "password" -> "secret")).get
+      val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("username" -> "testuser", "password" -> "secret")).get
 
       status(login) must equalTo(OK)
     }
 
     "reject the user" in new WithApplication {
 
-      val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("username" -> "bob", "password" -> "wrong")).get
+      val login = route(FakeRequest(POST, "/login").withFormUrlEncodedBody("username" -> "testuser", "password" -> "wrong")).get
 
       status(login) must equalTo(UNAUTHORIZED)
     }
