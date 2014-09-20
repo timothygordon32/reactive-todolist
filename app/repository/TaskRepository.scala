@@ -55,7 +55,7 @@ object TaskRepository {
 
   def deleteTask(id: String): Future[Boolean] = {
     collection.remove(Json.obj("_id" -> BSONObjectID(id))).map {
-      lastError => lastError.updatedExisting
+      lastError => lastError.updated == 1
     }
   }
 
