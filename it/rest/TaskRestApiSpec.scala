@@ -1,7 +1,9 @@
+package rest
+
 
 import java.util.UUID
 
-import play.api.libs.json.{JsObject, JsString, JsArray, Json}
+import play.api.libs.json.{JsArray, JsString, Json}
 import play.api.test._
 
 /**

@@ -1,3 +1,5 @@
+package rest
+
 
 import play.api.test._
 

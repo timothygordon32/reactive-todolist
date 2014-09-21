@@ -1,11 +1,12 @@
+package ui
+
 import java.util.UUID
 
-import org.fluentlenium.core.Fluent
-import play.api.libs.ws.WS
 import play.api.libs.json.Json
-import play.api.test.{WebDriverFactory, PlaySpecification, WithBrowser}
+import play.api.libs.ws.WS
+import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
 
-class AngularSpec extends PlaySpecification {
+class UiSpec extends PlaySpecification {
 
   "Application" should {
 
