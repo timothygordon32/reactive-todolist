@@ -61,19 +61,6 @@ object Application extends Controller {
     )
   }
 
-  def echo = Action.async(parse.json) { implicit request =>
-    Future.successful(
-      request.body.validate[Task].fold(
-        valid = {
-          task => Ok(Json.toJson[Task](task))
-        },
-        invalid = {
-          errors => BadRequest(JsError.toFlatJson(errors))
-        }
-      )
-    )
-  }
-
   def createTask = Action.async(parse.json) { implicit request =>
     request.body.validate[Task].fold(
       valid = {
