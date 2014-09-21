@@ -1,4 +1,5 @@
-import models.Task
+package models
+
 import models.Task._
 import org.specs2.mutable._
 import play.api.libs.json._

@@ -1,12 +1,13 @@
+package security
+
 import controllers.PasswordHash
-import org.mindrot.jbcrypt.BCrypt
 import org.specs2.mutable._
 
 
 
 class PasswordHashSpec extends Specification {
 
-  import PasswordHash._
+  import controllers.PasswordHash._
 
     "password hasher" should {
 

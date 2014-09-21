@@ -7,8 +7,7 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.bson.{BSONDocument, BSONObjectID}
-import reactivemongo.core.commands.{FindAndModify, Remove}
+import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
