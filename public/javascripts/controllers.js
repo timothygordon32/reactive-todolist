@@ -10,7 +10,7 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
 
     $scope.todos = [];
 
-    $resource("/json/tasks").query(function(data) {
+    $resource("/tasks").query(function(data) {
         $scope.todos = _.map(data, function(task) {
             return {text: task.label, done: false };
         });

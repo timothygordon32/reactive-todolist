@@ -14,7 +14,7 @@ class UiSpec extends PlaySpecification {
 
       var label = s"label-${UUID.randomUUID}"
 
-      await(WS.url(s"http://localhost:$port/json/tasks").post(Json.obj("label" -> label)))
+      await(WS.url(s"http://localhost:$port/tasks").post(Json.obj("label" -> label)))
 
       val page = browser.goTo(s"http://localhost:$port/")
 

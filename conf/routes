@@ -13,7 +13,7 @@ POST        /login                   controllers.Authenticator.login
 GET         /username                controllers.Authenticator.getUsername
 
 # Tasks
-POST        /json/tasks              controllers.Tasks.create
-GET         /json/tasks              controllers.Tasks.list
-GET         /json/tasks/:id          controllers.Tasks.get(id: String)
-DELETE      /json/tasks/:id          controllers.Tasks.delete(id: String)
+POST        /tasks              controllers.Tasks.create
+GET         /tasks              controllers.Tasks.list
+GET         /tasks/:id          controllers.Tasks.get(id: String)
+DELETE      /tasks/:id          controllers.Tasks.delete(id: String)

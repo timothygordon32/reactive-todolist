@@ -22,17 +22,17 @@ class TaskRestApiSpec extends PlaySpecification {
     "list the tasks in JSON" in new WithApplication {
 
       var label = "label-" + UUID.randomUUID
-      var created = contentAsJson(route(FakeRequest(POST, "/json/tasks").withBody(Json.obj("label" -> label))).get)
+      var created = contentAsJson(route(FakeRequest(POST, "/tasks").withBody(Json.obj("label" -> label))).get)
       var JsString(id) = created \ "id"
 
-      val tasksWithCreated = route(FakeRequest(GET, "/json/tasks")).get
+      val tasksWithCreated = route(FakeRequest(GET, "/tasks")).get
       status(tasksWithCreated) must equalTo(OK)
       contentType(tasksWithCreated) must beSome.which(_ == "application/json")
       contentAsJson(tasksWithCreated).as[JsArray].value must contain(Json.obj("id" -> id, "label" -> label))
 
-      await(route(FakeRequest(DELETE, s"/json/tasks/$id")).get)
+      await(route(FakeRequest(DELETE, s"/tasks/$id")).get)
 
-      val tasksWithoutCreated = route(FakeRequest(GET, "/json/tasks")).get
+      val tasksWithoutCreated = route(FakeRequest(GET, "/tasks")).get
       contentAsJson(tasksWithoutCreated).as[JsArray].value must not contain Json.obj("id" -> id, "label" -> label)
     }
   }
