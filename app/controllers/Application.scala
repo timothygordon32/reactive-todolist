@@ -16,65 +16,6 @@ import scala.concurrent.Future
 object Application extends Controller {
 
   def index = Action {
-    Redirect(routes.Application.tasks())
-  }
-
-  def tasks = Action { implicit request =>
     Ok(views.html.tasks())
   }
-
-  val loginForm = Form(
-    tuple(
-      "username" -> text,
-      "password" -> text
-    )
-  )
-
-  def validate(username: String, password: String) = {
-    Play.current.configuration.getString(s"users.$username") match {
-      case Some(hash) => PasswordHash.verify(password, hash)
-      case None => !Play.isProd && username == "testuser" && password == "secret"
-    }
-  }
-
-  def login = Action { implicit request =>
-    val (username, password) = loginForm.bindFromRequest.get
-    if (validate(username, password)) Ok.withNewSession.withSession(Security.username -> username) else Unauthorized
-  }
-
-  def getUsername = Action { request =>
-    Ok(Json.obj(Security.username -> request.session.get(Security.username)))
-  }
-
-  def createTask = Action.async(parse.json) { implicit request =>
-    request.body.validate[Task].fold(
-      valid = {
-        task => TaskRepository.create(task).map(result => Ok(Json.toJson(result)))
-      },
-      invalid = {
-        errors => Future.successful(BadRequest(JsError.toFlatJson(errors)))
-      }
-    )
-  }
-
-  def list = Action.async {
-    TaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
-  }
-
-  def getTask(id: String) = Action.async {
-    TaskRepository.find(id).map {
-      case Some(task) => Ok(Json.toJson(task))
-      case None => NotFound
-    }
-  }
-
-  def deleteTaskJson(id: String) = Action.async {
-    TaskRepository.deleteTask(id).map {
-      deleted => if (deleted) Ok else NoContent
-    }
-  }
-
-  val taskForm = Form(
-    "label" -> nonEmptyText
-  )
 }

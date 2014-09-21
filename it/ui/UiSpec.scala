@@ -12,11 +12,11 @@ class UiSpec extends PlaySpecification {
 
     "display a task" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX)) {
 
-      var label = "label-" + UUID.randomUUID
+      var label = s"label-${UUID.randomUUID}"
 
-      await(WS.url("http://localhost:" + port + "/json/tasks").post(Json.obj("label" -> label)))
+      await(WS.url(s"http://localhost:$port/json/tasks").post(Json.obj("label" -> label)))
 
-      val page = browser.goTo("http://localhost:" + port + "/app")
+      val page = browser.goTo(s"http://localhost:$port/")
 
       page.await until "input" hasName "username"
 
