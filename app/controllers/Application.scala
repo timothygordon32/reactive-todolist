@@ -16,7 +16,11 @@ import scala.concurrent.Future
 object Application extends Controller {
 
   def index = Action {
-    Redirect(routes.Application.tasks)
+    Redirect(routes.Application.tasks())
+  }
+
+  def tasks = Action { implicit request =>
+    Ok(views.html.tasks())
   }
 
   val loginForm = Form(
@@ -42,25 +46,6 @@ object Application extends Controller {
     Ok(Json.obj(Security.username -> request.session.get(Security.username)))
   }
 
-  def tasks = Action.async { implicit request =>
-    TaskRepository.findAll.map {
-      tasks => Ok(views.html.index(tasks, taskForm))
-    }
-  }
-
-  def newTask = Action.async { implicit request =>
-    taskForm.bindFromRequest.fold (
-      errors => {
-        TaskRepository.findAll.map {
-          tasks => BadRequest(views.html.index(tasks, errors))
-        }
-      },
-      label => {
-        TaskRepository.create(new Task(None, label)).map(_ => Redirect(routes.Application.tasks))
-      }
-    )
-  }
-
   def createTask = Action.async(parse.json) { implicit request =>
     request.body.validate[Task].fold(
       valid = {
@@ -83,18 +68,11 @@ object Application extends Controller {
     }
   }
 
-  def deleteTask(id: String) = Action.async {
-    TaskRepository.deleteTask(id).map(_ => Redirect(routes.Application.tasks))
-  }
-
   def deleteTaskJson(id: String) = Action.async {
     TaskRepository.deleteTask(id).map {
       deleted => if (deleted) Ok else NoContent
     }
   }
-
-  import play.api.data.Forms._
-  import play.api.data._
 
   val taskForm = Form(
     "label" -> nonEmptyText
