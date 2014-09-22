@@ -1,6 +1,6 @@
 package repository
 
-import models.Task
+import models.{User, Task}
 import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -12,7 +12,7 @@ import reactivemongo.bson.BSONObjectID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object TaskRepository {
+object UserTaskRepository {
   import play.api.Play.current
   import play.modules.reactivemongo.json.BSONFormats._
 
@@ -28,32 +28,27 @@ object TaskRepository {
 
   def db = ReactiveMongoPlugin.db
 
-  lazy val collection = db[JSONCollection]("tasks")
+  lazy val collection = db[JSONCollection]("userTasks")
 
-  def create(task: Task): Future[Task] = {
+  def create(task: Task)(implicit user: User): Future[Task] = {
     val toCreate = task match {
       case Task(None, _) => task.copy(id = Some(BSONObjectID.generate))
       case Task(Some(_), _) => task
     }
 
-    collection.insert(Json.toJson(toCreate)).map {
+    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.username)).map {
       lastError =>
         Logger.info(s"Created task $toCreate")
         toCreate
     }
   }
 
-  def findAll: Future[List[Task]] = {
-    collection.find(Json.obj()).cursor[Task].collect[List]()
+  def findAll(implicit user: User): Future[List[Task]] = {
+    collection.find(Json.obj("user" -> user.username)).cursor[Task].collect[List]()
   }
 
-  def find(id: String): Future[Option[Task]] = {
-    val byId = Json.obj("_id" -> BSONObjectID(id))
-    collection.find(byId).cursor[Task].headOption
-  }
-
-  def deleteTask(id: String): Future[Boolean] = {
-    collection.remove(Json.obj("_id" -> BSONObjectID(id))).map {
+  def deleteTask(id: String)(implicit user: User): Future[Boolean] = {
+    collection.remove(Json.obj("_id" -> BSONObjectID(id)) ++ Json.obj("user" -> user.username)).map {
       lastError => lastError.updated == 1
     }
   }

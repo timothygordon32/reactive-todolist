@@ -35,7 +35,7 @@ object Tasks extends Controller {
 
   def delete(id: String) = Action.async {
     TaskRepository.deleteTask(id).map {
-      deleted => if (deleted) Ok else NoContent
+      deleted => if (deleted) Ok else NotFound
     }
   }
 }

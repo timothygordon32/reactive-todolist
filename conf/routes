@@ -17,3 +17,9 @@ POST        /tasks              controllers.Tasks.create
 GET         /tasks              controllers.Tasks.list
 GET         /tasks/:id          controllers.Tasks.get(id: String)
 DELETE      /tasks/:id          controllers.Tasks.delete(id: String)
+
+# User tasks
+POST        /user/tasks         controllers.UserTasks.create
+GET         /user/tasks         controllers.UserTasks.list
+#GET         /user/tasks/:id     controllers.UserTasks.get(id: String)
+DELETE      /user/tasks/:id     controllers.UserTasks.delete(id: String)
