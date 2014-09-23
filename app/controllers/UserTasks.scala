@@ -29,6 +29,13 @@ object UserTasks extends Controller {
     UserTaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
   }
 
+  def get(id: String) = Authenticated.async { implicit request =>
+    UserTaskRepository.find(id).map {
+      case Some(task) => Ok(Json.toJson(task))
+      case None => NotFound
+    }
+  }
+
   def delete(id: String) = Authenticated.async { implicit request =>
     UserTaskRepository.deleteTask(id).map {
       deleted => if (deleted) Ok else NotFound
