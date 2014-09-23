@@ -47,8 +47,13 @@ object UserTaskRepository {
     collection.find(Json.obj("user" -> user.username)).cursor[Task].collect[List]()
   }
 
+  def find(id: String)(implicit user: User): Future[Option[Task]] = {
+    val byId = Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)
+    collection.find(byId).cursor[Task].headOption
+  }
+
   def deleteTask(id: String)(implicit user: User): Future[Boolean] = {
-    collection.remove(Json.obj("_id" -> BSONObjectID(id)) ++ Json.obj("user" -> user.username)).map {
+    collection.remove(Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)).map {
       lastError => lastError.updated == 1
     }
   }
