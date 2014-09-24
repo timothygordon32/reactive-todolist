@@ -1,9 +1,8 @@
 package ui
 
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
-import play.api.libs.json.Json
-import play.api.libs.ws.WS
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
 
 class UiSpec extends PlaySpecification {
@@ -14,8 +13,6 @@ class UiSpec extends PlaySpecification {
 
       var label = s"label-${UUID.randomUUID}"
 
-      await(WS.url(s"http://localhost:$port/tasks").post(Json.obj("label" -> label)))
-
       val page = browser.goTo(s"http://localhost:$port/")
 
       page.await until "input" hasName "username"
@@ -25,9 +22,12 @@ class UiSpec extends PlaySpecification {
 
       page.find("#login").click()
 
-      page.await until "#headline" containsText "testuser"
-      page.await until "ul li label span" hasText label
+      page.await atMost(1, TimeUnit.SECONDS) until "#headline" containsText "testuser"
+
+      page.fill("#add-task-text").`with`(label)
+      page.find("#add-task").click()
+
+      page.await atMost(1, TimeUnit.SECONDS) until "ul li label span" hasText label
     }
   }
-
 }
