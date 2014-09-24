@@ -12,7 +12,7 @@ import reactivemongo.bson.BSONObjectID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object UserTaskRepository {
+object TaskRepository {
   import play.api.Play.current
   import play.modules.reactivemongo.json.BSONFormats._
 

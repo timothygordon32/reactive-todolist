@@ -5,11 +5,11 @@ import models.{Task, User}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
-import repository.UserTaskRepository
+import repository.TaskRepository
 
 import scala.concurrent.Future
 
-object UserTasks extends Controller {
+object Tasks extends Controller {
 
   implicit def toUser(implicit request: Security.AuthenticatedRequest[_, User]): User = request.user
 
@@ -17,7 +17,7 @@ object UserTasks extends Controller {
 
     request.body.validate[Task].fold(
       valid = {
-        task => UserTaskRepository.create(task).map(result => Ok(Json.toJson(result)))
+        task => TaskRepository.create(task).map(result => Ok(Json.toJson(result)))
       },
       invalid = {
         errors => Future.successful(BadRequest(JsError.toFlatJson(errors)))
@@ -26,18 +26,18 @@ object UserTasks extends Controller {
   }
 
   def list = Authenticated.async { implicit request =>
-    UserTaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
+    TaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
   }
 
   def get(id: String) = Authenticated.async { implicit request =>
-    UserTaskRepository.find(id).map {
+    TaskRepository.find(id).map {
       case Some(task) => Ok(Json.toJson(task))
       case None => NotFound
     }
   }
 
   def delete(id: String) = Authenticated.async { implicit request =>
-    UserTaskRepository.deleteTask(id).map {
+    TaskRepository.deleteTask(id).map {
       deleted => if (deleted) Ok else NotFound
     }
   }

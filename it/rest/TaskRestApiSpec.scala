@@ -7,7 +7,7 @@ import play.api.mvc.Security
 import play.api.test._
 import reactivemongo.bson.BSONObjectID
 
-class UserTaskRestApiSpec extends PlaySpecification {
+class TaskRestApiSpec extends PlaySpecification {
 
   "User task REST API" should {
 
