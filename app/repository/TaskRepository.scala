@@ -54,8 +54,10 @@ object TaskRepository {
     collection.find(byId).cursor[Task].headOption
   }
 
-  def update(task: Task)(implicit user: User): Future[_] = {
-    collection.save(Json.toJson(task).as[JsObject] ++ Json.obj("user" -> user.username))
+  def update(task: Task)(implicit user: User): Future[Boolean] = {
+    collection.save(Json.toJson(task).as[JsObject] ++ Json.obj("user" -> user.username)).map {
+      lastError => lastError.updated == 1
+    }
   }
 
   def delete(id: String)(implicit user: User): Future[Boolean] = {

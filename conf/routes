@@ -16,4 +16,5 @@ GET         /username                controllers.Authenticator.getUsername
 POST        /tasks                   controllers.Tasks.create
 GET         /tasks                   controllers.Tasks.list
 GET         /tasks/:id               controllers.Tasks.get(id: String)
+PUT         /tasks/:id               controllers.Tasks.update(id: String)
 DELETE      /tasks/:id               controllers.Tasks.delete(id: String)

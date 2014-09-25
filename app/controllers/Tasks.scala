@@ -5,9 +5,11 @@ import models.{Task, User}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
+import reactivemongo.bson.BSONObjectID
 import repository.TaskRepository
 
 import scala.concurrent.Future
+import scala.util.{Success, Failure}
 
 object Tasks extends Controller {
 
@@ -34,6 +36,24 @@ object Tasks extends Controller {
       case Some(task) => Ok(Json.toJson(task))
       case None => NotFound
     }
+  }
+
+  def update(id: String) = Authenticated.async(parse.json) { implicit request =>
+
+    request.body.validate[Task].fold(
+      valid = {
+        task => BSONObjectID.parse(id) match {
+          case Success(bsonId) => TaskRepository.update(task.copy(id = Some(bsonId))).map {
+            case true => NoContent
+            case false => NotFound
+          }
+          case Failure(e) => Future.successful(BadRequest)
+        }
+      },
+      invalid = {
+        errors => Future.successful(BadRequest(JsError.toFlatJson(errors)))
+      }
+    )
   }
 
   def delete(id: String) = Authenticated.async { implicit request =>

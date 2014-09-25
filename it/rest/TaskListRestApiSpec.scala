@@ -2,12 +2,13 @@ package rest
 
 import java.util.UUID
 
-import play.api.libs.json.{JsArray, JsString, Json}
+import play.api.libs.json.{JsObject, JsArray, JsString, Json}
+import play.api.libs.ws.WS
 import play.api.mvc.Security
 import play.api.test._
 import reactivemongo.bson.BSONObjectID
 
-class TaskRestApiSpec extends PlaySpecification {
+class TaskListRestApiSpec extends PlaySpecification {
 
   "User task REST API" should {
 
