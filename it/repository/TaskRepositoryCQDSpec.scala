@@ -19,8 +19,8 @@ class TaskRepositoryCQDSpec extends PlaySpecification {
       list must contain(created1)
       list must contain(created2)
 
-      await(TaskRepository.deleteTask(created1.id.get.stringify)) must be equalTo true
-      await(TaskRepository.deleteTask(created2.id.get.stringify)) must be equalTo true
+      await(TaskRepository.delete(created1.id.get.stringify)) must be equalTo true
+      await(TaskRepository.delete(created2.id.get.stringify)) must be equalTo true
     }
   }
 }

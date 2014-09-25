@@ -18,9 +18,9 @@ class TaskRepositoryCRDSpec extends PlaySpecification {
       val found = await(TaskRepository.find(id))
       found.get must be equalTo created
 
-      await(TaskRepository.deleteTask(id)) must be equalTo true
+      await(TaskRepository.delete(id)) must be equalTo true
       await(TaskRepository.find(id)) must be equalTo None
-      await(TaskRepository.deleteTask(id)) must be equalTo false
+      await(TaskRepository.delete(id)) must be equalTo false
     }
   }
 }

@@ -10,7 +10,10 @@ class TaskSpec extends Specification {
   "JSON serialization" should {
     "should serialize to JSON" in {
       val id = Some(BSONObjectID.generate)
-      val expectedJson = Json.obj("id" -> id.get.stringify, "label" -> "I'm new")
+      val expectedJson = Json.obj(
+        "id" -> id.get.stringify,
+        "label" -> "I'm new",
+        "done" -> false)
       Json.toJson(Task(id, "I'm new")) must be equalTo expectedJson
     }
 

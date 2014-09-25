@@ -15,19 +15,19 @@ class UiSpec extends PlaySpecification {
 
       val page = browser.goTo(s"http://localhost:$port/")
 
-      page.await until "input" hasName "username"
+      (page.await atMost(5, TimeUnit.SECONDS) until "input").isPresent
 
       page.fill("#username").`with`("testuser")
       page.fill("#password").`with`("secret")
 
       page.find("#login").click()
 
-      page.await atMost(1, TimeUnit.SECONDS) until "#headline" containsText "testuser"
+      page.await atMost(5, TimeUnit.SECONDS) until "#headline" containsText "testuser"
 
       page.fill("#add-task-text").`with`(label)
       page.find("#add-task").click()
 
-      page.await atMost(1, TimeUnit.SECONDS) until "ul li label span" hasText label
+      page.await atMost(5, TimeUnit.SECONDS) until "ul li label span" hasText label
     }
   }
 }

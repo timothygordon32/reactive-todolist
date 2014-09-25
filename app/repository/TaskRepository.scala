@@ -18,12 +18,14 @@ object TaskRepository {
 
   implicit val taskWrites: Writes[Task] = (
     (__ \ "_id").write[Option[BSONObjectID]] and
-      (__ \ "label").write[String]
+      (__ \ "label").write[String] and
+      (__ \ "done").write[Boolean]
     )(unlift(Task.unapply))
 
   implicit val taskReads: Reads[Task] = (
     (__ \ "_id").read[Option[BSONObjectID]] and
-      (__ \ "label").read[String]
+      (__ \ "label").read[String] and
+      (__ \ "done").read[Boolean]
     )(Task.apply _)
 
   def db = ReactiveMongoPlugin.db
@@ -32,8 +34,8 @@ object TaskRepository {
 
   def create(task: Task)(implicit user: User): Future[Task] = {
     val toCreate = task match {
-      case Task(None, _) => task.copy(id = Some(BSONObjectID.generate))
-      case Task(Some(_), _) => task
+      case Task(None, _, _) => task.copy(id = Some(BSONObjectID.generate))
+      case Task(Some(_), _, _) => task
     }
 
     collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.username)).map {
@@ -52,7 +54,11 @@ object TaskRepository {
     collection.find(byId).cursor[Task].headOption
   }
 
-  def deleteTask(id: String)(implicit user: User): Future[Boolean] = {
+  def update(task: Task)(implicit user: User): Future[_] = {
+    collection.save(Json.toJson(task).as[JsObject] ++ Json.obj("user" -> user.username))
+  }
+
+  def delete(id: String)(implicit user: User): Future[Boolean] = {
     collection.remove(Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)).map {
       lastError => lastError.updated == 1
     }

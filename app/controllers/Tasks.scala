@@ -37,7 +37,7 @@ object Tasks extends Controller {
   }
 
   def delete(id: String) = Authenticated.async { implicit request =>
-    TaskRepository.deleteTask(id).map {
+    TaskRepository.delete(id).map {
       deleted => if (deleted) Ok else NotFound
     }
   }

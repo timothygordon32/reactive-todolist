@@ -14,7 +14,7 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
 
     Task.query(function(data) {
         $scope.todos = _.map(data, function(task) {
-            return {text: task.label, done: false };
+            return {text: task.label, done: task.done };
         });
         $scope.loaded = true;
     });
@@ -24,9 +24,9 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
     };
 
     $scope.addTodo = function() {
-        var task = new Task({label: $scope.formTodoText});
+        var task = new Task({label: $scope.formTodoText, done: false});
         task.$save(function(saved) {
-            $scope.todos.push({text: saved.label, done: false });
+            $scope.todos.push({text: saved.label, done: saved.done });
             $scope.formTodoText = "";
         });
     };

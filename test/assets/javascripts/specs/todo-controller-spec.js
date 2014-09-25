@@ -19,8 +19,8 @@ describe('Todo controller', function () {
     it('should be empty by default', inject(function ($controller, $rootScope) {
         $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([
-            {id: 1, label: 'task1'},
-            {id: 2, label: 'task2'}
+            {id: 1, label: 'task1', done: false},
+            {id: 2, label: 'task2', done: false}
         ]);
 
         scope = $rootScope.$new();
@@ -43,7 +43,7 @@ describe('Todo controller', function () {
         $httpBackend.flush();
         expect(scope.todos).toEqual([]);
 
-        $httpBackend.expectPOST("/tasks", {label: 'label'}).respond({id: 1, label: 'label'});
+        $httpBackend.expectPOST("/tasks", {label: 'label', done: false}).respond({id: 1, label: 'label', done: false});
 
         scope.formTodoText = "label";
         scope.addTodo();

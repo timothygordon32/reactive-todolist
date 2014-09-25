@@ -16,7 +16,7 @@ class TaskRestApiSpec extends PlaySpecification {
       val session = Security.username -> "test"
       var label = "label-" + UUID.randomUUID
       var created = contentAsJson(route(FakeRequest(POST, "/tasks")
-        .withBody(Json.obj("label" -> label))
+        .withBody(Json.obj("label" -> label, "done" -> false))
         .withSession(session)).get)
       var JsString(id) = created \ "id"
 
@@ -24,12 +24,12 @@ class TaskRestApiSpec extends PlaySpecification {
         .withSession(session)).get
       status(tasksWithCreated) must be equalTo OK
       contentType(tasksWithCreated) must beSome.which(_ == "application/json")
-      contentAsJson(tasksWithCreated).as[JsArray].value must contain(Json.obj("id" -> id, "label" -> label))
+      contentAsJson(tasksWithCreated).as[JsArray].value must contain(Json.obj("id" -> id, "label" -> label, "done" -> false))
 
       await(route(FakeRequest(DELETE, s"/tasks/$id").withSession(session)).get)
 
       val tasksWithoutCreated = route(FakeRequest(GET, "/tasks").withSession(session)).get
-      contentAsJson(tasksWithoutCreated).as[JsArray].value must not contain Json.obj("id" -> id, "label" -> label)
+      contentAsJson(tasksWithoutCreated).as[JsArray].value must not contain Json.obj("id" -> id, "label" -> label, "done" -> false)
     }
   }
 }
