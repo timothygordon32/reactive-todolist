@@ -9,20 +9,23 @@ class TaskRepositoryUpdateSpec extends PlaySpecification {
 
   "User task repository" should {
 
-    "list tasks" in new WithApplication {
+    "update a task" in new WithApplication {
+      // Given
       implicit val user = User(UUID.randomUUID.toString)
       val label = s"label-${UUID.randomUUID()}"
       val created = await(TaskRepository.create(Task(None, label)))
       created.done must beFalse
 
-      val id = created.id.get.stringify
-
+      // When
       val update = created.copy(done = true)
       await(TaskRepository.update(update))
 
+      // Then
+      val id = created.id.get.stringify
       val reRead = await(TaskRepository.find(id))
       reRead.get.done must beTrue
 
+      // Cleanup
       await(TaskRepository.delete(id)) must be equalTo true
     }
   }
