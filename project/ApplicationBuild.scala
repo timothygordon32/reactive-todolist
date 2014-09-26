@@ -49,7 +49,7 @@ object ApplicationBuild extends Build with Application {
 
   def testSettings() = Seq(
     fork in Test := false,
-    parallelExecution in Test := false,
+    parallelExecution in Test := true,
     addTestReportOption(Test)
   )
 
@@ -59,7 +59,7 @@ object ApplicationBuild extends Build with Application {
     fork in IntegrationTest := false,
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-    parallelExecution in IntegrationTest := false,
+    parallelExecution in IntegrationTest := true,
     (compile in IntegrationTest) <<= (compile in IntegrationTest).dependsOn(assets in TestAssets)
   )
 
