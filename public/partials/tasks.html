@@ -10,7 +10,7 @@
             <ul class="unstyled">
                 <li ng-repeat="todo in todos | filter:search">
                     <label class="checkbox">
-                        <input type="checkbox" ng-model="todo.done"/>
+                        <input type="checkbox" ng-model="todo.done" ng-click="update(todo)"/>
                         <span class="done-{{ todo.done }}">{{ todo.text }}</span>
                     </label>
                 </li>
