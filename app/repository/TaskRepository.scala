@@ -7,6 +7,7 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
+import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,6 +32,13 @@ object TaskRepository {
   def db = ReactiveMongoPlugin.db
 
   lazy val collection = db[JSONCollection]("userTasks")
+
+  val indexesCreated = collection.indexesManager.ensure(Index(Seq("user" -> IndexType.Ascending)))
+
+  indexesCreated.map {
+    case true => Logger.info("Created index for 'user'")
+    case false => Logger.info("Index for 'user' already exists")
+  }
 
   def create(task: Task)(implicit user: User): Future[Task] = {
     val toCreate = task match {
