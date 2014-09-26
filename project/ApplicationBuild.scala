@@ -18,8 +18,7 @@ object ApplicationBuild extends Build with Application {
     "org.mindrot" % "jbcrypt" % "0.3m",
     "com.typesafe.play" %% "play-test" % "2.3.3" % "it")
 
-  val appResolvers = Seq(
-    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
+  val appAdditionalResolvers = Seq(
     "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/")
 
   lazy val plugins = Seq(
@@ -82,7 +81,7 @@ object ApplicationBuild extends Build with Application {
     .settings(inConfig(TemplateItTest)(Defaults.itSettings): _*)
     .settings(integrationTestSettings(): _*)
     .settings(
-      resolvers ++= appResolvers)
+      resolvers ++= appAdditionalResolvers)
 
 }
 
