@@ -3,6 +3,7 @@ package ui
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+import org.fluentlenium.core.filter.FilterConstructor._
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
 
 class UiSpec extends PlaySpecification {
@@ -10,9 +11,6 @@ class UiSpec extends PlaySpecification {
   "Application" should {
 
     "display a task" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX)) {
-
-      var label = s"label-${UUID.randomUUID}"
-
       val page = browser.goTo(s"http://localhost:$port/")
 
       (page.await atMost(5, TimeUnit.SECONDS) until "input").isPresent
@@ -24,10 +22,19 @@ class UiSpec extends PlaySpecification {
 
       page.await atMost(5, TimeUnit.SECONDS) until "#headline" containsText "testuser"
 
+      var label = s"label-${UUID.randomUUID}"
+
       page.fill("#add-task-text").`with`(label)
       page.find("#add-task").click()
 
       page.await atMost(5, TimeUnit.SECONDS) until "ul li label span" hasText label
+
+      page.find("ul li label", withText(label)).find("input").click()
+
+      page.await until "ul li label span.done-true" hasText label
+
+      val refreshedPage = browser.goTo(s"http://localhost:$port/#tasks")
+      refreshedPage.await until "ul li label span.done-true" hasText label
     }
   }
 }
