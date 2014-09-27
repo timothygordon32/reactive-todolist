@@ -29,16 +29,18 @@ object TaskRepository {
       (__ \ "done").read[Boolean]
     )(Task.apply _)
 
-  def db = ReactiveMongoPlugin.db
+  private def db = ReactiveMongoPlugin.db
 
-  lazy val collection = db[JSONCollection]("userTasks")
+  private lazy val collection = db[JSONCollection]("userTasks")
 
-  val indexesCreated = collection.indexesManager.ensure(Index(Seq("user" -> IndexType.Ascending)))
+  private val indexesCreated = collection.indexesManager.ensure(Index(Seq("user" -> IndexType.Ascending)))
 
   indexesCreated.map {
     case true => Logger.info("Created index for 'user'")
     case false => Logger.info("Index for 'user' already exists")
   }
+
+  def indexes() = indexesCreated.flatMap(_ => collection.indexesManager.list())
 
   def create(task: Task)(implicit user: User): Future[Task] = {
     val toCreate = task match {
