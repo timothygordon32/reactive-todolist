@@ -35,6 +35,9 @@ class UiSpec extends PlaySpecification {
 
       val refreshedPage = browser.goTo(s"http://localhost:$port/#tasks")
       refreshedPage.await atMost(5, TimeUnit.SECONDS) until "ul li label span.done-true" hasText text
+
+      refreshedPage.find("#clear-completed").click()
+      page.await().until("ul li label span.done-true").withText(text).isNotPresent
     }
   }
 }
