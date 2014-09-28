@@ -48,11 +48,7 @@ describe('Todo controller', function () {
         scope.formTodoText = "text";
         scope.addTodo();
         $httpBackend.flush();
-        // Todo would prefer to use Jasmine 2
-//        expect(scope.todos[0]).toEqual(jasmine.objectContaining({id:1, text:'text', done: false}));
-        expect(scope.todos[0].id).toEqual(1);
-        expect(scope.todos[0].text).toEqual('text');
-        expect(scope.todos[0].done).toEqual(false);
+        expect(scope.todos[0]).toEqual(jasmine.objectContaining({id:1, text:'text', done: false}));
     }));
 
     it('should update a task', inject(function($controller, $rootScope) {
