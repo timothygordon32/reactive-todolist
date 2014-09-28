@@ -22,19 +22,19 @@ class UiSpec extends PlaySpecification {
 
       page.await atMost(5, TimeUnit.SECONDS) until "#headline" containsText "testuser"
 
-      var label = s"label-${UUID.randomUUID}"
+      var text = s"text-${UUID.randomUUID}"
 
-      page.fill("#add-task-text").`with`(label)
+      page.fill("#add-task-text").`with`(text)
       page.find("#add-task").click()
 
-      page.await atMost(5, TimeUnit.SECONDS) until "ul li label span" hasText label
+      page.await atMost(5, TimeUnit.SECONDS) until "ul li label span" hasText text
 
-      page.find("ul li label", withText(label)).find("input").click()
+      page.find("ul li label", withText(text)).find("input").click()
 
-      page.await until "ul li label span.done-true" hasText label
+      page.await until "ul li label span.done-true" hasText text
 
       val refreshedPage = browser.goTo(s"http://localhost:$port/#tasks")
-      refreshedPage.await until "ul li label span.done-true" hasText label
+      refreshedPage.await until "ul li label span.done-true" hasText text
     }
   }
 }

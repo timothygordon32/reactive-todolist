@@ -12,8 +12,8 @@ class TaskRepositoryUpdateSpec extends PlaySpecification {
     "update a task" in new WithApplication {
       // Given
       implicit val user = User(UUID.randomUUID.toString)
-      val label = s"label-${UUID.randomUUID()}"
-      val created = await(TaskRepository.create(Task(None, label)))
+      val text = s"text-${UUID.randomUUID()}"
+      val created = await(TaskRepository.create(Task(None, text)))
       created.done must beFalse
 
       // When

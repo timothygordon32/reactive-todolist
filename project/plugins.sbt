@@ -8,5 +8,5 @@ resolvers := Seq("Typesafe repository" at "http://repo.typesafe.com/typesafe/rel
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.3")
 
 // Jasmine plugin for running JavaScript tests
-addSbtPlugin("com.joescii" % "sbt-jasmine-plugin" % "1.2.3")
+addSbtPlugin("com.joescii" % "sbt-jasmine-plugin" % "1.3.0")
 

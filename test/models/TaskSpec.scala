@@ -12,7 +12,7 @@ class TaskSpec extends Specification {
       val id = Some(BSONObjectID.generate)
       val expectedJson = Json.obj(
         "id" -> id.get.stringify,
-        "label" -> "I'm new",
+        "text" -> "I'm new",
         "done" -> false)
       Json.toJson(Task(id, "I'm new")) must be equalTo expectedJson
     }

@@ -19,8 +19,8 @@ describe('Todo controller', function () {
     it('should be empty by default', inject(function ($controller, $rootScope) {
         $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([
-            {id: 1, label: 'task1', done: false},
-            {id: 2, label: 'task2', done: false}
+            {id: 1, text: 'task1', done: false},
+            {id: 2, text: 'task2', done: false}
         ]);
 
         scope = $rootScope.$new();
@@ -43,18 +43,22 @@ describe('Todo controller', function () {
         $httpBackend.flush();
         expect(scope.todos).toEqual([]);
 
-        $httpBackend.expectPOST("/tasks", {label: 'label', done: false}).respond({id: 1, label: 'label', done: false});
+        $httpBackend.expectPOST("/tasks", {text: 'text', done: false}).respond({id: 1, text: 'text', done: false});
 
-        scope.formTodoText = "label";
+        scope.formTodoText = "text";
         scope.addTodo();
         $httpBackend.flush();
-        expect(scope.todos).toEqual([{id:1, text:'label', done: false}]);
+        // Todo would prefer to use Jasmine 2
+//        expect(scope.todos[0]).toEqual(jasmine.objectContaining({id:1, text:'text', done: false}));
+        expect(scope.todos[0].id).toEqual(1);
+        expect(scope.todos[0].text).toEqual('text');
+        expect(scope.todos[0].done).toEqual(false);
     }));
 
     it('should update a task', inject(function($controller, $rootScope) {
         $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([
-            {id: 1, label: 'task1', done: false}
+            {id: 1, text: 'task1', done: false}
         ]);
         scope = $rootScope.$new();
         todoCtrl = $controller('TodoCtrl', {
@@ -63,7 +67,7 @@ describe('Todo controller', function () {
         $httpBackend.flush();
         expect(scope.todos.length).toEqual(1);
 
-        $httpBackend.expectPUT("/tasks/1", {id: 1, label: 'task1', done: true}).respond(204);
+        $httpBackend.expectPUT("/tasks/1", {id: 1, text: 'task1', done: true}).respond(204);
         scope.update({id: 1, text: 'task1', done: true});
         $httpBackend.flush();
     }));

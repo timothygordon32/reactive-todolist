@@ -12,10 +12,10 @@ class TaskRepositoryCRDSpec extends PlaySpecification {
     "retrieve and delete a saved task" in new WithApplication {
       // Given
       implicit val user = User(UUID.randomUUID.toString)
-      val label = s"label-${UUID.randomUUID()}"
+      val text = s"text-${UUID.randomUUID()}"
 
       // When
-      val created = await(TaskRepository.create(Task(None, label)))
+      val created = await(TaskRepository.create(Task(None, text)))
 
       // Then
       val id = created.id.get.stringify

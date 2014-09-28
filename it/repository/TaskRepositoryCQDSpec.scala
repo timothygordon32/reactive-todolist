@@ -13,8 +13,8 @@ class TaskRepositoryCQDSpec extends PlaySpecification {
       // Given
       implicit val user = User(UUID.randomUUID.toString)
       // And
-      val created1 = await(TaskRepository.create(Task(None, "label")))
-      val created2 = await(TaskRepository.create(Task(None, "label")))
+      val created1 = await(TaskRepository.create(Task(None, "text")))
+      val created2 = await(TaskRepository.create(Task(None, "text")))
 
       // When
       val list = await(TaskRepository.findAll)

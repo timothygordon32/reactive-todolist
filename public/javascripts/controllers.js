@@ -12,10 +12,7 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
 
     var Task = $resource("/tasks/:taskId", {taskId: '@id'}, {'update': {method: 'PUT'}});
 
-    Task.query(function(data) {
-        $scope.todos = _.map(data, function(task) {
-            return {id:task.id, text: task.label, done: task.done };
-        });
+    $scope.todos = Task.query(function() {
         $scope.loaded = true;
     });
 
@@ -24,9 +21,9 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
     };
 
     $scope.addTodo = function() {
-        var task = new Task({label: $scope.formTodoText, done: false});
+        var task = new Task({text: $scope.formTodoText, done: false});
         task.$save(function(saved) {
-            $scope.todos.push({id:saved.id, text: saved.label, done: saved.done });
+            $scope.todos.push(saved);
             $scope.formTodoText = "";
         });
     };
@@ -45,8 +42,8 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
         $scope.todos = $scope.getRemaining();
     };
 
-    $scope.update= function(todo) {
-        Task.update({id: todo.id, label: todo.text, done: todo.done});
+    $scope.update= function(task) {
+        Task.update({id: task.id, text: task.text, done: task.done});
     };
 });
 

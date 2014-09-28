@@ -13,9 +13,9 @@ class TaskUpdateRestApiSpec extends PlaySpecification {
     "updates a task as done" in new WithApplication {
 
       val session = Security.username -> "test"
-      var label = "label-" + UUID.randomUUID
+      var text = "text-" + UUID.randomUUID
       var created = contentAsJson(route(FakeRequest(POST, "/tasks")
-        .withBody(Json.obj("label" -> label, "done" -> false))
+        .withBody(Json.obj("text" -> text, "done" -> false))
         .withSession(session)).get).as[JsObject]
       var JsString(id) = created \ "id"
 
@@ -29,7 +29,7 @@ class TaskUpdateRestApiSpec extends PlaySpecification {
         .withSession(session)).get
       status(updated) must be equalTo OK
       contentType(updated) must beSome.which(_ == "application/json")
-      contentAsJson(updated).as[JsObject] must be equalTo Json.obj("id" -> id, "label" -> label, "done" -> true)
+      contentAsJson(updated).as[JsObject] must be equalTo Json.obj("id" -> id, "text" -> text, "done" -> true)
 
       await(route(FakeRequest(DELETE, s"/tasks/$id").withSession(session)).get)
     }

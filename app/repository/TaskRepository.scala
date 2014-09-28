@@ -5,7 +5,7 @@ import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
-import play.modules.reactivemongo.json.BSONFormats
+import play.modules.reactivemongo.json.BSONFormats._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
@@ -13,21 +13,25 @@ import reactivemongo.bson.BSONObjectID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object TaskRepository {
-  import play.api.Play.current
+object TaskRepositoryFormats {
   import play.modules.reactivemongo.json.BSONFormats._
 
   implicit val taskWrites: Writes[Task] = (
     (__ \ "_id").write[Option[BSONObjectID]] and
-      (__ \ "label").write[String] and
+      (__ \ "text").write[String] and
       (__ \ "done").write[Boolean]
     )(unlift(Task.unapply))
 
   implicit val taskReads: Reads[Task] = (
     (__ \ "_id").read[Option[BSONObjectID]] and
-      (__ \ "label").read[String] and
+      ((__ \ "label").read[String] or (__ \ "text").read[String]) and
       (__ \ "done").read[Boolean]
     )(Task.apply _)
+}
+
+object TaskRepository {
+  import play.api.Play.current
+  import repository.TaskRepositoryFormats._
 
   private def db = ReactiveMongoPlugin.db
 
