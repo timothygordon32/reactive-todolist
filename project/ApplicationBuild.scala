@@ -40,7 +40,7 @@ object ApplicationBuild extends Build with Application {
       "-encoding", "UTF-8"))
 
   def jasmineAdditionalSettings() = Seq(
-    jasmineEdition := 1,
+    jasmineEdition := 2,
     appJsDir := Seq(baseDirectory.value / "app/assets/javascripts"),
     appJsLibDir := Seq(baseDirectory.value  / "public/javascripts"),
     jasmineTestDir := Seq(baseDirectory.value  / "test/assets/javascripts"),

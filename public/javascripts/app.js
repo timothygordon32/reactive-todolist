@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('todo', ['todo.controllers']);
+angular.module('todo', ['ngRoute', 'todo.controllers']);
 
 angular.module('todo')
     .config(['$routeProvider', function ($routeProvider) {
