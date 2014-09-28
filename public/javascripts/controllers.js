@@ -38,8 +38,20 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
         });
     };
 
+    var getCompleted = function() {
+        return _.filter($scope.todos, function (todo) {
+            return todo.done;
+        });
+    };
+
     $scope.clearCompleted = function () {
-        $scope.todos = $scope.getRemaining();
+        _.each(getCompleted(), function(completed) {
+            completed.$delete(function() {
+                $scope.todos = _.filter($scope.todos, function(task) {
+                    return task.id != completed.id;
+                });
+            });
+        });
     };
 
     $scope.update= function(task) {

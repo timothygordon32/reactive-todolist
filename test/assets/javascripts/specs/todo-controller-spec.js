@@ -71,4 +71,25 @@ describe('Todo controller', function () {
         scope.update({id: 1, text: 'task1', done: true});
         $httpBackend.flush();
     }));
+
+    it('should delete a completed task', inject(function($controller, $rootScope) {
+        // Given
+        $httpBackend.expectGET("/username").respond({username: 'testuser'});
+        $httpBackend.expectGET("/tasks").respond([
+            {id: 1, text: 'task1', done: false}
+        ]);
+        scope = $rootScope.$new();
+        todoCtrl = $controller('TodoCtrl', {
+            $scope: scope
+        });
+        $httpBackend.flush();
+        // When
+        scope.todos[0].done = true;
+        $httpBackend.expectDELETE("/tasks/1").respond(204);
+        scope.clearCompleted();
+        // Then
+        $httpBackend.flush();
+        scope.$apply();
+        expect(scope.todos).toEqual([]);
+    }));
 });
