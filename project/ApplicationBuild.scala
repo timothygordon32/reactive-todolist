@@ -55,7 +55,9 @@ object ApplicationBuild extends Build with Application {
 
   def integrationTestSettings() = Seq(
     unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "it")),
-    unmanagedResourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "target" / "web" / "public" / "test")),
+    unmanagedClasspath in IntegrationTest <<= (unmanagedClasspath in IntegrationTest, baseDirectory) map { (uc, base) =>
+      Attributed.blank(base / "target" / "web" / "public" / "test") +: uc
+    },
     fork in IntegrationTest := false,
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
