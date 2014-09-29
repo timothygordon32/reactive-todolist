@@ -2,7 +2,7 @@ package rest
 
 import java.util.UUID
 
-import play.api.libs.json.{JsObject, JsString, JsArray, Json}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.mvc.Security
 import play.api.test._
 
