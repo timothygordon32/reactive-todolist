@@ -14,9 +14,9 @@ object ApplicationBuild extends Build with Application {
   val appDependencies = Seq(
     "org.reactivemongo" %% "reactivemongo" % "0.10.5.akka23-SNAPSHOT",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
-    "com.typesafe.play" %% "play-ws" % "2.3.3",
     "org.mindrot" % "jbcrypt" % "0.3m",
-    "com.typesafe.play" %% "play-test" % "2.3.3" % "it")
+    "com.typesafe.play" %% "play-ws" % "2.3.3" % "test,it",
+    "com.typesafe.play" %% "play-test" % "2.3.3" % "test,it")
 
   val appResolvers = Seq(
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
@@ -55,6 +55,9 @@ object ApplicationBuild extends Build with Application {
 
   def integrationTestSettings() = Seq(
     unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "it")),
+    // Workaround so that integration tests can be run in an IDE
+    unmanagedResourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "target" / "web" / "public" / "test")),
+    // Ensure that ;clean; it:test can be run without running test
     unmanagedClasspath in IntegrationTest <<= (unmanagedClasspath in IntegrationTest, baseDirectory) map { (uc, base) =>
       Attributed.blank(base / "target" / "web" / "public" / "test") +: uc
     },
