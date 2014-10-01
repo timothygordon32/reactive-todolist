@@ -4,8 +4,6 @@ angular.module('todo.controllers', ['ngResource']);
 
 angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource) {
 
-    $scope.identity = $resource("/username").get();
-
     $scope.loaded = false;
 
     $scope.todos = [];
@@ -68,7 +66,8 @@ angular.module('todo.controllers').controller('LandingCtrl', function ($rootScop
             method: 'POST',
             url: '/login',
             data: $scope.formData
-        }).success(function () {
+        }).success(function (login) {
+            $rootScope.login = login;
             $location.path("/tasks");
         });
     }

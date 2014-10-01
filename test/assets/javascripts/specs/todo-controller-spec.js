@@ -17,7 +17,6 @@ describe('Todo controller', function () {
     });
 
     it('should be empty by default', inject(function ($controller, $rootScope) {
-        $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([
             {id: 1, text: 'task1', done: false},
             {id: 2, text: 'task2', done: false}
@@ -34,7 +33,6 @@ describe('Todo controller', function () {
     }));
 
     it('should create a task', inject(function ($controller, $rootScope) {
-        $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([]);
         scope = $rootScope.$new();
         todoCtrl = $controller('TodoCtrl', {
@@ -52,7 +50,6 @@ describe('Todo controller', function () {
     }));
 
     it('should update a task', inject(function($controller, $rootScope) {
-        $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([
             {id: 1, text: 'task1', done: false}
         ]);
@@ -70,7 +67,6 @@ describe('Todo controller', function () {
 
     it('should delete a completed task', inject(function($controller, $rootScope) {
         // Given
-        $httpBackend.expectGET("/username").respond({username: 'testuser'});
         $httpBackend.expectGET("/tasks").respond([
             {id: 1, text: 'task1', done: false}
         ]);

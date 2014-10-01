@@ -16,13 +16,14 @@ describe('Login controller', function () {
         });
     }));
 
-    it('should submit the user credentials', inject(function($location) {
-        $httpBackend.expectPOST('/login', {username: 'testuser', password: 'secret'}).respond(200);
+    it('should submit the user credentials', inject(function($location, $rootScope) {
+        $httpBackend.expectPOST('/login', {username: 'testuser', password: 'secret'}).respond(200, {username: 'testuser'});
 
         scope.formData.username = 'testuser';
         scope.formData.password = 'secret';
         scope.setUsername();
         $httpBackend.flush();
+        expect($rootScope.login.username).toBe('testuser');
         expect($location.url()).toBe('/tasks');
     }));
 });
