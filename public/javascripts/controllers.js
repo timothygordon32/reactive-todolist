@@ -65,17 +65,9 @@ angular.module('todo.controllers').controller('LandingCtrl', function ($rootScop
 
     $scope.setUsername = function() {
         $http({
-            method  : 'POST',
-            url     : '/login',
-            data    : $scope.formData,
-            headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
-            transformRequest: function(obj) {
-                var str = [];
-                angular.forEach(Object.keys(obj), function(p) {
-                    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
-                });
-                return str.join("&");
-            }
+            method: 'POST',
+            url: '/login',
+            data: $scope.formData
         }).success(function () {
             $location.path("/tasks");
         });

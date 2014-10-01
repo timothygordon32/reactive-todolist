@@ -1,7 +1,8 @@
-<div class="container-fluid" ng-show="loaded">
+<div class="container" ng-show="loaded">
     <fieldset>
         <legend id="headline">
             <span>Hello {{ identity.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span>
+            <button id="logout" class="btn"><i class="icon-off"></i></button>
         </legend>
         <div>
             <form class="form-horizontal">
@@ -25,5 +26,4 @@
             <button id="clear-completed" class="btn" ng-click="clearCompleted()"><i class="icon-trash"></i>Clear Completed</button>
         </div>
     </fieldset>
-    <br/>
 </div>

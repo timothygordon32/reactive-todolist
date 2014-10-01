@@ -2,24 +2,29 @@ package controllers
 
 import play.api.Play
 import play.api.Play.current
-import play.api.data.Form
-import play.api.data.Forms._
 import play.api.libs.json.Json
 import play.api.mvc._
 
 object Authenticator extends Controller {
 
-  val loginForm = Form(
-    tuple(
-      "username" -> text,
-      "password" -> text
-    )
-  )
+  case class LoginWithPassword(username: String, password: String) {
+    def sanitise = Login(username)
+  }
 
-  def login = Action { implicit request =>
-    val (username, password) = loginForm.bindFromRequest.get
-    if (validate(username, password)) Ok.withNewSession.withSession(Security.username -> username)
-    else Unauthorized
+  implicit val reads = Json.reads[LoginWithPassword]
+
+  case class Login(username: String)
+
+  implicit val writes = Json.writes[Login]
+
+  def login = Action(parse.json) { implicit request =>
+    request.body.validate[LoginWithPassword].fold(
+      _ => BadRequest,
+      login => {
+        if (validate(login.username, login.password))
+          Ok(Json.toJson(login.sanitise)).withNewSession.withSession(Security.username -> login.username)
+        else Unauthorized
+      })
   }
 
   private def validate(username: String, password: String) = {
@@ -31,5 +36,9 @@ object Authenticator extends Controller {
 
   def getUsername = Authenticated { request =>
     Ok(Json.obj(Security.username -> request.session.get(Security.username)))
+  }
+
+  def logoff = Authenticated { request =>
+    Ok.withNewSession
   }
 }
