@@ -29,7 +29,7 @@ object Authenticator extends Controller {
     }
   }
 
-  def getUsername = Action { request =>
+  def getUsername = Authenticated { request =>
     Ok(Json.obj(Security.username -> request.session.get(Security.username)))
   }
 }
