@@ -12,6 +12,15 @@ angular.module('todo')
                 templateUrl: "assets/partials/tasks.html",
                 controller: "TodoCtrl"})
             .otherwise({
-                redirectTo: "/landing"
+                redirectTo: "/tasks"
             });
-    }]);
+    }]).run(function($location, $http, $rootScope) {
+        $http({method: "GET", url: "/login"}).success(function(login) {
+            $rootScope.login = login;
+            $location.path("/tasks");
+        }).error(function(data, status) {
+            if (status == 401) {
+                $location.path("/landing");
+            }
+        });
+    });

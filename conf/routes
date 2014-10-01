@@ -10,9 +10,8 @@ GET         /assets/*file            controllers.Assets.versioned(path="/public"
 
 # Security
 POST        /login                   controllers.Authenticator.login
-GET         /login                   controllers.Authenticator.getUsername
+GET         /login                   controllers.Authenticator.getLogin
 DELETE      /login                   controllers.Authenticator.logoff
-GET         /username                controllers.Authenticator.getUsername
 
 # Tasks
 POST        /tasks                   controllers.Tasks.create

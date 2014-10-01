@@ -34,7 +34,7 @@ object Authenticator extends Controller {
     }
   }
 
-  def getUsername = Authenticated { request =>
+  def getLogin = Authenticated { request =>
     Ok(Json.obj(Security.username -> request.session.get(Security.username)))
   }
 
