@@ -2,7 +2,7 @@
     <fieldset>
         <legend id="headline">
             <span>Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span>
-            <button id="logout" class="btn"><i class="icon-off"></i></button>
+            <button id="logoff" ng-click="logoff()" class="btn"><i class="icon-off"></i></button>
         </legend>
         <div>
             <form class="form-horizontal">

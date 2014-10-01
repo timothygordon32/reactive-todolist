@@ -49,7 +49,7 @@ class SecurityRestApiSpec extends PlaySpecification {
       // When
       val logoff = route(FakeRequest(DELETE, "/login").withSession("username" -> "testuser")).get
       // Then
-      status(logoff) must equalTo(OK)
+      status(logoff) must equalTo(NO_CONTENT)
       session(logoff).get("username") must equalTo(None)
     }
   }

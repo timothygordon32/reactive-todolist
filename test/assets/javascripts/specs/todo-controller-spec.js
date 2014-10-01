@@ -84,4 +84,21 @@ describe('Todo controller', function () {
         scope.$apply();
         expect(scope.todos).toEqual([]);
     }));
+
+    it('should log the user off', inject(function($controller, $rootScope, $location) {
+        // Given
+        $httpBackend.expectGET("/tasks").respond([]);
+        scope = $rootScope.$new();
+        todoCtrl = $controller('TodoCtrl', {
+            $scope: scope
+        });
+        $httpBackend.flush();
+        // When
+        $httpBackend.expectDELETE("/login").respond(204);
+        scope.logoff();
+        // Then
+        $httpBackend.flush();
+        expect($rootScope.login).toEqual(jasmine.objectContaining({}));
+        expect($location.url()).toBe('/landing');
+    }));
 });

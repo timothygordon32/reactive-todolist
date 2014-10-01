@@ -39,6 +39,6 @@ object Authenticator extends Controller {
   }
 
   def logoff = Authenticated { request =>
-    Ok.withNewSession
+    NoContent.withNewSession
   }
 }

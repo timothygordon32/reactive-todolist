@@ -2,7 +2,7 @@
 
 angular.module('todo.controllers', ['ngResource']);
 
-angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource) {
+angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $http, $rootScope, $location) {
 
     $scope.loaded = false;
 
@@ -52,8 +52,18 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
         });
     };
 
-    $scope.update= function(task) {
+    $scope.update = function(task) {
         Task.update({id: task.id, text: task.text, done: task.done});
+    };
+
+    $scope.logoff = function() {
+        $http({
+            method: 'DELETE',
+            url: '/login'
+        }).success(function () {
+            $rootScope.login = {};
+            $location.path("/landing");
+        });
     };
 });
 
