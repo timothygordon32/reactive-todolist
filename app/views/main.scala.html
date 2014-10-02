@@ -1,22 +1,29 @@
 @(title: String)(content: Html)
 
 <!DOCTYPE html>
-
-<html ng-app="todo">
-    <head>
-        <title>@title</title>
-        <meta charset="utf-8"/>
-        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" type="text/css">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular.min.js" type="text/javascript"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular-route.min.js" type="text/javascript"></script>
-        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular-resource.min.js" type="text/javascript"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/app.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/controllers.js")" type="text/javascript"></script>
-    </head>
-    <body>
-        @content
-    </body>
+<html lang="en" ng-app="todo">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular.min.js" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular-route.min.js" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular-resource.min.js" type="text/javascript"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("javascripts/app.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("javascripts/controllers.js")" type="text/javascript"></script>
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    @content
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</body>
 </html>

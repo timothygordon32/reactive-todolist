@@ -53,7 +53,16 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
     };
 
     $scope.update = function(task) {
-        Task.update({id: task.id, text: task.text, done: task.done});
+        task.$update();
+    };
+
+    $scope.toggle = function(task) {
+        task.done = !task.done;
+        task.$update();
+    };
+
+    $scope.mute = function($event) {
+        $event.stopPropagation();
     };
 
     $scope.logoff = function() {

@@ -1,29 +1,29 @@
 <div class="container" ng-show="loaded">
-    <fieldset>
-        <legend id="headline">
-            <span>Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span>
-            <button id="logoff" ng-click="logoff()" class="btn"><i class="icon-off"></i></button>
-        </legend>
-        <div>
-            <form class="form-horizontal">
-                <input type="text" ng-model="search" placeholder="Filter tasks"/>
-            </form>
-            <ul class="unstyled">
-                <li ng-repeat="todo in todos | filter:search">
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="todo.done" ng-change="update(todo)"/>
-                        <span class="done-{{ todo.done }}">{{ todo.text }}</span>
-                    </label>
-                </li>
-            </ul>
-            <form class="form-horizontal">
-                <label>
-                    <input id="add-task-text" type="text" ng-model="formTodoText" ng-model-instant placeholder="Enter new task"/>
-                    <button id="add-task" class="btn" ng-click="addTodo()"><i class="icon-plus"></i>Add</button>
-                </label>
-            </form>
-
-            <button id="clear-completed" class="btn" ng-click="clearCompleted()"><i class="icon-trash"></i>Clear Completed</button>
+    <div class="header">
+        <button id="logoff" type="button" class="pull-right btn btn-default" ng-click="logoff()"><span class="glyphicon glyphicon-off"></span> Logoff</button>
+        <h3 id="headline" class="text-muted">Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</h3>
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+        <input id="filter-tasks" class="form-control" type="text" ng-model="search" placeholder="Search tasks">
+    </div>
+    <hr>
+    <div class="list-group">
+        <div class="list-group-item" ng-repeat="todo in todos | filter:search">
+            <div ng-click="toggle(todo)">
+                <input type="checkbox" ng-model="todo.done" ng-click="mute($event)" ng-change="update(todo)">
+                <span class="done-{{ todo.done }}">{{ todo.text }}</span>
+            </div>
         </div>
-    </fieldset>
+    </div>
+    <hr>
+    <form role="form">
+        <div class="input-group">
+            <input id="add-task-text" type="text" class="form-control" ng-model="formTodoText" ng-model-instant autofocus placeholder="Enter new task">
+            <div class="input-group-btn">
+                <button id="add-task" tabindex="-1" class="btn btn-primary" type="submit" ng-click="addTodo()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+            </div>
+        </div>
+    </form>
+    <button id="clear-completed" class="btn btn-default" ng-click="clearCompleted()"><span class="glyphicon glyphicon-trash"></span> Clear Completed</button>
 </div>

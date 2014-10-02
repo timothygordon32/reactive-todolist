@@ -27,17 +27,17 @@ class UiSpec extends PlaySpecification {
       page.fill("#add-task-text").`with`(text)
       page.find("#add-task").click()
 
-      page.await atMost(5, TimeUnit.SECONDS) until "ul li label span" hasText text
+      page.await atMost(5, TimeUnit.SECONDS) until ".list-group-item span" hasText text
 
-      page.find("ul li label", withText(text)).find("input").click()
+      page.find(".list-group-item", withText(text)).find("input").click()
 
-      page.await until "ul li label span.done-true" hasText text
+      page.await until ".list-group-item span.done-true" hasText text
 
       val refreshedPage = browser.goTo(s"http://localhost:$port/#tasks")
-      refreshedPage.await atMost(5, TimeUnit.SECONDS) until "ul li label span.done-true" hasText text
+      refreshedPage.await atMost(5, TimeUnit.SECONDS) until ".list-group-item span.done-true" hasText text
 
       refreshedPage.find("#clear-completed").click()
-      page.await().until("ul li label span.done-true").withText(text).isNotPresent
+      page.await().until(".list-group-item span.done-true").withText(text).isNotPresent
     }
   }
 }
