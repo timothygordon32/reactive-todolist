@@ -1,7 +1,7 @@
 <div class="container">
     <form class="form-signin" role="form">
         <h2 class="form-signin-heading">Hello! Who are you?</h2>
-        <input id="username" type="text" class="form-control" placeholder="Username" autofocus required ng-model="formData.username">
+        <input id="username" type="text" class="form-control" placeholder="Username" autofocus required autocomplete="off" autocapitalize="none" ng-model="formData.username">
         <input id="password" type="password" class="form-control" required placeholder="And password" autocomplete="off" ng-model="formData.password">
         <button id="login" class="btn btn-lg btn-primary btn-block" type="submit" ng-click="setUsername()">Sign in</button>
     </form>
