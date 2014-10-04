@@ -23,3 +23,7 @@ Note that you will also need the MongoLab add-on installed for your application:
 
 Note the use of an optional property key MONGOLAB_URI in the application.conf - on Heroku this will be set by the add-on
 so that the app can connect to a hosted MongoDB.
+
+The application makes use of secure cookies on HTTPS only (enforced by a filter in production). For correct operation of cookies set
+
+`heroku config:set SESSION_SECURE=true`
