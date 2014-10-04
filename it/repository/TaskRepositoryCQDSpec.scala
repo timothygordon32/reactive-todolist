@@ -20,8 +20,7 @@ class TaskRepositoryCQDSpec extends PlaySpecification {
       val list = await(TaskRepository.findAll)
 
       // Then
-      list must contain(created1)
-      list must contain(created2)
+      list must contain(created1, created2).inOrder.atMost
 
       // Cleanup
       await(TaskRepository.delete(created1.id.get.stringify)) must be equalTo true
