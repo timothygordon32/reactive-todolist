@@ -7,6 +7,7 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats._
 import play.modules.reactivemongo.json.collection.JSONCollection
+import reactivemongo.api.indexes.IndexType.{Descending, Ascending}
 import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 
@@ -44,7 +45,10 @@ object TaskRepository {
     case false => Logger.info("Index for 'user' already exists")
   }
 
-  def indexes() = indexesCreated.flatMap(_ => collection.indexesManager.list())
+  def indexes(): Future[List[Index]] = for {
+    _ <- indexesCreated
+    indexes <- collection.indexesManager.list()
+  } yield indexes
 
   def create(task: Task)(implicit user: User): Future[Task] = {
     val toCreate = task match {
@@ -60,7 +64,7 @@ object TaskRepository {
   }
 
   def findAll(implicit user: User): Future[List[Task]] = {
-    collection.find(Json.obj("user" -> user.username)).cursor[Task].collect[List]()
+    collection.find(Json.obj("user" -> user.username)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
   }
 
   def find(id: String)(implicit user: User): Future[Option[Task]] = {

@@ -4,6 +4,7 @@ import java.util.UUID
 
 import models.{User, Task}
 import play.api.test.{PlaySpecification, WithApplication}
+import reactivemongo.bson.BSONObjectID
 
 class TaskRepositoryCQDSpec extends PlaySpecification {
 
@@ -12,9 +13,11 @@ class TaskRepositoryCQDSpec extends PlaySpecification {
     "list tasks" in new WithApplication {
       // Given
       implicit val user = User(UUID.randomUUID.toString)
+      val first = Task(Some(BSONObjectID.generate), "first")
+      val second = Task(Some(BSONObjectID.generate), "second")
       // And
-      val created1 = await(TaskRepository.create(Task(None, "text")))
-      val created2 = await(TaskRepository.create(Task(None, "text")))
+      val created2 = await(TaskRepository.create(second))
+      val created1 = await(TaskRepository.create(first))
 
       // When
       val list = await(TaskRepository.findAll)
