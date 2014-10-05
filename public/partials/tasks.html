@@ -1,4 +1,4 @@
-<div class="container" ng-show="loaded">
+<div id="tasks-page" class="container" ng-show="loaded">
     <div class="header">
         <button id="logoff" type="button" class="pull-right btn btn-default" ng-click="logoff()"><span class="glyphicon glyphicon-off"></span> Logoff</button>
         <h3 id="headline" class="text-muted">Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</h3>
@@ -10,7 +10,7 @@
     <hr>
     <div class="list-group">
         <div class="list-group-item" ng-repeat="todo in todos | filter:search">
-            <div ng-click="toggle(todo)">
+            <div class="todo" ng-click="toggle(todo)">
                 <input type="checkbox" ng-model="todo.done" ng-click="mute($event)" ng-change="update(todo)">
                 <span class="done-{{ todo.done }}">{{ todo.text }}</span>
             </div>

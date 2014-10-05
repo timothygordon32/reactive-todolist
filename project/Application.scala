@@ -4,6 +4,7 @@ import com.joescii.SbtJasminePlugin._
 import sbt.Keys._
 import sbt.Tests.{SubProcess, Group}
 import sbt._
+import com.typesafe.sbt.less.Import.LessKeys
 
 trait Application {
 
@@ -57,6 +58,11 @@ trait Application {
     testOptions in conf += Tests.Argument("-o", "-u", testResultDir, "-h", testResultDir + "/html-report")
   }
 
+  def lessSettings() = Seq(
+    includeFilter in (Assets, LessKeys.less) := "*.less",
+    LessKeys.compress := true
+  )
+
   lazy val project = Project(appName, file("."))
     .enablePlugins(plugins:_ *)
     .settings(
@@ -70,6 +76,7 @@ trait Application {
     .settings(libraryDependencies ++= appDependencies)
     .settings(jasmineSettings : _*)
     .settings(jasmineAdditionalSettings() : _*)
+    .settings(lessSettings() : _*)
     .settings(inConfig(Test)(Defaults.testSettings): _*)
     .settings(testSettings(): _*)
     .configs(IntegrationTest)
