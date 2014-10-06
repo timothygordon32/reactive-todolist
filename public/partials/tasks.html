@@ -1,13 +1,27 @@
-<div id="tasks-page" class="container" ng-show="loaded">
-    <div class="header">
-        <button id="logoff" type="button" class="pull-right btn btn-default" ng-click="logoff()"><span class="glyphicon glyphicon-off"></span> Logoff</button>
-        <h3 id="headline" class="text-muted">Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</h3>
+<div id="tasks-page" ng-show="loaded">
+<div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div class="navbar-brand"><span id="headline">Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span></div>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a id="logoff" ng-click="logoff()"><span class="glyphicon glyphicon-off"></span> Log Out</a></li>
+            </ul>
+        </div><!--/.navbar-collapse -->
     </div>
+</div>
+<div class="container">
     <div class="input-group">
         <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
         <input id="filter-tasks" class="form-control" type="text" ng-model="search" placeholder="Search tasks">
     </div>
-    <hr>
     <div class="list-group">
         <div class="list-group-item" ng-repeat="todo in todos | filter:search">
             <div class="todo" ng-click="toggle(todo)">
@@ -16,7 +30,6 @@
             </div>
         </div>
     </div>
-    <hr>
     <form role="form">
         <div class="input-group">
             <input id="add-task-text" type="text" class="form-control" ng-model="formTodoText" ng-model-instant autofocus placeholder="Enter new task">
@@ -25,5 +38,8 @@
             </div>
         </div>
     </form>
-    <button id="clear-completed" class="btn btn-default" ng-click="clearCompleted()"><span class="glyphicon glyphicon-trash"></span> Clear Completed</button>
+    <div class="input-group">
+        <button id="clear-completed" class="btn btn-danger" ng-click="clearCompleted()"><span class="glyphicon glyphicon-trash"></span> Clear Completed</button>
+    </div>
+</div>
 </div>
