@@ -8,7 +8,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <div class="navbar-brand"><span id="headline">Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span></div>
+            <div class="navbar-brand">
+                <div id="headline">
+                    <span class="hidden-xs">Hello {{ login.username }}, you have tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span>
+                    <span class="visible-xs">{{ login.username }}, tasks: {{ getTodosCount() }}, remaining: {{ getRemainingCount() }}</span>
+                </div>
+            </div>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
