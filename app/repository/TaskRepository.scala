@@ -83,4 +83,10 @@ object TaskRepository {
       lastError => lastError.updated == 1
     }
   }
+
+  def deleteDone(implicit user: User): Future[Int] = {
+    collection.remove(Json.obj("done" -> true, "user" -> user.username)).map {
+      lastError => lastError.updated
+    }
+  }
 }

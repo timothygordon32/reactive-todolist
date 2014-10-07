@@ -61,4 +61,10 @@ object Tasks extends Controller {
       deleted => if (deleted) NoContent else NotFound
     }
   }
+
+  def deleteDone() = Authenticated.async { implicit request =>
+    TaskRepository.deleteDone.map {
+      deleted => Redirect(controllers.routes.Tasks.list())
+    }
+  }
 }

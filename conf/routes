@@ -14,6 +14,7 @@ GET         /login                   controllers.Authenticator.getLogin
 DELETE      /login                   controllers.Authenticator.logoff
 
 # Tasks
+DELETE      /tasks/done              controllers.Tasks.deleteDone
 POST        /tasks                   controllers.Tasks.create
 GET         /tasks                   controllers.Tasks.list
 GET         /tasks/:id               controllers.Tasks.get(id: String)
