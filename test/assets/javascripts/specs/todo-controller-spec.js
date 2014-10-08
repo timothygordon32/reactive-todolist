@@ -61,7 +61,8 @@ describe('Todo controller', function () {
         expect(scope.todos.length).toEqual(1);
 
         $httpBackend.expectPUT("/tasks/1", {id: 1, text: 'task1', done: true}).respond(204);
-        scope.update({id: 1, text: 'task1', done: true});
+        scope.todos[0].done = true;
+        scope.update(scope.todos[0]);
         $httpBackend.flush();
     }));
 
