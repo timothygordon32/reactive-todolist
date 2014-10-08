@@ -43,11 +43,12 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
     };
 
     $scope.clearCompleted = function () {
-        _.each(getCompleted(), function(completed) {
-            completed.$delete(function() {
-                $scope.todos = _.filter($scope.todos, function(task) {
-                    return task.id != completed.id;
-                });
+        $http({
+            method: 'DELETE',
+            url: '/tasks/done'
+        }).success(function (tasks) {
+            $scope.todos = _.map(tasks, function(task) {
+                return new Task(task);
             });
         });
     };

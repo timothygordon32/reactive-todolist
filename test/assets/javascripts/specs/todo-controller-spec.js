@@ -82,7 +82,7 @@ describe('Todo controller', function () {
         $httpBackend.flush();
     }));
 
-    it('should delete a completed task', inject(function($controller, $rootScope) {
+    it('should delete completed tasks', inject(function($controller, $rootScope) {
         // Given
         $httpBackend.expectGET("/tasks").respond([
             {id: 1, text: 'task1', done: false}
@@ -94,12 +94,19 @@ describe('Todo controller', function () {
         $httpBackend.flush();
         // When
         scope.todos[0].done = true;
-        $httpBackend.expectDELETE("/tasks/1").respond(204);
+        // Note: redirect from DELETE /tasks/done to /tasks handled by browser and not visible to client JavaScript
+        $httpBackend.expectDELETE("/tasks/done").respond(200, [
+            {id: 1, text: 'task1', done: false}
+        ]);
         scope.clearCompleted();
         // Then
         $httpBackend.flush();
         scope.$apply();
-        expect(scope.todos).toEqual([]);
+        expect(scope.todos.length).toBe(1);
+        // And (check returned object still bound to correct REST URL)
+        $httpBackend.expectPUT("/tasks/1", {id: 1, text: 'task1', done: true}).respond(204);
+        scope.toggle(scope.todos[0]);
+        $httpBackend.flush();
     }));
 
     it('should log the user off', inject(function($controller, $rootScope, $location) {
