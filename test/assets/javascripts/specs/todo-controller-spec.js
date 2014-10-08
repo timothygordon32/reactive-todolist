@@ -66,6 +66,22 @@ describe('Todo controller', function () {
         $httpBackend.flush();
     }));
 
+    it('should toggle the task "done" state', inject(function($controller, $rootScope) {
+        $httpBackend.expectGET("/tasks").respond([
+            {id: 1, text: 'task1', done: false}
+        ]);
+        scope = $rootScope.$new();
+        todoCtrl = $controller('TodoCtrl', {
+            $scope: scope
+        });
+        $httpBackend.flush();
+        expect(scope.todos.length).toEqual(1);
+
+        $httpBackend.expectPUT("/tasks/1", {id: 1, text: 'task1', done: true}).respond(204);
+        scope.toggle(scope.todos[0]);
+        $httpBackend.flush();
+    }));
+
     it('should delete a completed task', inject(function($controller, $rootScope) {
         // Given
         $httpBackend.expectGET("/tasks").respond([
