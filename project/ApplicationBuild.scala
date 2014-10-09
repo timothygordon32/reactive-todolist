@@ -11,6 +11,7 @@ object ApplicationBuild extends Build with Application {
     "org.reactivemongo" %% "reactivemongo" % "0.10.5.akka23-SNAPSHOT",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.akka23-SNAPSHOT",
     "org.mindrot" % "jbcrypt" % "0.3m",
+    "ws.securesocial" %% "securesocial" % "3.0-M1",
     "com.typesafe.play" %% "play-ws" % "2.3.3" % "test,it",
     "com.typesafe.play" %% "play-test" % "2.3.3" % "test,it")
 

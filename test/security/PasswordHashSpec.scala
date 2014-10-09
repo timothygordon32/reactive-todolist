@@ -1,20 +1,29 @@
 package security
 
-import controllers.PasswordHash
 import org.specs2.mutable._
-
-
+import securesocial.core.PasswordInfo
 
 class PasswordHashSpec extends Specification {
 
-  import controllers.PasswordHash._
+  import PasswordHash._
 
-    "password hasher" should {
+  "custom password hasher" should {
 
-      "hash a password consistently" in {
-        val hashed = hash("secret")
+    "hash a password consistently" in {
+      val hashed = hash("secret")
 
-        verify("secret", hashed) must be equalTo true
-      }
+      verify("secret", hashed) must beTrue
     }
+  }
+
+  "secure social password hasher" should {
+
+    "match a password info" in {
+
+      val hashed = hash("secret")
+
+      TodoListRuntimeEnvironment.currentHasher.matches(
+        PasswordInfo(TodoListRuntimeEnvironment.currentHasher.id, hashed), "secret") should beTrue
+    }
+  }
 }

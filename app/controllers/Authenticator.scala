@@ -4,6 +4,7 @@ import play.api.Play
 import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.mvc._
+import security.{Authenticated, PasswordHash}
 
 object Authenticator extends Controller {
 

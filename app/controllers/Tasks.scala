@@ -7,6 +7,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
 import repository.TaskRepository
+import security.Authenticated
 
 import scala.concurrent.Future
 import scala.util.{Success, Failure}

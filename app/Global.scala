@@ -1,3 +1,19 @@
-import play.api.mvc.WithFilters
+import java.lang.reflect.Constructor
 
-object Global extends WithFilters(HttpsRedirectFilter)
+import models.User
+import play.api.mvc.WithFilters
+import securesocial.core.RuntimeEnvironment
+import security.TodoListRuntimeEnvironment
+
+object Global extends WithFilters(HttpsRedirectFilter) {
+  override def getControllerInstance[A](controllerClass: Class[A]): A = {
+    val instance  = controllerClass.getConstructors.find { c =>
+      val params = c.getParameterTypes
+      params.length == 1 && params(0) == classOf[RuntimeEnvironment[User]]
+    }.map {
+      _.asInstanceOf[Constructor[A]].newInstance(TodoListRuntimeEnvironment)
+    }
+    instance.getOrElse(super.getControllerInstance(controllerClass))
+  }
+
+}
