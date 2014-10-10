@@ -15,7 +15,7 @@ angular.module('todo')
                 redirectTo: "/tasks"
             });
     }]).run(function($location, $http, $rootScope) {
-        $http({method: "GET", url: "/login"}).success(function(login) {
+        $http.get("/login").success(function(login) {
             $rootScope.login = login;
             $location.path("/tasks");
         }).error(function(data, status) {
