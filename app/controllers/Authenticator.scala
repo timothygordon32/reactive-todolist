@@ -1,12 +1,14 @@
 package controllers
 
+import models.User
 import play.api.Play
 import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.mvc._
+import securesocial.core.{SecureSocial, RuntimeEnvironment}
 import security.{Authenticated, PasswordHash}
 
-object Authenticator extends Controller {
+class Authenticator(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
 
   case class LoginWithPassword(username: String, password: String) {
     def sanitise = Login(username)
@@ -32,7 +34,7 @@ object Authenticator extends Controller {
     Play.current.configuration.getString(s"users.$username") match {
       case Some(hash) => PasswordHash.verify(password, hash)
       case None => !Play.isProd && username == "testuser" && password == "secret"
-    }
+  }
   }
 
   def getLogin = Authenticated { request =>

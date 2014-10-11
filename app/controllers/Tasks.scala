@@ -7,17 +7,17 @@ import play.api.libs.json._
 import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
 import repository.TaskRepository
+import securesocial.core.{SecureSocial, RuntimeEnvironment}
 import security.Authenticated
 
 import scala.concurrent.Future
 import scala.util.{Success, Failure}
 
-object Tasks extends Controller {
+class Tasks(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
 
   implicit def toUser(implicit request: Security.AuthenticatedRequest[_, User]): User = request.user
 
   def create = Authenticated.async(parse.json) { implicit request =>
-
     request.body.validate[Task].fold(
       valid = {
         task => TaskRepository.create(task).map(result => Ok(Json.toJson(result)))

@@ -1,22 +1,48 @@
 package security
 
 import models.User
-import securesocial.core.{BasicProfile, PasswordInfo}
+import play.api.{Logger, Play}
+import play.api.Play.current
 import securesocial.core.providers.MailToken
+import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.{SaveMode, UserService}
+import securesocial.core.{AuthenticationMethod, BasicProfile, PasswordInfo}
 
 import scala.concurrent.Future
 
-object PlayConfigurationUserService extends UserService[User] {
-  override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = ???
+trait PasswordInfoProvider {
+  def passwordHashFor(username: String): Option[String]
+}
+
+object PlayConfigurationUserService extends PlayConfigurationUserService {
+  val TestUserPasswordHash = PasswordHash.hash("secret")
+
+  override def passwordHashFor(username: String): Option[String] = {
+    Play.current.configuration.getString(s"users.$username") match {
+      case Some(hash) => Some(hash)
+      case None => if (Play.isProd && username == "testuser") Some(TestUserPasswordHash) else None
+    }
+  }
+}
+
+trait PlayConfigurationUserService extends UserService[User] with PasswordInfoProvider {
+  override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = Future.successful {
+    Logger.info(s"Looking for user $userId")
+    passwordHashFor(userId).map { hash =>
+      val profile = BasicProfile(providerId, userId, None, None, None, Some(s"$userId@nomail.com"), None,
+        authMethod = AuthenticationMethod.UserPassword,
+        passwordInfo = Some(PasswordInfo(PasswordHasher.id, hash)))
+      profile
+    }
+  }
+
+  override def passwordInfoFor(user: User): Future[Option[PasswordInfo]] = ???
 
   override def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = ???
 
   override def deleteToken(uuid: String): Future[Option[MailToken]] = ???
 
   override def link(current: User, to: BasicProfile): Future[User] = ???
-
-  override def passwordInfoFor(user: User): Future[Option[PasswordInfo]] = ???
 
   override def save(profile: BasicProfile, mode: SaveMode): Future[User] = ???
 
