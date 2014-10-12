@@ -20,7 +20,7 @@ object PlayConfigurationUserService extends PlayConfigurationUserService {
   override def passwordHashFor(username: String): Option[String] = {
     Play.current.configuration.getString(s"users.$username") match {
       case Some(hash) => Some(hash)
-      case None => if (Play.isProd && username == "testuser") Some(TestUserPasswordHash) else None
+      case None => if (!Play.isProd && username == "testuser") Some(TestUserPasswordHash) else None
     }
   }
 }
@@ -32,6 +32,7 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
       val profile = BasicProfile(providerId, userId, None, None, None, Some(s"$userId@nomail.com"), None,
         authMethod = AuthenticationMethod.UserPassword,
         passwordInfo = Some(PasswordInfo(PasswordHasher.id, hash)))
+      Logger.info(s"Found profile for user $userId")
       profile
     }
   }
@@ -44,7 +45,11 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
 
   override def link(current: User, to: BasicProfile): Future[User] = ???
 
-  override def save(profile: BasicProfile, mode: SaveMode): Future[User] = ???
+  override def save(profile: BasicProfile, mode: SaveMode): Future[User] = Future.successful {
+    mode match {
+      case SaveMode.LoggedIn => User(profile.userId)
+    }
+  }
 
   override def findToken(token: String): Future[Option[MailToken]] = ???
 

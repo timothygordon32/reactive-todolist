@@ -82,7 +82,7 @@ angular.module('todo.controllers').controller('LandingCtrl', function ($rootScop
     $scope.formData = {};
 
     $scope.setUsername = function() {
-        $http.post('/login', $scope.formData).success(function (login) {
+        $http.post('/users/authenticate/userpass', $scope.formData).success(function (login) {
             $rootScope.login = login;
             $location.path("/tasks");
         });

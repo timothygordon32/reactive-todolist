@@ -7,17 +7,16 @@ import play.api.libs.json._
 import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
 import repository.TaskRepository
-import securesocial.core.{SecureSocial, RuntimeEnvironment}
-import security.Authenticated
+import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
 import scala.concurrent.Future
-import scala.util.{Success, Failure}
+import scala.util.{Failure, Success}
 
 class Tasks(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
 
-  implicit def toUser(implicit request: Security.AuthenticatedRequest[_, User]): User = request.user
+  implicit def toUser(implicit request: SecuredRequest[_]): User = request.user
 
-  def create = Authenticated.async(parse.json) { implicit request =>
+  def create = SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[Task].fold(
       valid = {
         task => TaskRepository.create(task).map(result => Ok(Json.toJson(result)))
@@ -28,19 +27,18 @@ class Tasks(override implicit val env: RuntimeEnvironment[User]) extends Control
     )
   }
 
-  def list = Authenticated.async { implicit request =>
+  def list = SecuredAction.async { implicit request =>
     TaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
   }
 
-  def get(id: String) = Authenticated.async { implicit request =>
+  def get(id: String) = SecuredAction.async { implicit request =>
     TaskRepository.find(id).map {
       case Some(task) => Ok(Json.toJson(task))
       case None => NotFound
     }
   }
 
-  def update(id: String) = Authenticated.async(parse.json) { implicit request =>
-
+  def update(id: String) = SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[Task].fold(
       valid = {
         task => BSONObjectID.parse(id) match {
@@ -57,13 +55,13 @@ class Tasks(override implicit val env: RuntimeEnvironment[User]) extends Control
     )
   }
 
-  def delete(id: String) = Authenticated.async { implicit request =>
+  def delete(id: String) = SecuredAction.async { implicit request =>
     TaskRepository.delete(id).map {
       deleted => if (deleted) NoContent else NotFound
     }
   }
 
-  def deleteDone() = Authenticated.async { implicit request =>
+  def deleteDone() = SecuredAction.async { implicit request =>
     TaskRepository.deleteDone.map {
       deleted => Redirect(controllers.routes.Tasks.list())
     }

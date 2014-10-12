@@ -12,22 +12,23 @@ class TaskListRestApiSpec extends PlaySpecification {
 
     "list the tasks in JSON" in new WithApplication {
 
-      val session = Security.username -> "test"
+      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser", "password" -> "secret"))).get).get("id").head
+
       var text = "text-" + UUID.randomUUID
       var created = contentAsJson(route(FakeRequest(POST, "/tasks")
         .withBody(Json.obj("text" -> text, "done" -> false))
-        .withSession(session)).get)
+        .withCookies(identity)).get)
       var JsString(id) = created \ "id"
 
       val tasksWithCreated = route(FakeRequest(GET, "/tasks")
-        .withSession(session)).get
+        .withCookies(identity)).get
       status(tasksWithCreated) must be equalTo OK
       contentType(tasksWithCreated) must beSome.which(_ == "application/json")
       contentAsJson(tasksWithCreated).as[JsArray].value must contain(Json.obj("id" -> id, "text" -> text, "done" -> false))
 
-      await(route(FakeRequest(DELETE, s"/tasks/$id").withSession(session)).get)
+      await(route(FakeRequest(DELETE, s"/tasks/$id").withCookies(identity)).get)
 
-      val tasksWithoutCreated = route(FakeRequest(GET, "/tasks").withSession(session)).get
+      val tasksWithoutCreated = route(FakeRequest(GET, "/tasks").withCookies(identity)).get
       contentAsJson(tasksWithoutCreated).as[JsArray].value must not contain Json.obj("id" -> id, "text" -> text, "done" -> false)
     }
   }

@@ -5,8 +5,8 @@ import play.api.Play
 import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.mvc._
-import securesocial.core.{SecureSocial, RuntimeEnvironment}
-import security.{Authenticated, PasswordHash}
+import securesocial.core.{RuntimeEnvironment, SecureSocial}
+import security.PasswordHash
 
 class Authenticator(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
 
@@ -37,11 +37,11 @@ class Authenticator(override implicit val env: RuntimeEnvironment[User]) extends
   }
   }
 
-  def getLogin = Authenticated { request =>
-    Ok(Json.obj(Security.username -> request.session.get(Security.username)))
+  def getLogin = SecuredAction { request =>
+    Ok(Json.obj(Security.username -> request.user.username))
   }
 
-  def logoff = Authenticated { request =>
-    NoContent.withNewSession
+  def logoff = SecuredAction { request =>
+    NoContent.discardingCookies(DiscardingCookie("id"))
   }
 }
