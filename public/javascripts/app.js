@@ -8,6 +8,9 @@ angular.module('todo')
             .when("/landing", {
                 templateUrl: "assets/partials/landing.html",
                 controller: "LandingCtrl"})
+            .when("/signup", {
+                templateUrl: "assets/partials/signup.html",
+                controller: "SignupController"})
             .when("/tasks", {
                 templateUrl: "assets/partials/tasks.html",
                 controller: "TodoCtrl"})

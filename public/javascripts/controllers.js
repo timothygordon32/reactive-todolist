@@ -88,3 +88,14 @@ angular.module('todo.controllers').controller('LandingCtrl', function ($rootScop
         });
     }
 });
+
+angular.module('todo.controllers').controller('SignupController', function ($scope, $http, $location) {
+
+    $scope.formData = {};
+
+    $scope.setEmail = function() {
+        $http.post('/users/signup', $scope.formData).success(function () {
+            $location.path("/login");
+        });
+    }
+});
