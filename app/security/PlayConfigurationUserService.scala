@@ -26,6 +26,8 @@ object PlayConfigurationUserService extends PlayConfigurationUserService {
 }
 
 trait PlayConfigurationUserService extends UserService[User] with PasswordInfoProvider {
+  var tokens = List.empty[MailToken]
+
   override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = Future.successful {
     Logger.info(s"Looking for user $userId")
     passwordHashFor(userId).map { hash =>
@@ -39,7 +41,9 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
 
   override def passwordInfoFor(user: User): Future[Option[PasswordInfo]] = ???
 
-  override def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = ???
+  override def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] = Future.successful {
+    None
+  }
 
   override def deleteToken(uuid: String): Future[Option[MailToken]] = ???
 
@@ -57,5 +61,8 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
 
   override def updatePasswordInfo(user: User, info: PasswordInfo): Future[Option[BasicProfile]] = ???
 
-  override def saveToken(token: MailToken): Future[MailToken] = ???
+  override def saveToken(token: MailToken): Future[MailToken] = Future.successful {
+    tokens = token :: tokens
+    token
+  }
 }
