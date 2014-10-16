@@ -9,8 +9,4 @@ class Home(override implicit val env: RuntimeEnvironment[User]) extends Controll
   def index = Action {
     Ok(views.html.tasks())
   }
-
-  def secureSocial = SecuredAction {
-    Ok(views.html.tasks())
-  }
 }
