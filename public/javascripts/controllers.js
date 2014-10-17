@@ -95,7 +95,18 @@ angular.module('todo.controllers').controller('SignupController', function ($sco
 
     $scope.setEmail = function() {
         $http.post('/users/signup', $scope.formData).success(function () {
-            $location.path("/login");
+            $location.path("/landing");
+        });
+    }
+});
+
+angular.module('todo.controllers').controller('SignupVerifiedController', function ($scope, $http, $location, $routeParams) {
+
+    $scope.formData = {};
+
+    $scope.signUp = function() {
+        $http.post('/users/signup/' + $routeParams.token, $scope.formData).success(function () {
+            $location.path("/landing");
         });
     }
 });

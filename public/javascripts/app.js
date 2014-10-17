@@ -11,6 +11,9 @@ angular.module('todo')
             .when("/signup", {
                 templateUrl: "assets/partials/signup.html",
                 controller: "SignupController"})
+            .when("/signup/:token", {
+                templateUrl: "assets/partials/signup-verified.html",
+                controller: "SignupVerifiedController"})
             .when("/tasks", {
                 templateUrl: "assets/partials/tasks.html",
                 controller: "TodoCtrl"})
@@ -18,12 +21,15 @@ angular.module('todo')
                 redirectTo: "/tasks"
             });
     }]).run(function($location, $http, $rootScope) {
-        $http.get("/login").success(function(login) {
-            $rootScope.login = login;
-            $location.path("/tasks");
-        }).error(function(data, status) {
-            if (status == 401) {
-                $location.path("/landing");
-            }
-        });
+        if (!$location.path().match(/signup\//)) {
+            $http.get("/login").success(function(login) {
+                $rootScope.login = login;
+                $location.path("/tasks");
+            }).error(function(data, status) {
+                if (status == 401) {
+                    $location.path("/landing");
+                }
+            });
+
+        }
     });

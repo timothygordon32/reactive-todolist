@@ -1,0 +1,24 @@
+<div id="signup-verified-page" class="container">
+    <form class="form-signup" role="form">
+        <h2 class="form-signin-heading">Sign Up!</h2>
+        <p class="leading">Enter your details then you can get started.</p>
+        <div class="form-group">
+            <label for="firstName">First name</label>
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Joe" autofocus required ng-model="formData.firstName">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last name</label>
+            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Bloggs" required ng-model="formData.lastName">
+        </div>
+        <div class="form-group">
+            <label for="password1">Password</label>
+            <input type="password" class="form-control" id="password1" name="password.password1" placeholder="Password" required ng-model="formData.password.password1">
+        </div>
+        <div class="form-group">
+            <label for="password2">Repeat Password</label>
+            <input type="password" class="form-control" id="password2" name="password.password2" placeholder="Repeat Password" required ng-model="formData.password.password2">
+        </div>
+
+        <button id="sign-up" class="btn btn-success btn-lg btn-block" type="submit" ng-click="signUp()"><span class="glyphicon glyphicon-play"></span> Sign up</button>
+    </form>
+</div>
