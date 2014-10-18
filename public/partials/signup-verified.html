@@ -3,8 +3,12 @@
         <h2 class="form-signin-heading">Sign Up!</h2>
         <p class="leading">Enter your details then you can get started.</p>
         <div class="form-group">
+            <label for="userName">Username</label>
+            <input type="text" class="form-control" id="userName" name="userName" autofocus required ng-model="formData.userName">
+        </div>
+        <div class="form-group">
             <label for="firstName">First name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Joe" autofocus required ng-model="formData.firstName">
+            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Joe" required ng-model="formData.firstName">
         </div>
         <div class="form-group">
             <label for="lastName">Last name</label>
