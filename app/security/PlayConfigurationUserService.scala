@@ -55,7 +55,7 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
     }
   }
 
-  override def findToken(token: String): Future[Option[MailToken]] = ???
+  override def findToken(token: String): Future[Option[MailToken]] = Future.successful(tokens.find(_.uuid == token))
 
   override def deleteExpiredTokens(): Unit = ???
 
