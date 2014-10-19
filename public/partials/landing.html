@@ -1,8 +1,30 @@
 <div id="login-page" class="container">
-    <form class="form-signin" role="form">
+    <form name="loginForm" class="form-signin" role="form">
         <h2 class="form-signin-heading">Hello! Who are you?</h2>
-        <input id="username" type="text" class="form-control" placeholder="Username" autofocus required autocorrect="off" autocomplete="off" autocapitalize="none" ng-model="formData.username">
-        <input id="password" type="password" class="form-control" required placeholder="And password" autocomplete="off" ng-model="formData.password">
-        <button id="login" class="btn btn-lg btn-primary btn-block" type="submit" ng-click="setUsername()">Sign in</button>
+        <div class="form-group" ng-class='{"has-error": formData.errors["username"].length > 0}'>
+            <label for="username" class="sr-only">Username</label>
+            <input id="username" type="text" class="form-control" placeholder="Username" autofocus ng-required="true"
+                   autocorrect="off" autocomplete="off" autocapitalize="none" ng-model="formData.username">
+            <div ng-show="formData.errors['username']" class="has-error help-block">
+                <div ng-repeat='error in formData.errors["username"]'>
+                    {{error}}
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-class='{"has-error": formData.errors["password"].length > 0}'>
+            <label for="password" class="sr-only">Password</label>
+            <input id="password" type="password" class="form-control"
+                   ng-class='{"has-error": formData.errors["password"].length > 0}' ng-required="true"
+                   placeholder="And password" autocomplete="off" ng-model="formData.password">
+            <div ng-show="formData.errors['password']" class="has-error help-block">
+                <div ng-repeat='error in formData.errors["password"]'>
+                    {{error}}
+                </div>
+            </div>
+        </div>
+        <div ng-show="formData.errors.message" class="text-center alert alert-danger">
+            {{formData.errors.message}}
+        </div>
+        <button id="login" ng-disabled="loginForm.$invalid" class="btn btn-lg btn-primary btn-block" type="submit" ng-click="setUsername()">Sign in</button>
     </form>
 </div>

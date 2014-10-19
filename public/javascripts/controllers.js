@@ -76,10 +76,14 @@ angular.module('todo.controllers').controller('LandingCtrl', function ($rootScop
     $scope.formData = {};
 
     $scope.setUsername = function () {
-        $http.post('/users/authenticate/userpass', $scope.formData).success(function (login) {
-            $rootScope.login = login;
-            $location.path("/tasks");
-        });
+        $http.post('/users/authenticate/userpass', $scope.formData)
+            .success(function (login) {
+                $rootScope.login = login;
+                $location.path("/tasks");
+            })
+            .error(function (errors) {
+                $scope.formData.errors = errors;
+            });
     }
 });
 
