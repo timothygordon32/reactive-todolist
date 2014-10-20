@@ -27,16 +27,20 @@ object PlayConfigurationUserService extends PlayConfigurationUserService {
 
 trait PlayConfigurationUserService extends UserService[User] with PasswordInfoProvider {
   var tokens = List.empty[MailToken]
-  var users = List.empty[User]
+  var profiles = List.empty[BasicProfile]
 
   override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = Future.successful {
     Logger.info(s"Looking for user $userId")
-    passwordHashFor(userId).map { hash =>
-      val profile = BasicProfile(providerId, userId, None, None, None, Some(s"$userId@nomail.com"), None,
-        authMethod = AuthenticationMethod.UserPassword,
-        passwordInfo = Some(PasswordInfo(PasswordHasher.id, hash)))
-      Logger.info(s"Found profile for user $userId")
-      profile
+    profiles.find(_.userId == userId) match {
+      case Some(profile) => Some(profile)
+      case None =>
+        passwordHashFor(userId).map { hash =>
+          val profile = BasicProfile(providerId, userId, None, None, None, Some(s"$userId@nomail.com"), None,
+            authMethod = AuthenticationMethod.UserPassword,
+            passwordInfo = Some(PasswordInfo(PasswordHasher.id, hash)))
+          Logger.info(s"Found pre-loaded profile for user $userId")
+          profile
+        }
     }
   }
 
@@ -57,7 +61,9 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
   override def save(profile: BasicProfile, mode: SaveMode): Future[User] = Future.successful {
     mode match {
       case SaveMode.LoggedIn => User(profile.userId)
-      case SaveMode.SignUp => User(profile.userId)
+      case SaveMode.SignUp =>
+        profiles = profiles :+ profile
+        User(profile.userId)
     }
   }
 
