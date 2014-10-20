@@ -27,6 +27,7 @@ object PlayConfigurationUserService extends PlayConfigurationUserService {
 
 trait PlayConfigurationUserService extends UserService[User] with PasswordInfoProvider {
   var tokens = List.empty[MailToken]
+  var users = List.empty[User]
 
   override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = Future.successful {
     Logger.info(s"Looking for user $userId")
@@ -45,13 +46,18 @@ trait PlayConfigurationUserService extends UserService[User] with PasswordInfoPr
     None
   }
 
-  override def deleteToken(uuid: String): Future[Option[MailToken]] = ???
+  override def deleteToken(uuid: String): Future[Option[MailToken]] = Future.successful {
+    val found = tokens.find(_.uuid == uuid)
+    tokens = tokens.filterNot(_.uuid == uuid)
+    found
+  }
 
   override def link(current: User, to: BasicProfile): Future[User] = ???
 
   override def save(profile: BasicProfile, mode: SaveMode): Future[User] = Future.successful {
     mode match {
       case SaveMode.LoggedIn => User(profile.userId)
+      case SaveMode.SignUp => User(profile.userId)
     }
   }
 
