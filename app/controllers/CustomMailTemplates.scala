@@ -2,15 +2,25 @@ package controllers
 
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import play.twirl.api.Html
 import securesocial.controllers.MailTemplates
 import securesocial.core.{IdentityProvider, BasicProfile}
-import views.html.email.signUpHtml
-import views.txt.email.signUpText
+import views.html.email.{welcomeEmailHtml, signUpEmailHtml}
+import views.txt.email.{welcomeEmailText, signUpEmailText}
 
 object CustomMailTemplates extends MailTemplates {
+  def baseUrl(implicit request: RequestHeader) = s"${routes.Home.index().absoluteURL(IdentityProvider.sslEnabled)}#"
+
   override def getSignUpEmail(token: String)(implicit request: RequestHeader, lang: Lang) = {
-    val link = s"${routes.Home.index().absoluteURL(IdentityProvider.sslEnabled)}#/signup/$token"
-    (Some(signUpText(link)), Some(signUpHtml(link)))
+    val link = s"$baseUrl/signup/$token"
+    (Some(signUpEmailText(link)), Some(signUpEmailHtml(link)))
+  }
+
+  override def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
+    val signInLink = s"$baseUrl/landing"
+    val salutationText = user.firstName.fold("Welcome,")(name => s"Welcome $name,")
+    val salutationHtml = user.firstName.fold(Html("Welcome"))(name => Html(s"Welcome $name,"))
+    (Some(welcomeEmailText(salutationText, signInLink)), Some(welcomeEmailHtml(salutationHtml, signInLink)))
   }
 
   override def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = ???
@@ -18,8 +28,6 @@ object CustomMailTemplates extends MailTemplates {
   override def getSendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang) = ???
 
   override def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = ???
-
-  override def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = ???
 
   override def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = ???
 }

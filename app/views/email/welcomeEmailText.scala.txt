@@ -1,0 +1,4 @@
+@(salutation: String, link: String)
+@salutation
+
+You're all signed-up. You can now sign in and get stated by clicking this link or copying it into your browser address bar: @link
