@@ -37,7 +37,7 @@ class UiSpec extends PlaySpecification {
       refreshedPage.await atMost(5, TimeUnit.SECONDS) until ".list-group-item span.done-true" hasText text
 
       refreshedPage.find("#clear-completed").click()
-      page.await().until(".list-group-item span.done-true").withText(text).isNotPresent
+      (page.await atMost(5, TimeUnit.SECONDS) until ".list-group-item span.done-true" withText text).isNotPresent
     }
   }
 }
