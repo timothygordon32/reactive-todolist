@@ -17,9 +17,10 @@ class ProfileRepositoryCreateReadSpec extends PlaySpecification {
         override def db = ReactiveMongoPlugin.db
       }
       val userId = UUID.randomUUID.toString
+      val providerId = "userpass"
       val email = s"$userId@somemail.com"
       val profile = BasicProfile(
-        providerId = "userpass",
+        providerId = providerId,
         userId = userId,
         firstName = Some("Joe"),
         lastName = Some("Bloggs"),
@@ -34,7 +35,9 @@ class ProfileRepositoryCreateReadSpec extends PlaySpecification {
 
       await(repo.save(profile, SaveMode.SignUp)) must be equalTo User(userId)
 
-      await(repo.findByEmailAndProvider(email, providerId = "userpass")) must be equalTo Some(profile)
+      await(repo.findByEmailAndProvider(email, providerId = providerId)) must be equalTo Some(profile)
+
+      await(repo.find(providerId, userId)) must be equalTo Some(profile)
     }
   }
 }

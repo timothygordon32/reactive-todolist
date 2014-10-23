@@ -26,4 +26,7 @@ trait ProfileRepository {
 
   def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] =
     collection.find(Json.obj("email" -> email)).cursor[BasicProfile].headOption
+
+  def find(providerId: String, userId: String): Future[Option[BasicProfile]] =
+    collection.find(Json.obj("userId" -> userId)).cursor[BasicProfile].headOption
 }
