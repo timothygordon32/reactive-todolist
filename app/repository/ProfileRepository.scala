@@ -27,15 +27,20 @@ trait ProfileRepository {
   implicit val authMethodFormat = Json.format[AuthenticationMethod]
   implicit val profileFormat = Json.format[BasicProfile]
 
-  private val indexesCreated = collection.indexesManager.ensure(Index(Seq(("email", IndexType.Ascending))))
+  private def ensureIndex(index: Index) =
+    collection.indexesManager.ensure(index).map {
+      case true => Logger.info(s"Created index [$index] for profile repository")
+      case false => Logger.info(s"Index [$index] not created for profile repository")
+    }
 
-  indexesCreated.map {
-    case true => Logger.info("Created indexes for profile repository")
-    case false => Logger.info("No indexes created for profile repository")
-  }
+  private val emailIndexCreated =
+    ensureIndex(Index(Seq("email" -> IndexType.Ascending), Some("email")))
+  private val providerIdUserIdIndexCreated =
+    ensureIndex(Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("providerIdUserId")))
 
   def indexes(): Future[List[Index]] = for {
-    _ <- indexesCreated
+    _ <- emailIndexCreated
+    _ <- providerIdUserIdIndexCreated
     indexes <- collection.indexesManager.list()
   } yield indexes
 

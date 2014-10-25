@@ -16,8 +16,12 @@ class ProfileRepositorySpec extends PlaySpecification {
 
     "have an index on email" in new WithApplication with TestCase {
       val indexes = await(repo.indexes())
-      // Then
       indexes.filter(_.key == Seq("email" -> IndexType.Ascending)) must not be empty
+    }
+
+    "have an index on providerId and userId" in new WithApplication with TestCase {
+      val indexes = await(repo.indexes())
+      indexes.filter(_.key == Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending)) must not be empty
     }
 
     "save profile and find a user by provider and email" in new WithApplication with TestCase {
