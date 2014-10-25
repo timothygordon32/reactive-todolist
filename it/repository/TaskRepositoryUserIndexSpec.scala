@@ -13,7 +13,7 @@ class TaskRepositoryUserIndexSpec extends PlaySpecification {
       // When
       val indexes = await(TaskRepository.indexes())
       // Then
-      indexes must contain((i: Index) => i.key must beEqualTo(Seq("user" -> IndexType.Ascending)))
+      indexes.filter(_.key == Seq("user" -> IndexType.Ascending)) must not be empty
     }
   }
 }
