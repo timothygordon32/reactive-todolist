@@ -5,6 +5,7 @@ import java.util.UUID
 import models.User
 import play.api.test.{PlaySpecification, WithApplication}
 import play.modules.reactivemongo.ReactiveMongoPlugin
+import reactivemongo.api.indexes.IndexType
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
@@ -13,12 +14,26 @@ class ProfileRepositorySpec extends PlaySpecification {
 
   "Profile repository" should {
 
-    "save profile and find a user" in new WithApplication with TestCase {
+    "have an index on email" in new WithApplication with TestCase {
+      val indexes = await(repo.indexes())
+      // Then
+      indexes.filter(_.key == Seq("email" -> IndexType.Ascending)) must not be empty
+    }
+
+    "save profile and find a user by provider and email" in new WithApplication with TestCase {
       await(repo.save(profile, SaveMode.SignUp)) must be equalTo User(userId)
 
       await(repo.findByEmailAndProvider(email, providerId = providerId)) must be equalTo Some(profile)
+    }
+
+    "save profile and find a user by provider and user id" in new WithApplication with TestCase {
+      await(repo.save(profile, SaveMode.SignUp)) must be equalTo User(userId)
 
       await(repo.find(providerId, userId)) must be equalTo Some(profile)
+    }
+
+    "save profile and find user password info" in new WithApplication with TestCase {
+      await(repo.save(profile, SaveMode.SignUp)) must be equalTo User(userId)
 
       await(repo.passwordInfoFor(User(userId))) must be equalTo profile.passwordInfo
     }
@@ -56,7 +71,7 @@ class ProfileRepositorySpec extends PlaySpecification {
 
   trait TestCase {
     import play.api.Play.current
-    val repo = new ProfileRepository {
+    lazy val repo = new ProfileRepository {
       override def db = ReactiveMongoPlugin.db
     }
     val userId = UUID.randomUUID.toString

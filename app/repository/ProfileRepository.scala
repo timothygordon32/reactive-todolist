@@ -1,10 +1,12 @@
 package repository
 
 import models.User
+import play.api.Logger
 import play.api.libs.json.Json
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.DB
+import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.{Update, FindAndModify}
 import securesocial.core._
@@ -24,6 +26,18 @@ trait ProfileRepository {
   implicit val passwordInfoFormat = Json.format[PasswordInfo]
   implicit val authMethodFormat = Json.format[AuthenticationMethod]
   implicit val profileFormat = Json.format[BasicProfile]
+
+  private val indexesCreated = collection.indexesManager.ensure(Index(Seq(("email", IndexType.Ascending))))
+
+  indexesCreated.map {
+    case true => Logger.info("Created indexes for profile repository")
+    case false => Logger.info("No indexes created for profile repository")
+  }
+
+  def indexes(): Future[List[Index]] = for {
+    _ <- indexesCreated
+    indexes <- collection.indexesManager.list()
+  } yield indexes
 
   def save(profile: BasicProfile, mode: SaveMode): Future[User] = mode match {
     case SaveMode.SignUp => collection.save(profile).map(_ => User(profile.userId))
