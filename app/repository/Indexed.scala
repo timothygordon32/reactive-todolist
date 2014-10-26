@@ -11,7 +11,7 @@ trait Indexed {
   def indexesManager: CollectionIndexesManager
 
   def toDescription(index: Index): String = index.name.getOrElse {
-    index.key.map { case (field, indexType) => (field, toDescription(indexType))}.toString()
+    index.key.map { case (field, indexType) => (field, toDescription(indexType))}.mkString("[", ",", "]")
   }
 
   def toDescription(indexType: IndexType): String = indexType.value match {
@@ -22,7 +22,7 @@ trait Indexed {
 
   def ensureIndex(index: Index): Future[Unit] =
     indexesManager.ensure(index).map {
-      case true => Logger.info(s"Created index [${toDescription(index)}] for profile repository")
-      case false => Logger.info(s"Index [${toDescription(index)}] not created for profile repository")
+      case true => Logger.info(s"Created index ${toDescription(index)} for profile repository")
+      case false => Logger.info(s"Index ${toDescription(index)} not created for profile repository")
     }
 }
