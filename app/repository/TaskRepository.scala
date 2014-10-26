@@ -8,7 +8,7 @@ import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.IndexType.{Descending, Ascending}
-import reactivemongo.api.indexes.{IndexType, Index}
+import reactivemongo.api.indexes.{CollectionIndexesManager, IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,20 +30,17 @@ object TaskRepositoryFormats {
     )(Task.apply _)
 }
 
-object TaskRepository {
+object TaskRepository extends Indexed {
   import play.api.Play.current
   import repository.TaskRepositoryFormats._
 
-  private def db = ReactiveMongoPlugin.db
+  def db = ReactiveMongoPlugin.db
 
   private lazy val collection = db[JSONCollection]("userTasks")
 
-  private val indexesCreated = collection.indexesManager.ensure(Index(Seq("user" -> IndexType.Ascending)))
+  override def indexesManager: CollectionIndexesManager = collection.indexesManager
 
-  indexesCreated.map {
-    case true => Logger.info("Created index for 'user'")
-    case false => Logger.info("Index for 'user' already exists")
-  }
+  private val indexesCreated = ensureIndex(Index(Seq("user" -> IndexType.Ascending)))
 
   def indexes(): Future[List[Index]] = for {
     _ <- indexesCreated
