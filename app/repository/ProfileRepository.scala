@@ -1,12 +1,11 @@
 package repository
 
 import models.User
-import play.api.Logger
 import play.api.libs.json.Json
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.DB
-import reactivemongo.api.indexes.{IndexType, Index}
+import reactivemongo.api.indexes.{CollectionIndexesManager, IndexType, Index}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.{Update, FindAndModify}
 import securesocial.core._
@@ -16,7 +15,7 @@ import securesocial.core.services.SaveMode
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ProfileRepository {
+trait ProfileRepository extends Indexed {
   def db: DB
 
   private lazy val collection = db.sibling("users").collection[JSONCollection]("profiles")
@@ -27,11 +26,7 @@ trait ProfileRepository {
   implicit val authMethodFormat = Json.format[AuthenticationMethod]
   implicit val profileFormat = Json.format[BasicProfile]
 
-  private def ensureIndex(index: Index) =
-    collection.indexesManager.ensure(index).map {
-      case true => Logger.info(s"Created index [$index] for profile repository")
-      case false => Logger.info(s"Index [$index] not created for profile repository")
-    }
+  override def indexesManager: CollectionIndexesManager = collection.indexesManager
 
   private val emailIndexCreated =
     ensureIndex(Index(Seq("email" -> IndexType.Ascending), Some("email")))

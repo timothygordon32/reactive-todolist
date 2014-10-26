@@ -4,13 +4,16 @@ import org.joda.time.{DateTimeZone, DateTime}
 import play.api.libs.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.DB
+import reactivemongo.api.indexes.{IndexType, Index, CollectionIndexesManager}
 import securesocial.core.providers.MailToken
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-trait TokenRepository {
+trait TokenRepository extends Indexed {
   def db: DB
+
+  override def indexesManager: CollectionIndexesManager = collection.indexesManager
 
   private lazy val collection = db.sibling("users").collection[JSONCollection]("tokens")
 
@@ -26,6 +29,17 @@ trait TokenRepository {
   }
 
   implicit val tokenFormat = Json.format[MailToken]
+
+  private val emailIndexCreated =
+    ensureIndex(Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
+  private val providerIdUserIdIndexCreated =
+    ensureIndex(Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
+
+  def indexes(): Future[List[Index]] = for {
+    _ <- emailIndexCreated
+    _ <- providerIdUserIdIndexCreated
+    indexes <- collection.indexesManager.list()
+  } yield indexes
 
   def saveToken(token: MailToken): Future[MailToken] =
     collection.insert(token).map(_ => token)
