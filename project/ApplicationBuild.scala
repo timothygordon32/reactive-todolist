@@ -16,7 +16,8 @@ object ApplicationBuild extends Build with Application {
     "com.typesafe.play" %% "play-test" % "2.3.3" % "test,it")
 
   val appResolvers = Seq(
-    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/")
+    "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
+    "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/")
 
   lazy val plugins = Seq(
     play.PlayScala)
