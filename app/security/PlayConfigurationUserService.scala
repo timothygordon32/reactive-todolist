@@ -15,12 +15,12 @@ trait PasswordInfoProvider {
 }
 
 object PlayConfigurationUserService extends PlayConfigurationUserService {
-  val TestUserPasswordHash = PasswordHash.hash("secret")
+  val TestUserPasswordHash = PasswordHash.hash("secret1")
 
   override def passwordHashFor(username: String): Option[String] = {
     Play.current.configuration.getString(s"users.$username") match {
       case Some(hash) => Some(hash)
-      case None => if (!Play.isProd && username == "testuser") Some(TestUserPasswordHash) else None
+      case None => if (!Play.isProd && username == "testuser1") Some(TestUserPasswordHash) else None
     }
   }
 }

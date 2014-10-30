@@ -10,9 +10,9 @@ class PasswordHashSpec extends Specification {
   "custom password hasher" should {
 
     "hash a password consistently" in {
-      val hashed = hash("secret")
+      val hashed = hash("secret1")
 
-      verify("secret", hashed) must beTrue
+      verify("secret1", hashed) must beTrue
     }
   }
 
@@ -20,10 +20,10 @@ class PasswordHashSpec extends Specification {
 
     "match a password info" in {
 
-      val hashed = hash("secret")
+      val hashed = hash("secret1")
 
       TodoListRuntimeEnvironment.currentHasher.matches(
-        PasswordInfo(TodoListRuntimeEnvironment.currentHasher.id, hashed), "secret") should beTrue
+        PasswordInfo(TodoListRuntimeEnvironment.currentHasher.id, hashed), "secret1") should beTrue
     }
   }
 }

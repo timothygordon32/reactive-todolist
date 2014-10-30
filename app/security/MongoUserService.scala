@@ -24,19 +24,28 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
     Future.sequence(List(profileIndexes, tokenIndexes)).map(_.flatten)
   }
 
-  private def seedTestUser = find(UsernamePasswordProvider.UsernamePassword, "testuser").flatMap { profile =>
-    if (!profile.isDefined) save(BasicProfile(
+  private def seedTestUser: Future[_] = find(UsernamePasswordProvider.UsernamePassword, "testuser1").flatMap { profile =>
+    if (!profile.isDefined) {
+      for {
+        _ <- save("testuser1", "secret1")
+        _ <- save("testuser2", "secret2")
+      } yield ()
+    }
+    else Future.successful(())
+  }
+
+  private def save(userId: String, password: String): Future[User] = {
+    save(BasicProfile(
       providerId = UsernamePasswordProvider.UsernamePassword,
-      userId = "testuser",
+      userId = userId,
       firstName = None,
       lastName = None,
       fullName = None,
-      email = Some("testuser@nomail.com"),
+      email = Some(s"$userId@nomail.com"),
       avatarUrl = None,
       authMethod = AuthenticationMethod.UserPassword,
-      passwordInfo = Some(PasswordInfo(PasswordHasher.id, PasswordHash.hash("secret")))),
+      passwordInfo = Some(PasswordInfo(PasswordHasher.id, PasswordHash.hash(password)))),
       SaveMode.SignUp)
-    else Future.successful(profile)
   }
 
   if (!Play.isProd) seedTestUser

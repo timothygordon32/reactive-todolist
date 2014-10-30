@@ -15,12 +15,12 @@ class UiSpec extends PlaySpecification {
 
       (page.await atMost(5, TimeUnit.SECONDS) until "#username").isPresent
 
-      page.fill("#username").`with`("testuser")
-      page.fill("#password").`with`("secret")
+      page.fill("#username").`with`("testuser1")
+      page.fill("#password").`with`("secret1")
 
       page.find("#login").click()
 
-      page.await atMost(5, TimeUnit.SECONDS) until "#headline" containsText "testuser"
+      page.await atMost(5, TimeUnit.SECONDS) until "#headline" containsText "testuser1"
 
       var text = s"text-${UUID.randomUUID}"
 

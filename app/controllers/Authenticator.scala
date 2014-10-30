@@ -33,7 +33,7 @@ class Authenticator(override implicit val env: RuntimeEnvironment[User]) extends
   private def validate(username: String, password: String) = {
     Play.current.configuration.getString(s"users.$username") match {
       case Some(hash) => PasswordHash.verify(password, hash)
-      case None => !Play.isProd && username == "testuser" && password == "secret"
+      case None => !Play.isProd && username == "testuser1" && password == "secret1"
   }
   }
 
