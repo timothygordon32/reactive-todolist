@@ -15,10 +15,10 @@ import securesocial.core.services.SaveMode
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ProfileRepository extends Indexed {
+trait ProfileRepository extends Indexed with SecureSocialDatabase {
   def db: DB
 
-  private lazy val collection = db.sibling("users").collection[JSONCollection]("profiles")
+  private lazy val collection = db.sibling(secureSocialDatabase).collection[JSONCollection]("profiles")
 
   implicit val oAuth1Format = Json.format[OAuth1Info]
   implicit val oAuth2Format = Json.format[OAuth2Info]
@@ -61,7 +61,7 @@ trait ProfileRepository extends Indexed {
 
   private def updatePasswordInfo(userId: String, info: PasswordInfo): Future[Option[BasicProfile]] = {
     import BSONFormats._
-    db.sibling("users").command(FindAndModify(
+    db.sibling(secureSocialDatabase).command(FindAndModify(
       collection.name,
       Json.obj("providerId" -> UsernamePasswordProvider.UsernamePassword, "userId" -> userId).as[BSONDocument],
       Update(Json.obj("$set" -> Json.obj("passwordInfo" -> info)).as[BSONDocument], fetchNewObject = true)))
