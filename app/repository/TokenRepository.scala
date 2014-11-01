@@ -13,8 +13,6 @@ import scala.concurrent.Future
 trait TokenRepository extends Indexed with SecureSocialDatabase {
   def db: DB
 
-  override def indexesManager: CollectionIndexesManager = collection.indexesManager
-
   private lazy val collection = db.sibling(secureSocialDatabase).collection[JSONCollection]("tokens")
 
   implicit val dateTimeRead: Reads[DateTime] =
@@ -31,9 +29,9 @@ trait TokenRepository extends Indexed with SecureSocialDatabase {
   implicit val tokenFormat = Json.format[MailToken]
 
   private val emailIndexCreated =
-    ensureIndex(Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
+    ensureIndex(collection, Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
   private val providerIdUserIdIndexCreated =
-    ensureIndex(Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
+    ensureIndex(collection, Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
 
   def indexes(): Future[List[Index]] = for {
     _ <- emailIndexCreated

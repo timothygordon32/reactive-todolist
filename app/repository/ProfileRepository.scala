@@ -5,9 +5,9 @@ import play.api.libs.json.Json
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.DB
-import reactivemongo.api.indexes.{CollectionIndexesManager, IndexType, Index}
+import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
-import reactivemongo.core.commands.{Update, FindAndModify}
+import reactivemongo.core.commands.{FindAndModify, Update}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
@@ -26,12 +26,10 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   implicit val authMethodFormat = Json.format[AuthenticationMethod]
   implicit val profileFormat = Json.format[BasicProfile]
 
-  override def indexesManager: CollectionIndexesManager = collection.indexesManager
-
   private val emailIndexCreated =
-    ensureIndex(Index(Seq("email" -> IndexType.Ascending), Some("email")))
+    ensureIndex(collection, Index(Seq("email" -> IndexType.Ascending), Some("email")))
   private val providerIdUserIdIndexCreated =
-    ensureIndex(Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("providerIdUserId")))
+    ensureIndex(collection, Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("providerIdUserId")))
 
   def indexes(): Future[List[Index]] = for {
     _ <- emailIndexCreated

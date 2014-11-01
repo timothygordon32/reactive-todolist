@@ -1,14 +1,12 @@
 package repository
 
 import models.{User, Task}
-import play.api.Logger
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats._
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.indexes.IndexType.{Descending, Ascending}
-import reactivemongo.api.indexes.{CollectionIndexesManager, IndexType, Index}
+import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,9 +36,7 @@ object TaskRepository extends Indexed {
 
   private lazy val collection = db[JSONCollection]("userTasks")
 
-  override def indexesManager: CollectionIndexesManager = collection.indexesManager
-
-  private val indexesCreated = ensureIndex(Index(Seq("user" -> IndexType.Ascending)))
+  private val indexesCreated = ensureIndex(collection, Index(Seq("user" -> IndexType.Ascending), Some("user")))
 
   def indexes(): Future[List[Index]] = for {
     _ <- indexesCreated
@@ -53,11 +49,7 @@ object TaskRepository extends Indexed {
       case Task(Some(_), _, _) => task
     }
 
-    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.username)).map {
-      lastError =>
-        Logger.info(s"Created task $toCreate")
-        toCreate
-    }
+    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.username)).map(_ => toCreate)
   }
 
   def findAll(implicit user: User): Future[List[Task]] = {
