@@ -10,7 +10,7 @@ class UiSpec extends PlaySpecification {
 
   "Application" should {
 
-    "display a task" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX)) {
+    "display a task" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19001) {
       val page = browser.goTo(s"http://localhost:$port/")
 
       (page.await atMost(5, TimeUnit.SECONDS) until "#username").isPresent
