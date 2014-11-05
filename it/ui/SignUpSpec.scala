@@ -1,10 +1,10 @@
 package ui
 
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 
 import org.subethamail.wiser.Wiser
-import play.api.test.{FakeApplication, WebDriverFactory, WithBrowser, PlaySpecification}
+import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
+import ui.model.{EmailMessages, LoginPage, SignUpPage, SignUpVerifiedPage}
 
 class SignUpSpec extends PlaySpecification {
 
@@ -19,36 +19,29 @@ class SignUpSpec extends PlaySpecification {
       ),
       port = 19002) {
 
-      val fakeMailServer = new Wiser
+      val fakeMailServer = new Wiser with EmailMessages
       fakeMailServer.setHostname("localhost")
       fakeMailServer.setPort(10025)
       fakeMailServer.start()
 
-      val login = browser.goTo(s"http://localhost:$port/")
-      (login.await atMost(5, TimeUnit.SECONDS) until "#username").isPresent
+      browser.await untilPage browser.goTo(new LoginPage(webDriver, port)) isAt()
 
-      val signUp = browser.goTo(s"http://localhost:$port/#/signup")
-      (signUp.await atMost(5, TimeUnit.SECONDS) until "#email").isPresent
+      val signUp = new SignUpPage(webDriver, port)
+      browser.await untilPage browser.goTo(signUp) isAt()
 
       var uniqueEmail = s"${UUID.randomUUID}@nomail.com"
-      signUp.fill("#email") `with` uniqueEmail
-
-      signUp.find("#signup").click
+      signUp signUpWithEmail uniqueEmail
 
       eventually {
-        fakeMailServer.getMessages should have size 1
+        fakeMailServer messagesFor uniqueEmail should have size 1
       }
 
-      val message = fakeMailServer.getMessages.get(0)
-      message.getMimeMessage
+      val message = (fakeMailServer messagesFor uniqueEmail).head
 
-      val regex = "/signup/([-a-f0-9]+)".r
-      val link = regex.findFirstMatchIn(message.toString).map(_.group(1))
+      val signUpUuid = message signUpUuid()
+      signUpUuid must not be None
 
-      link must not be None
-
-      val signUpVerified = browser.goTo(s"http://localhost:$port/#/signup/${link.get}")
-      (signUpVerified.await atMost(5, TimeUnit.SECONDS) until ".form-auth-heading").isPresent
+      browser.await untilPage browser.goTo(new SignUpVerifiedPage(signUpUuid.get, webDriver, port)) isAt()
     }
   }
 }
