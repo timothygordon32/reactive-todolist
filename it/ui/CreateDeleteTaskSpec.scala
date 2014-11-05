@@ -6,9 +6,9 @@ import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
 
 class CreateDeleteTaskSpec extends PlaySpecification {
 
-  "Application" should {
+  "Task page" should {
 
-    "display a task" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19001) {
+    "allow creating a task, marking it as done and clearing it" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19001) {
       val loginPage = browser.goTo(new LoginPage(webDriver, port))
 
       val taskPage = loginPage.login("testuser1", "secret1")
