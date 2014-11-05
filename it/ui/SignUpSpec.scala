@@ -4,7 +4,7 @@ import java.util.UUID
 
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{EmailMessages, LoginPage, SignUpPage, SignUpVerifiedPage}
+import ui.model._
 
 class SignUpSpec extends PlaySpecification {
 
@@ -26,22 +26,34 @@ class SignUpSpec extends PlaySpecification {
 
       browser.await untilPage browser.goTo(new LoginPage(webDriver, port)) isAt()
 
-      val signUp = new SignUpPage(webDriver, port)
-      browser.await untilPage browser.goTo(signUp) isAt()
+      val signUp = browser goTo new SignUpPage(webDriver, port)
+      browser.await untilPage signUp isAt()
 
       var uniqueEmail = s"${UUID.randomUUID}@nomail.com"
       signUp signUpWithEmail uniqueEmail
 
-      eventually {
-        fakeMailServer messagesFor uniqueEmail should have size 1
-      }
+      eventually(fakeMailServer messagesFor uniqueEmail should have size 1)
 
       val message = (fakeMailServer messagesFor uniqueEmail).head
 
       val signUpUuid = message signUpUuid()
       signUpUuid must not be None
 
-      browser.await untilPage browser.goTo(new SignUpVerifiedPage(signUpUuid.get, webDriver, port)) isAt()
+      val verifiedPage = browser.goTo(new SignUpVerifiedPage(signUpUuid.get, webDriver, port))
+      browser.await untilPage verifiedPage isAt()
+
+      var randomUserId = s"test-userid-${UUID.randomUUID}"
+      var randomPassword = s"test-password-${UUID.randomUUID}"
+      verifiedPage enterDetails(
+        userId = randomUserId, firstName = "Joe", lastName = "Bloggs",
+        password1 = randomPassword, password2 = randomPassword)
+
+      eventually(fakeMailServer messagesFor uniqueEmail should have size 2)
+
+      val loginPage = browser.goTo(new LoginPage(webDriver, port))
+      val taskPage = loginPage.login(randomUserId, randomPassword)
+
+      browser.await untilPage taskPage isAt()
     }
   }
 }
