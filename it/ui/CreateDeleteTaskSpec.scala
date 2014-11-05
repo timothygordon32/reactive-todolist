@@ -3,6 +3,7 @@ package ui
 import java.util.UUID
 
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
+import ui.pages.LoginPage
 
 class CreateDeleteTaskSpec extends PlaySpecification {
 

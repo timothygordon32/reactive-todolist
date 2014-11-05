@@ -1,4 +1,4 @@
-package ui
+package ui.pages
 
 import java.util.concurrent.TimeUnit
 
