@@ -1,0 +1,8 @@
+<div class="form-group" ng-class='{"has-error": errors.length > 0}'>
+    <div ng-transclude></div>
+    <div ng-show="errors" class="has-error help-block">
+        <div ng-repeat='error in errors'>
+            {{error}}
+        </div>
+    </div>
+</div>

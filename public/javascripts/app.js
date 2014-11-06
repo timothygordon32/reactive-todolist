@@ -33,3 +33,15 @@ angular.module('todo')
 
         }
     });
+
+angular.module('todo')
+    .directive('formGroup', function () {
+        return {
+            restrict: 'E',
+            transclude: true,
+            scope: {
+                'errors': '='
+            },
+            templateUrl: 'assets/partials/form-group.html'
+        };
+    });
