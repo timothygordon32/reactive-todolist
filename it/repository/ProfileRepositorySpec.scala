@@ -76,10 +76,7 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
   }
 
   trait TestCase extends Scope {
-    import play.api.Play.current
-    lazy val repo = new ProfileRepository {
-      override def db = ReactiveMongoPlugin.db
-    }
+    lazy val repo = new ProfileRepository {}
     val userId = UUID.randomUUID.toString
     val providerId = UsernamePasswordProvider.UsernamePassword
     val email = s"$userId@somemail.com"

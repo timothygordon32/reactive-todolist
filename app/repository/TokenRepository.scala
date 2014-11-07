@@ -11,9 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait TokenRepository extends Indexed with SecureSocialDatabase {
-  def db: DB
-
-  private lazy val collection = db.sibling(secureSocialDatabase).collection[JSONCollection]("tokens")
+  private lazy val collection = db.collection[JSONCollection]("tokens")
 
   implicit val dateTimeRead: Reads[DateTime] =
     (__ \ "$date").read[Long].map { dateTime =>
