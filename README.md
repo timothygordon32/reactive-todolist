@@ -21,7 +21,7 @@ After cloning this repository, install the Heroku toolbelt and log in with your 
 `heroku-setup.sh <your-app-name>`
 
 which will prompt you for the values of additional settings needed to run the application:
-* `APP_SECRET` override this to a new (secure) random value that can be generated using 
+* `APP_SECRET` override this to a new (secure) random value that can be generated using `play-generate-secret`.
 * `SMTP_HOST` your SMTP host to send out the emails for sign-up, password change, etc.
 * `SMTP_PORT` the port your SMTP server will use - TLS is the protocol.
 * `SMTP_USER` the user account that will be used to authenticate the connection to send mails.
