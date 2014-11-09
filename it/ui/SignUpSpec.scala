@@ -24,9 +24,10 @@ class SignUpSpec extends PlaySpecification {
       fakeMailServer.setPort(10025)
       fakeMailServer.start()
 
-      browser.await untilPage browser.goTo(new LoginPage(webDriver, port)) isAt()
+      val login = browser.goTo(new LoginPage(webDriver, port))
+      browser.await untilPage login isAt()
 
-      val signUp = browser goTo new SignUpPage(webDriver, port)
+      val signUp = login.signUp
       browser.await untilPage signUp isAt()
 
       var uniqueEmail = s"${UUID.randomUUID}@nomail.com"

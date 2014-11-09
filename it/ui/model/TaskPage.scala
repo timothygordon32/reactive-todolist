@@ -17,7 +17,7 @@ class TaskPage(val username: String, val driver: WebDriver, val port: Int) exten
   }
 
   def mustNotHaveTaskWithText(text: String) {
-    (await atMost(5, TimeUnit.SECONDS) until ".list-group-item span.done-true" withText text).isNotPresent
+    (await atMost(5, TimeUnit.SECONDS) until ".list-group-item span" withText text).isNotPresent
   }
 
   def toggleTaskWithText(text: String) {

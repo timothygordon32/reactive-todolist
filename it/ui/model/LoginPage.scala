@@ -19,6 +19,14 @@ class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver)
     tasksPage
   }
 
+  def signUp: SignUpPage = {
+    find("#signup").click()
+
+    val signUpPage = new SignUpPage(driver, port)
+    await untilPage signUpPage isAt()
+    signUpPage
+  }
+
   override def getUrl = s"http://localhost:$port/"
 
   override def isAt() = (await atMost(5, TimeUnit.SECONDS) until "#username").isPresent

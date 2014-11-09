@@ -15,6 +15,7 @@
         <div ng-show="formData.errors.message" class="text-center alert alert-danger">
             {{formData.errors.message}}
         </div>
+        <p><a id="signup" href="#/signup">Don't have an account? Sign up for one!</a></p>
         <button id="login" ng-disabled="loginForm.$invalid" class="btn btn-lg btn-primary btn-block" type="submit" ng-click="setUsername()">Sign in</button>
     </form>
 </div>
