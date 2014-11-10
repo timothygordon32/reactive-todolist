@@ -5,8 +5,8 @@ import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import securesocial.controllers.MailTemplates
 import securesocial.core.{IdentityProvider, BasicProfile}
-import views.html.email.{welcomeEmailHtml, signUpEmailHtml}
-import views.txt.email.{welcomeEmailText, signUpEmailText}
+import views.html.email.{alreadyRegisteredEmailHtml, welcomeEmailHtml, signUpEmailHtml}
+import views.txt.email.{alreadyRegisteredEmailText, welcomeEmailText, signUpEmailText}
 
 object CustomMailTemplates extends MailTemplates {
   def baseUrl(implicit request: RequestHeader) = s"${routes.Home.index().absoluteURL(IdentityProvider.sslEnabled)}#"
@@ -29,5 +29,9 @@ object CustomMailTemplates extends MailTemplates {
 
   override def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = ???
 
-  override def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = ???
+  override def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
+    val salutationText = user.firstName.fold("Hey,")(name => s"Hey $name,")
+    val salutationHtml = user.firstName.fold(Html("Hey"))(name => Html(s"Hey $name,"))
+    (Some(alreadyRegisteredEmailText(salutationText)), Some(alreadyRegisteredEmailHtml(salutationHtml)))
+  }
 }
