@@ -11,7 +11,9 @@ object ApplicationBuild extends Build with Application {
     "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23",
     "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23",
     "org.mindrot" % "jbcrypt" % "0.3m",
+    "com.typesafe.play" %% "play-ws" % "2.3.3" excludeAll ExclusionRule(organization = "org.apache.httpcomponents"),
     "ws.securesocial" %% "securesocial" % "3.0-M1",
+    "org.apache.httpcomponents" % "httpclient" % "4.3.1",
     "org.subethamail" % "subethasmtp" % "3.1.7" % "test,it" exclude("javax.mail", "mail"),
     "com.typesafe.play" %% "play-ws" % "2.3.3" % "test,it",
     "com.typesafe.play" %% "play-test" % "2.3.3" % "test,it")
