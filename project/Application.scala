@@ -77,7 +77,6 @@ trait Application {
     .settings(jasmineSettings : _*)
     .settings(jasmineAdditionalSettings() : _*)
     .settings(lessSettings() : _*)
-    .settings(inConfig(Test)(Defaults.testSettings): _*)
     .settings(testSettings(): _*)
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
