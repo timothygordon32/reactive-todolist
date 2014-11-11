@@ -7,7 +7,7 @@ describe('Login controller', function () {
 
     beforeEach(module('todo.controllers'));
 
-    beforeEach(inject(function(_$httpBackend_, $controller, $rootScope) {
+    beforeEach(inject(function (_$httpBackend_, $controller, $rootScope) {
         $httpBackend = _$httpBackend_;
 
         scope = $rootScope.$new();
@@ -16,8 +16,10 @@ describe('Login controller', function () {
         });
     }));
 
-    it('should submit the user credentials', inject(function($location, $rootScope) {
-        $httpBackend.expectPOST('/login', {username: 'testuser', password: 'secret'}).respond(200, {username: 'testuser'});
+    it('should submit the user credentials', inject(function ($location, $rootScope) {
+        $httpBackend.expectPOST('/users/authenticate/userpass',
+            {username: 'testuser', password: 'secret'})
+            .respond(200, {username: 'testuser'});
 
         scope.formData.username = 'testuser';
         scope.formData.password = 'secret';
