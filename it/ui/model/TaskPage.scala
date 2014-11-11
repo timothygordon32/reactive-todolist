@@ -2,9 +2,12 @@ package ui.model
 
 import java.util.concurrent.TimeUnit
 
+import com.google.common.base.Predicate
 import org.fluentlenium.core.FluentPage
 import org.fluentlenium.core.filter.FilterConstructor._
 import org.openqa.selenium.WebDriver
+
+import scala.util.{Failure, Success, Try}
 
 class TaskPage(val username: String, val driver: WebDriver, val port: Int) extends FluentPage(driver) {
   def addTask(text: String) {
@@ -17,7 +20,18 @@ class TaskPage(val username: String, val driver: WebDriver, val port: Int) exten
   }
 
   def mustNotHaveTaskWithText(text: String) {
-    (await atMost(5, TimeUnit.SECONDS) until ".list-group-item span" withText text).isNotPresent
+    await atMost(5, TimeUnit.SECONDS) until {
+      Try {
+        findFirst(".list-group-item span", withText(text))
+      } match {
+        case Success(_) => false
+        case Failure(e) => true
+      }
+    }
+  }
+
+  implicit def fixPredicate[E1, E2](p: => Boolean): Predicate[E2] = new Predicate[E2] {
+    def apply(p1: E2) = p
   }
 
   def toggleTaskWithText(text: String) {
