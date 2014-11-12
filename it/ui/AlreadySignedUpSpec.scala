@@ -1,11 +1,10 @@
 package ui
 
-import org.specs2.time.Duration
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{LoginPage, EmailMessages}
+import ui.model.{SecurityMessageMatchers, SecurityMessages, LoginPage}
 
-class AlreadySignedUpSpec extends PlaySpecification {
+class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers {
 
   "Security" should {
 
@@ -18,7 +17,7 @@ class AlreadySignedUpSpec extends PlaySpecification {
       ),
       port = 19003) {
 
-      val fakeMailServer = new Wiser with EmailMessages
+      val fakeMailServer = new Wiser with SecurityMessages
       fakeMailServer.setHostname("localhost")
       fakeMailServer.setPort(10026)
       fakeMailServer.start()
@@ -32,13 +31,11 @@ class AlreadySignedUpSpec extends PlaySpecification {
       var alreadyRegisteredEmail = "testuser1@nomail.com"
       signUp signUpWithEmail alreadyRegisteredEmail
 
-      val oneSecond: Duration = new Duration(1000)
-
       eventually(fakeMailServer.messagesFor(alreadyRegisteredEmail) must have size 1)
 
       val message = (fakeMailServer messagesFor alreadyRegisteredEmail).head
 
-      message.underlying.toString must contain ("already signed-up")
+      message must beAlreadySignedUp
     }
   }
 }

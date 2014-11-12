@@ -19,7 +19,7 @@ class SignUpSpec extends PlaySpecification {
       ),
       port = 19002) {
 
-      val fakeMailServer = new Wiser with EmailMessages
+      val fakeMailServer = new Wiser with SecurityMessages
       fakeMailServer.setHostname("localhost")
       fakeMailServer.setPort(10025)
       fakeMailServer.start()
