@@ -43,16 +43,15 @@ class SignUpSpec extends PlaySpecification {
       val verifiedPage = browser.goTo(new SignUpVerifiedPage(signUpUuid.get, webDriver, port))
       browser.await untilPage verifiedPage isAt()
 
-      var randomUserId = s"test-userid-${UUID.randomUUID}"
-      var randomPassword = s"test-password-${UUID.randomUUID}"
+      var newUser = User.generate
       verifiedPage enterDetails(
-        userId = randomUserId, firstName = "Joe", lastName = "Bloggs",
-        password1 = randomPassword, password2 = randomPassword)
+        userId = newUser.userId, firstName = newUser.firstName, lastName = "Bloggs",
+        password1 = newUser.password, password2 = newUser.password)
 
       eventually(fakeMailServer messagesFor uniqueEmail should have size 2)
 
       val loginPage = browser.goTo(new LoginPage(webDriver, port))
-      val taskPage = loginPage.login(randomUserId, randomPassword)
+      val taskPage = loginPage.login(newUser)
 
       browser.await untilPage taskPage isAt()
     }

@@ -3,7 +3,7 @@ package ui
 import java.util.UUID
 
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.LoginPage
+import ui.model.{User, LoginPage}
 
 class CreateDeleteTaskSpec extends PlaySpecification {
 
@@ -12,21 +12,21 @@ class CreateDeleteTaskSpec extends PlaySpecification {
     "allow creating a task, marking it as done and clearing it" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19001) {
       val loginPage = browser.goTo(new LoginPage(webDriver, port))
 
-      val taskPage = loginPage.login("testuser1", "secret1")
+      val taskPage = loginPage.login(User.User1)
 
-      var uniqueTaskText = s"text-${UUID.randomUUID}"
+      var taskText = s"text-${UUID.randomUUID}"
 
-      taskPage addTask uniqueTaskText
+      taskPage addTask taskText
 
-      taskPage mustHaveTaskWithText uniqueTaskText
+      taskPage mustHaveTaskWithText taskText
 
-      taskPage toggleTaskWithText uniqueTaskText
+      taskPage toggleTaskWithText taskText
 
       val refreshedTaskPage = taskPage.refresh
-      refreshedTaskPage mustHaveTaskWithText uniqueTaskText
+      refreshedTaskPage mustHaveTaskWithText taskText
 
       refreshedTaskPage.clearCompletedTasks
-      refreshedTaskPage mustNotHaveTaskWithText uniqueTaskText
+      refreshedTaskPage mustNotHaveTaskWithText taskText
     }
   }
 }
