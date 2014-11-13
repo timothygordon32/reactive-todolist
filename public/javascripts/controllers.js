@@ -66,12 +66,12 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
             url: '/login'
         }).success(function () {
             $rootScope.login = {};
-            $location.path("/landing");
+            $location.path("/login");
         });
     };
 });
 
-angular.module('todo.controllers').controller('LandingCtrl', function ($rootScope, $scope, $http, $location) {
+angular.module('todo.controllers').controller('LoginController', function ($rootScope, $scope, $http, $location) {
 
     $scope.formData = {};
 
@@ -93,7 +93,7 @@ angular.module('todo.controllers').controller('SignupController', function ($sco
 
     $scope.setEmail = function () {
         $http.post('/users/signup', $scope.formData).success(function () {
-            $location.path("/landing");
+            $location.path("/login");
         });
     }
 });
@@ -105,7 +105,7 @@ angular.module('todo.controllers').controller('SignupVerifiedController', functi
     $scope.signUp = function () {
         $http.post('/users/signup/' + $routeParams.token, $scope.formData)
             .success(function () {
-                $location.path("/landing");
+                $location.path("/login");
             }).error(function (response) {
                 $scope.formData.errors = response;
 

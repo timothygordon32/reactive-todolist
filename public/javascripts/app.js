@@ -6,8 +6,8 @@ angular.module('todo')
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
             .when("/landing", {
-                templateUrl: "assets/partials/landing.html",
-                controller: "LandingCtrl"})
+                templateUrl: "assets/partials/login.html",
+                controller: "LoginController"})
             .when("/signup", {
                 templateUrl: "assets/partials/signup.html",
                 controller: "SignupController"})

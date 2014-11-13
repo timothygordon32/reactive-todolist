@@ -17,7 +17,7 @@ object CustomMailTemplates extends MailTemplates {
   }
 
   override def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
-    val signInLink = s"$baseUrl/landing"
+    val signInLink = s"$baseUrl/login"
     val salutationText = user.firstName.fold("Welcome,")(name => s"Welcome $name,")
     val salutationHtml = user.firstName.fold(Html("Welcome"))(name => Html(s"Welcome $name,"))
     (Some(welcomeEmailText(salutationText, signInLink)), Some(welcomeEmailHtml(salutationHtml, signInLink)))

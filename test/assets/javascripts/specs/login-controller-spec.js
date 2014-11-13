@@ -11,7 +11,7 @@ describe('Login controller', function () {
         $httpBackend = _$httpBackend_;
 
         scope = $rootScope.$new();
-        loginCtrl = $controller('LandingCtrl', {
+        loginCtrl = $controller('LoginController', {
             $scope: scope
         });
     }));

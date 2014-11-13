@@ -123,6 +123,6 @@ describe('Todo controller', function () {
         // Then
         $httpBackend.flush();
         expect($rootScope.login).toEqual(jasmine.objectContaining({}));
-        expect($location.url()).toBe('/landing');
+        expect($location.url()).toBe('/login');
     }));
 });
