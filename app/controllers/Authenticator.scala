@@ -8,7 +8,7 @@ import securesocial.core.{RuntimeEnvironment, SecureSocial}
 class Authenticator(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
 
   def getLogin = SecuredAction { request =>
-    Ok(Json.obj(Security.username -> request.user.username))
+    Ok(Json.toJson[User](request.user))
   }
 
   def logoff = SecuredAction { request =>
