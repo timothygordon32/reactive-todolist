@@ -9,7 +9,6 @@ GET         /                        @controllers.Home.index
 GET         /assets/*file            controllers.Assets.versioned(path="/public", file)
 
 # Security
-POST        /login                   @controllers.Authenticator.login
 GET         /login                   @controllers.Authenticator.getLogin
 DELETE      /login                   @controllers.Authenticator.logoff
 
