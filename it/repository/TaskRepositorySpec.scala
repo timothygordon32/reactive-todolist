@@ -2,8 +2,8 @@ package repository
 
 import java.util.UUID
 
-import models.{User, Task}
-import play.api.test.{PlaySpecification, WithApplication}
+import models.{Task, User}
+import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
 import utils.StartedFakeApplication
@@ -14,7 +14,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "list tasks" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString)
+      implicit val user = User(UUID.randomUUID.toString, None)
       val first = Task(Some(BSONObjectID.generate), "first")
       val second = Task(Some(BSONObjectID.generate), "second")
       // And
@@ -34,7 +34,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "retrieve and delete a saved task" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString)
+      implicit val user = User(UUID.randomUUID.toString, None)
       val text = s"text-${UUID.randomUUID()}"
 
       // When
@@ -53,7 +53,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "update a task" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString)
+      implicit val user = User(UUID.randomUUID.toString, None)
       val text = s"text-${UUID.randomUUID()}"
       val created = await(TaskRepository.create(Task(None, text)))
       created.done must beFalse
@@ -73,7 +73,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "batch delete tasks" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString)
+      implicit val user = User(UUID.randomUUID.toString, None)
       val doneTask = Task(Some(BSONObjectID.generate), "done", done = true)
       val notDoneTask = Task(Some(BSONObjectID.generate), "not-done", done = false)
       // And

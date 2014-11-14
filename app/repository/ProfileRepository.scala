@@ -28,6 +28,8 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   private val providerIdUserIdIndexCreated =
     ensureIndex(collection, Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
 
+  implicit def toUser(profile: BasicProfile): User = User(profile.userId, profile.firstName)
+
   def indexes(): Future[List[Index]] = for {
     _ <- emailIndexCreated
     _ <- providerIdUserIdIndexCreated
@@ -35,9 +37,9 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   } yield indexes
 
   def save(profile: BasicProfile, mode: SaveMode): Future[User] = mode match {
-    case SaveMode.SignUp => collection.save(profile).map(_ => User(profile.userId))
-    case SaveMode.LoggedIn => Future.successful(User(profile.userId))
-    case SaveMode.PasswordChange => updatePasswordInfo(profile.userId, profile.passwordInfo.get).map(_ => User(profile.userId))
+    case SaveMode.SignUp => collection.save(profile).map(_ => profile)
+    case SaveMode.LoggedIn => Future.successful(profile)
+    case SaveMode.PasswordChange => updatePasswordInfo(profile.userId, profile.passwordInfo.get).map(_ => profile)
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] =

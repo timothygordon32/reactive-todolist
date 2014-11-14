@@ -7,7 +7,7 @@ import securesocial.core.RuntimeEnvironment
 import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.UserService
 
-object TodoListRuntimeEnvironment extends RuntimeEnvironment.Default[User] {
+object ApplicationRuntimeEnvironment extends RuntimeEnvironment.Default[User] {
   override lazy val userService: UserService[User] = MongoUserService
   override lazy val currentHasher: PasswordHasher = new PasswordHasher.Default(12)
   override lazy val mailTemplates: MailTemplates = CustomMailTemplates

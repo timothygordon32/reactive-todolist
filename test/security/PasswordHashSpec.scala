@@ -22,8 +22,8 @@ class PasswordHashSpec extends Specification {
 
       val hashed = hash("secret1")
 
-      TodoListRuntimeEnvironment.currentHasher.matches(
-        PasswordInfo(TodoListRuntimeEnvironment.currentHasher.id, hashed), "secret1") should beTrue
+      ApplicationRuntimeEnvironment.currentHasher.matches(
+        PasswordInfo(ApplicationRuntimeEnvironment.currentHasher.id, hashed), "secret1") should beTrue
     }
   }
 }

@@ -31,7 +31,7 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
       val login = route(FakeRequest(GET, "/login").withCookies(id)).get
 
       status(login) must equalTo(OK)
-      contentAsJson(login) must equalTo(Json.obj("username" -> "testuser1"))
+      contentAsJson(login) must equalTo(Json.obj("username" -> "testuser1", "firstName" -> "Test1"))
     }
 
     "deny without user token" in {
