@@ -30,8 +30,8 @@ class TaskPage(val username: String, val driver: WebDriver, val port: Int) exten
     }
   }
 
-  implicit def fixPredicate[E1, E2](p: => Boolean): Predicate[E2] = new Predicate[E2] {
-    def apply(p1: E2) = p
+  implicit def fixPredicate[_, V](p: => Boolean): Predicate[V] = new Predicate[V] {
+    def apply(p1: V) = p
   }
 
   def toggleTaskWithText(text: String) {
