@@ -14,7 +14,8 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication {
 
     "list the tasks in JSON" in {
 
-      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser1", "password" -> "secret1"))).get).get("id").head
+      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get).get("id").head
 
       val text = "text-" + UUID.randomUUID
       val created = contentAsJson(route(FakeRequest(POST, "/tasks")
@@ -36,7 +37,8 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication {
 
     "updates a task as done" in {
 
-      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser1", "password" -> "secret1"))).get).get("id").head
+      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get).get("id").head
 
       val text = "text-" + UUID.randomUUID
       val created = contentAsJson(route(FakeRequest(POST, "/tasks")
@@ -61,7 +63,7 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication {
 
     "delete all completed tasks for a user" in eventually {
       // Given
-      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser2", "password" -> "secret2"))).get).get("id").head
+      val identity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser2@nomail.com", "password" -> "secret2"))).get).get("id").head
       // And
       val textTodo = "text-" + UUID.randomUUID
       val createdTodo = contentAsJson(route(FakeRequest(POST, "/tasks")

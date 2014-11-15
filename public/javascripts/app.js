@@ -5,7 +5,7 @@ angular.module('todo', ['ngRoute', 'todo.controllers']);
 angular.module('todo')
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider
-            .when("/landing", {
+            .when("/login", {
                 templateUrl: "assets/partials/login.html",
                 controller: "LoginController"})
             .when("/signup", {
@@ -27,7 +27,7 @@ angular.module('todo')
                 $location.path("/tasks");
             }).error(function(data, status) {
                 if (status == 401) {
-                    $location.path("/landing");
+                    $location.path("/login");
                 }
             });
 

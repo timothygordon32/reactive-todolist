@@ -21,11 +21,11 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
     Future.sequence(List(profileIndexes, tokenIndexes)).map(_.flatten)
   }
 
-  private def seedTestUser: Future[_] = find(UsernamePasswordProvider.UsernamePassword, "testuser1").flatMap { profile =>
+  private def seedTestUser: Future[_] = find(UsernamePasswordProvider.UsernamePassword, "testuser1@nomail.com").flatMap { profile =>
     if (!profile.isDefined) {
       for {
-        _ <- save("testuser1", "secret1", "Test1")
-        _ <- save("testuser2", "secret2", "Test2")
+        _ <- save("testuser1@nomail.com", "secret1", "Test1")
+        _ <- save("testuser2@nomail.com", "secret2", "Test2")
       } yield ()
     }
     else Future.successful(())
@@ -38,7 +38,7 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
       firstName = Some(firstName),
       lastName = None,
       fullName = None,
-      email = Some(s"$userId@nomail.com"),
+      email = Some(userId),
       avatarUrl = None,
       authMethod = AuthenticationMethod.UserPassword,
       passwordInfo = Some(PasswordInfo(PasswordHasher.id, PasswordHash.hash(password)))),

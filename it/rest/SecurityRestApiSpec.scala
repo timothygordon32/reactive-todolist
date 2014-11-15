@@ -11,7 +11,8 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
 
     "validate the user credentials" in {
 
-      val login = route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser1", "password" -> "secret1"))).get
+      val login = route(FakeRequest(POST, "/users/authenticate/userpass")
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get
 
       status(login) must equalTo(SEE_OTHER)
       cookies(login).get("id") must not be None
@@ -19,19 +20,21 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
 
     "reject the user" in {
 
-      val login = route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser1", "password" -> "wrong"))).get
+      val login = route(FakeRequest(POST, "/users/authenticate/userpass")
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "wrong"))).get
 
       status(login) must equalTo(BAD_REQUEST)
     }
 
     "validate the user token" in {
 
-      val id = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser1", "password" -> "secret1"))).get).get("id").head
+      val id = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get).get("id").head
 
       val login = route(FakeRequest(GET, "/login").withCookies(id)).get
 
       status(login) must equalTo(OK)
-      contentAsJson(login) must equalTo(Json.obj("username" -> "testuser1", "firstName" -> "Test1"))
+      contentAsJson(login) must equalTo(Json.obj("username" -> "testuser1@nomail.com", "firstName" -> "Test1"))
     }
 
     "deny without user token" in {
@@ -45,7 +48,8 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
 
     "log the user off" in {
       // Given
-      val id = cookies(route(FakeRequest(POST, "/users/authenticate/userpass").withBody(Json.obj("username" -> "testuser1", "password" -> "secret1"))).get).get("id").head
+      val id = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get).get("id").head
       // And
       val identity = route(FakeRequest(GET, "/login").withCookies(id)).get
       status(identity) must equalTo(OK)
