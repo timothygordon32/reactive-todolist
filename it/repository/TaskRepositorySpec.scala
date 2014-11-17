@@ -10,6 +10,8 @@ import utils.StartedFakeApplication
 
 class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
+  def randomString = UUID.randomUUID().toString
+
   "User task repository" should {
 
     "list tasks" in {
@@ -99,9 +101,27 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
       // Given
       val repo = TaskRepository
       // When
-      val indexes = await(TaskRepository.indexes())
+      val indexes = await(repo.indexes())
       // Then
       indexes.filter(_.key == Seq("user" -> IndexType.Ascending)) must not be empty
+    }
+
+    "copy all tasks to another user" in {
+      // Given
+      val repo = TaskRepository
+      val oldUser = User(randomString, None)
+      val task1 = Task(None, randomString)
+      await(repo.create(task1)(oldUser))
+      val task2 = Task(None, randomString)
+      await(repo.create(task2)(oldUser))
+      val newUser = User(UUID.randomUUID().toString, None)
+      // When
+      await(repo.copy(from = oldUser, to = newUser))
+      // Then
+      val copied = await(repo.findAll(newUser))
+      copied must have size 2
+      copied(0).text must be equalTo task1.text
+      copied(1).text must be equalTo task2.text
     }
   }
 }

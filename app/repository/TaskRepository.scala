@@ -2,6 +2,7 @@ package repository
 
 import models.{User, Task}
 import play.api.libs.functional.syntax._
+import play.api.libs.iteratee.{Iteratee, Enumerator}
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats._
@@ -77,5 +78,21 @@ object TaskRepository extends Indexed {
     collection.remove(Json.obj("done" -> true, "user" -> user.username)).map {
       lastError => lastError.updated
     }
+  }
+
+  def copy(from: User, to: User): Future[List[Task]] = {
+    def copy(copies: Vector[Task], task: Task): Future[Vector[Task]] = create(task.copy(id = None))(to).map(copies :+ _)
+
+    def copyAll(tasks: List[Task])(user: User): Future[List[Task]] = {
+      val toCopy = Enumerator.enumerate(tasks)
+      val copier = Iteratee.foldM(Vector.empty[Task])(copy)
+
+      toCopy.run(copier).map(_.toList)
+    }
+
+    for {
+      fromTasks <- findAll(from)
+      toTasks <- copyAll(fromTasks)(to)
+    } yield toTasks
   }
 }
