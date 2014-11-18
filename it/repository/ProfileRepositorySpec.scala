@@ -26,8 +26,6 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     }
 
     "save profile and find a user by provider and email" in new TestCase {
-      implicit def toUserArgs(profile: BasicProfile): (String, Option[String]) = (profile.userId, profile.firstName)
-
       await(repo.save(profile, SaveMode.SignUp)) must be equalTo User(userId, firstName)
 
       await(repo.findByEmailAndProvider(email, providerId = providerId)) must be equalTo Some(profile)
