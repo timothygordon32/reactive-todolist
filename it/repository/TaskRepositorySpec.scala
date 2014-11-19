@@ -6,6 +6,7 @@ import models.{Task, User}
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
+import security.MongoUserService
 import utils.StartedFakeApplication
 
 class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {

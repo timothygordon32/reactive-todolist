@@ -1,8 +1,9 @@
 package security
 
 import models.User
-import play.api.Play
+import play.api.{Logger, Play}
 import play.api.Play.current
+import play.api.libs.iteratee.{Iteratee, Enumerator}
 import reactivemongo.api.indexes.Index
 import repository.{TaskRepository, ProfileRepository, TokenRepository}
 import securesocial.core.providers.UsernamePasswordProvider
@@ -14,6 +15,28 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object MongoUserService extends UserService[User] with ProfileRepository with TokenRepository {
+  def migrateAll = {
+    def migrate(total: Int, oldProfile: BasicProfile): Future[Int] = oldProfile.email match {
+      case None => Future.successful(total)
+      case Some(email) =>
+        find(UsernamePasswordProvider.UsernamePassword, email).flatMap {
+          case Some(_) => delete(oldProfile).map(_ => total + 1)
+          case None => for {
+            _ <- TaskRepository.copy(User(oldProfile.userId, None), User(email, None))
+            _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
+            _ <- delete(oldProfile)
+          }
+          yield total + 1
+        }
+    }
+
+    val oldProfiles = Enumerator.generateM(findOldProfile)
+    val migration = Iteratee.foldM(0)(migrate)
+
+    oldProfiles run migration
+  } map { migrated =>
+    Logger.info(s"Migrated $migrated profile(s)")
+  }
 
   override def indexes(): Future[List[Index]] = {
     val profileIndexes = super[ProfileRepository].indexes()
@@ -32,8 +55,9 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
     findByEmailAndProvider(email, providerId).flatMap {
       case None => Future.successful(None)
       case Some(oldProfile) => for {
-        _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
         _ <- TaskRepository.copy(User(oldProfile.userId, None), User(email, None))
+        _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
+        _ <- delete(oldProfile)
         newProfile <- super.find(providerId, email)
       }
       yield newProfile

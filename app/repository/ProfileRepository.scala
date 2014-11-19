@@ -64,4 +64,12 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
       Update(Json.obj("$set" -> Json.obj("passwordInfo" -> info)).as[BSONDocument], fetchNewObject = true)))
       .map(_.map(Json.toJson(_).as[BasicProfile]))
   }
+
+  def findOldProfile: Future[Option[BasicProfile]] =
+    collection.find(Json.obj("$where" -> "this.userId != this.email")).cursor[BasicProfile].headOption
+
+  def delete(profile: BasicProfile): Future[Int] =
+    collection.remove(Json.obj("userId" -> profile.userId)).map {
+      lastError => lastError.updated
+    }
 }
