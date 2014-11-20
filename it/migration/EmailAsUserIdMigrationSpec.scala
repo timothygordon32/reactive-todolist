@@ -2,9 +2,8 @@ package migration
 
 import java.util.UUID
 
-import models.User
 import org.specs2.specification.Scope
-import play.api.libs.json.{JsString, JsObject, JsArray, Json}
+import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 import play.api.test._
 import repository.ProfileRepository
 import securesocial.core.providers.utils.PasswordHasher
@@ -20,8 +19,8 @@ class EmailAsUserIdMigrationSpec extends PlaySpecification with StartedFakeAppli
 
     "be migrated automatically" in new TestCase {
       // Given
-      await(repo.save(profile1, SaveMode.SignUp)) must be equalTo user(userId1)
-      await(repo.save(profile2, SaveMode.SignUp)) must be equalTo user(userId2)
+      await(repo.save(profile1, SaveMode.SignUp)).username must be equalTo userId1
+      await(repo.save(profile2, SaveMode.SignUp)).username  must be equalTo userId2
       // When
       await(MongoUserService.migrateAll)
       // Then
@@ -34,7 +33,7 @@ class EmailAsUserIdMigrationSpec extends PlaySpecification with StartedFakeAppli
     "be accessible by their email address" in new TestCase {
       await(MongoUserService.migrateAll)
 
-      await(repo.save(profile1, SaveMode.SignUp)) must be equalTo user(userId1)
+      await(repo.save(profile1, SaveMode.SignUp)).username must be equalTo userId1
 
       val oldIdentity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
         .withBody(Json.obj("username" -> userId1, "password" -> password))).get).get("id").get
@@ -62,16 +61,13 @@ class EmailAsUserIdMigrationSpec extends PlaySpecification with StartedFakeAppli
 
     val ProviderId = UsernamePasswordProvider.UsernamePassword
 
-    def user(userId: String) = User(userId, Some(s"Joe-$userId"))
-
     def email(userId: String) = s"$userId@somemail.com"
-
 
     def createProfile(userId: String): BasicProfile = {
       BasicProfile(
         providerId = ProviderId,
         userId = userId,
-        firstName = user(userId).firstName,
+        firstName = Some(s"Joe-$userId"),
         lastName = Some("Bloggs"),
         fullName = Some("Joe Blow Bloggs"),
         email = Some(email(userId)),

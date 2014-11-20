@@ -45,17 +45,22 @@ object TaskRepository extends Indexed {
   } yield indexes
 
   def create(task: Task)(implicit user: User): Future[Task] = {
+    create(task, user.username)
+  }
+
+  def create(task: Task, userId: String): Future[Task] = {
     val toCreate = task match {
       case Task(None, _, _) => task.copy(id = Some(BSONObjectID.generate))
       case Task(Some(_), _, _) => task
     }
 
-    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.username)).map(_ => toCreate)
+    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> userId)).map(_ => toCreate)
   }
 
-  def findAll(implicit user: User): Future[List[Task]] = {
-    collection.find(Json.obj("user" -> user.username)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
-  }
+  def findAll(implicit user: User): Future[List[Task]] = findAll(user.username)
+
+  def findAll(userId: String): Future[List[Task]] =
+    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
 
   def find(id: String)(implicit user: User): Future[Option[Task]] = {
     val byId = Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)
@@ -80,10 +85,10 @@ object TaskRepository extends Indexed {
     }
   }
 
-  def copy(from: User, to: User): Future[List[Task]] = {
-    def copy(copies: Vector[Task], task: Task): Future[Vector[Task]] = create(task.copy(id = None))(to).map(copies :+ _)
+  def copy(fromUserId: String, toUserId: String): Future[List[Task]] = {
+    def copy(copies: Vector[Task], task: Task): Future[Vector[Task]] = create(task.copy(id = None), toUserId).map(copies :+ _)
 
-    def copyAll(tasks: List[Task])(user: User): Future[List[Task]] = {
+    def copyAll(tasks: List[Task]): Future[List[Task]] = {
       val toCopy = Enumerator.enumerate(tasks)
       val copier = Iteratee.foldM(Vector.empty[Task])(copy)
 
@@ -91,8 +96,8 @@ object TaskRepository extends Indexed {
     }
 
     for {
-      fromTasks <- findAll(from)
-      toTasks <- copyAll(fromTasks)(to)
+      fromTasks <- findAll(fromUserId)
+      toTasks <- copyAll(fromTasks)
     } yield toTasks
   }
 }

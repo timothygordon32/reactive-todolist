@@ -22,7 +22,7 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
         find(UsernamePasswordProvider.UsernamePassword, email).flatMap {
           case Some(_) => delete(oldProfile).map(_ => total + 1)
           case None => for {
-            _ <- TaskRepository.copy(User(oldProfile.userId, None), User(email, None))
+            _ <- TaskRepository.copy(oldProfile.userId, email)
             _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
             _ <- delete(oldProfile)
           }
@@ -55,7 +55,7 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
     findByEmailAndProvider(email, providerId).flatMap {
       case None => Future.successful(None)
       case Some(oldProfile) => for {
-        _ <- TaskRepository.copy(User(oldProfile.userId, None), User(email, None))
+        _ <- TaskRepository.copy(oldProfile.userId, email)
         _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
         _ <- delete(oldProfile)
         newProfile <- super.find(providerId, email)

@@ -13,11 +13,13 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
   def randomString = UUID.randomUUID().toString
 
+  def randomUser = User(BSONObjectID.generate, randomString, None)
+
   "User task repository" should {
 
     "list tasks" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString, None)
+      implicit val user = randomUser
       val first = Task(Some(BSONObjectID.generate), "first")
       val second = Task(Some(BSONObjectID.generate), "second")
       // And
@@ -37,7 +39,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "retrieve and delete a saved task" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString, None)
+      implicit val user = randomUser
       val text = s"text-${UUID.randomUUID()}"
 
       // When
@@ -56,7 +58,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "update a task" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString, None)
+      implicit val user = randomUser
       val text = s"text-${UUID.randomUUID()}"
       val created = await(TaskRepository.create(Task(None, text)))
       created.done must beFalse
@@ -76,7 +78,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
     "batch delete tasks" in {
       // Given
-      implicit val user = User(UUID.randomUUID.toString, None)
+      implicit val user = randomUser
       val doneTask = Task(Some(BSONObjectID.generate), "done", done = true)
       val notDoneTask = Task(Some(BSONObjectID.generate), "not-done", done = false)
       // And
@@ -110,14 +112,14 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
     "copy all tasks to another user" in {
       // Given
       val repo = TaskRepository
-      val oldUser = User(randomString, None)
+      val oldUser = randomUser
       val task1 = Task(None, randomString)
       await(repo.create(task1)(oldUser))
       val task2 = Task(None, randomString)
       await(repo.create(task2)(oldUser))
-      val newUser = User(UUID.randomUUID().toString, None)
+      val newUser = randomUser
       // When
-      await(repo.copy(from = oldUser, to = newUser))
+      await(repo.copy(fromUserId = oldUser.username, toUserId = newUser.username))
       // Then
       val copied = await(repo.findAll(newUser))
       copied must have size 2
