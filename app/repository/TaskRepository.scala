@@ -57,9 +57,24 @@ object TaskRepository extends Indexed {
     collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> userId)).map(_ => toCreate)
   }
 
-  def findAll(implicit user: User): Future[List[Task]] = findAll(user.username)
+  def create(task: Task, userId: BSONObjectID): Future[Task] = {
+    val toCreate = task match {
+      case Task(None, _, _) => task.copy(id = Some(BSONObjectID.generate))
+      case Task(Some(_), _, _) => task
+    }
+
+    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> userId)).map(_ => toCreate)
+  }
+
+  def findAll(implicit user: User): Future[List[Task]] = for {
+    byUsername <- findAll(user.username)
+    byId <- findAll(user.id)
+  } yield byUsername ++ byId
 
   def findAll(userId: String): Future[List[Task]] =
+    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
+
+  def findAll(userId: BSONObjectID): Future[List[Task]] =
     collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
 
   def find(id: String)(implicit user: User): Future[Option[Task]] = {

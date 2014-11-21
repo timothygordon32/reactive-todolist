@@ -6,7 +6,6 @@ import models.{Task, User}
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
-import security.MongoUserService
 import utils.StartedFakeApplication
 
 class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
@@ -125,6 +124,18 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
       copied must have size 2
       copied(0).text must be equalTo task1.text
       copied(1).text must be equalTo task2.text
+    }
+
+    "load tasks by user id or userId" in {
+      // Given
+      val repo = TaskRepository
+      implicit val user = randomUser
+      val task1 = await(repo.create(Task(text = randomString), user.username))
+      val task2 = await(repo.create(Task(text = randomString), user.id))
+      // When
+      val tasks = await(repo.findAll)
+      // Then
+      tasks must contain(task1, task2).inOrder.atMost
     }
   }
 }
