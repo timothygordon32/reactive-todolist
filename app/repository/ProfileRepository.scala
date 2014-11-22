@@ -58,7 +58,7 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
 
   implicit def toUser(profile: ProfileWithId): User = User(profile._id, profile.userId, profile.firstName)
 
-  def indexes(): Future[List[Index]] = for {
+  def indexes(): Future[Seq[Index]] = for {
     _ <- emailIndexCreated
     _ <- providerIdUserIdIndexCreated
     indexes <- collection.indexesManager.list()

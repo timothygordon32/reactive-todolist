@@ -38,10 +38,10 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
     Logger.info(s"Migrated $migrated profile(s)")
   }
 
-  override def indexes(): Future[List[Index]] = {
+  override def indexes(): Future[Seq[Index]] = {
     val profileIndexes = super[ProfileRepository].indexes()
     val tokenIndexes = super[TokenRepository].indexes()
-    Future.sequence(List(profileIndexes, tokenIndexes)).map(_.flatten)
+    Future.sequence(Seq(profileIndexes, tokenIndexes)).map(_.flatten)
   }
 
   override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {

@@ -31,7 +31,7 @@ trait TokenRepository extends Indexed with SecureSocialDatabase {
   private val providerIdUserIdIndexCreated =
     ensureIndex(collection, Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
 
-  def indexes(): Future[List[Index]] = for {
+  def indexes(): Future[Seq[Index]] = for {
     _ <- emailIndexCreated
     _ <- providerIdUserIdIndexCreated
     indexes <- collection.indexesManager.list()

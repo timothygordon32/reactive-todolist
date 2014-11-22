@@ -39,7 +39,7 @@ object TaskRepository extends Indexed {
 
   private val indexesCreated = ensureIndex(collection, Index(Seq("user" -> IndexType.Ascending), Some("user")))
 
-  def indexes(): Future[List[Index]] = for {
+  def indexes(): Future[Seq[Index]] = for {
     _ <- indexesCreated
     indexes <- collection.indexesManager.list()
   } yield indexes
@@ -66,16 +66,16 @@ object TaskRepository extends Indexed {
     collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> userId)).map(_ => toCreate)
   }
 
-  def findAll(implicit user: User): Future[List[Task]] = for {
+  def findAll(implicit user: User): Future[Seq[Task]] = for {
     byUsername <- findAll(user.username)
     byId <- findAll(user.id)
   } yield byUsername ++ byId
 
-  def findAll(userId: String): Future[List[Task]] =
-    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
+  def findAll(userId: String): Future[Seq[Task]] =
+    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()
 
-  def findAll(userId: BSONObjectID): Future[List[Task]] =
-    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[List]()
+  def findAll(userId: BSONObjectID): Future[Seq[Task]] =
+    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()
 
   def find(id: String)(implicit user: User): Future[Option[Task]] = {
     val byId = Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)
@@ -100,14 +100,14 @@ object TaskRepository extends Indexed {
     }
   }
 
-  def copy(fromUserId: String, toUserId: String): Future[List[Task]] = {
+  def copy(fromUserId: String, toUserId: String): Future[Seq[Task]] = {
     def copy(copies: Vector[Task], task: Task): Future[Vector[Task]] = create(task.copy(id = None), toUserId).map(copies :+ _)
 
-    def copyAll(tasks: List[Task]): Future[List[Task]] = {
+    def copyAll(tasks: Seq[Task]): Future[Seq[Task]] = {
       val toCopy = Enumerator.enumerate(tasks)
       val copier = Iteratee.foldM(Vector.empty[Task])(copy)
 
-      toCopy.run(copier).map(_.toList)
+      toCopy.run(copier)
     }
 
     for {
