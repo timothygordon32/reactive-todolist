@@ -1,17 +1,20 @@
 package repository
 
-import models.{User, Task}
+import models.{Task, User}
+import play.api.Play
+import play.api.libs.concurrent.Akka
 import play.api.libs.functional.syntax._
-import play.api.libs.iteratee.{Iteratee, Enumerator}
+import play.api.libs.iteratee.{Enumerator, Iteratee}
 import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats._
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.indexes.{IndexType, Index}
+import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONObjectID
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 object TaskRepositoryFormats {
   import play.modules.reactivemongo.json.BSONFormats._
@@ -114,5 +117,20 @@ object TaskRepository extends Indexed {
       fromTasks <- findAll(fromUserId)
       toTasks <- copyAll(fromTasks)
     } yield toTasks
+  }
+
+  def migrateUserId(user: User): Future[Int] = {
+    def delayed[T](duration: FiniteDuration) = akka.pattern.after[T](duration, using = Akka.system(Play.current).scheduler) _
+
+    def copy(migrated: Int, task: Task): Future[Int] = delayed(200.milliseconds) {
+      collection.save(Json.toJson(task).as[JsObject] ++ Json.obj("user" -> user.id)).map {
+        lastError => migrated + lastError.updated
+      }
+    }
+
+    val toMigrate = collection.find(Json.obj("user" -> user.username)).cursor[Task].enumerate()
+    val migrator = Iteratee.foldM(0)(copy)
+
+    toMigrate.run(migrator)
   }
 }

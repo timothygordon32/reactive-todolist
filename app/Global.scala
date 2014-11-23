@@ -21,7 +21,7 @@ object Global extends WithFilters(HttpsRedirectFilter) {
   }
 
   override def onStart(app: Application): Unit = {
-    Akka.system(app).scheduler.scheduleOnce(10.seconds) {
+    val x = Akka.system(app).scheduler.scheduleOnce(10.seconds) {
       MongoUserService.migrateAll
     }
   }
