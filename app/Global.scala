@@ -22,7 +22,7 @@ object Global extends WithFilters(HttpsRedirectFilter) {
 
   override def onStart(app: Application): Unit = {
     val x = Akka.system(app).scheduler.scheduleOnce(10.seconds) {
-      MongoUserService.migrateAll
+      MongoUserService.migrateUsernameToEmail(_ => true)
     }
   }
 }

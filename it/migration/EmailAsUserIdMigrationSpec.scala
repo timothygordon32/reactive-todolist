@@ -21,8 +21,9 @@ class EmailAsUserIdMigrationSpec extends PlaySpecification with StartedFakeAppli
       // Given
       await(repo.save(profile1, SaveMode.SignUp)).username must be equalTo userId1
       await(repo.save(profile2, SaveMode.SignUp)).username  must be equalTo userId2
+      def includeProfile(p: BasicProfile): Boolean = Seq(userId1, userId2).contains(p.userId)
       // When
-      await(MongoUserService.migrateAll)
+      await(MongoUserService.migrateUsernameToEmail(includeProfile))
       // Then
       eventually(await(repo.find(ProviderId, email(userId1))) must not be None)
       eventually(await(repo.find(ProviderId, userId1)) must be equalTo None)
@@ -31,8 +32,6 @@ class EmailAsUserIdMigrationSpec extends PlaySpecification with StartedFakeAppli
     }
 
     "be accessible by their email address" in new TestCase {
-      await(MongoUserService.migrateAll)
-
       await(repo.save(profile1, SaveMode.SignUp)).username must be equalTo userId1
 
       val oldIdentity = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")

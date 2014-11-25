@@ -15,19 +15,21 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object MongoUserService extends UserService[User] with ProfileRepository with TokenRepository {
-  def migrateAll = {
+  def migrateUsernameToEmail(include: BasicProfile => Boolean) = {
     def migrate(total: Int, oldProfile: BasicProfile): Future[Int] = oldProfile.email match {
       case None => Future.successful(total)
       case Some(email) =>
-        find(UsernamePasswordProvider.UsernamePassword, email).flatMap {
-          case Some(_) => delete(oldProfile).map(_ => total + 1)
-          case None => for {
-            _ <- TaskRepository.copy(oldProfile.userId, email)
-            _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
-            _ <- delete(oldProfile)
+        if (include(oldProfile)) {
+          find(UsernamePasswordProvider.UsernamePassword, email).flatMap {
+            case Some(_) => delete(oldProfile).map(_ => total + 1)
+            case None => for {
+              _ <- TaskRepository.copy(oldProfile.userId, email)
+              _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
+              _ <- delete(oldProfile)
+            }
+            yield total + 1
           }
-          yield total + 1
-        }
+        } else Future.successful(total)
     }
 
     val oldProfiles = Enumerator.generateM(findOldProfile)
