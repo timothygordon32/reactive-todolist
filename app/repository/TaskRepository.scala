@@ -119,7 +119,7 @@ object TaskRepository extends Indexed {
     } yield toTasks
   }
 
-  def migrateUserId(user: User): Future[Int] = {
+  def migrateTaskOwnershipToUserObjectId(user: User): Future[Int] = {
     def delayed[T](duration: FiniteDuration) = akka.pattern.after[T](duration, using = Akka.system(Play.current).scheduler) _
 
     def copy(migrated: Int, task: Task): Future[Int] = delayed(200.milliseconds) {

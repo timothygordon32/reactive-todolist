@@ -1,6 +1,7 @@
 package repository
 
 import models.User
+import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.Json
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
@@ -108,4 +109,6 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
     collection.remove(Json.obj("userId" -> profile.userId)).map {
       lastError => lastError.updated
     }
+
+  def enumerateProfiles: Enumerator[BasicProfile] = collection.find(Json.obj()).cursor[BasicProfile].enumerate()
 }
