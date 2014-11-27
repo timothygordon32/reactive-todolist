@@ -29,6 +29,8 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
     profiles run migration
   } map { migrated =>
     Logger.info(s"Migrated $migrated task(s) to ownership by user ObjectId")
+  } recover {
+    case e => Logger.error(s"Failed to migrate tasks to ownership by user ObjectId", e)
   }
 
   def migrateProfileUsernameToEmail(include: BasicProfile => Boolean) = {
@@ -56,6 +58,8 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
   } map { migrated =>
     Logger.info(s"Migrated $migrated profile(s) to use email as username")
     migrated
+  } recover {
+    case e => Logger.error(s"Failed to migrate profiles to use email as username", e)
   }
 
   override def indexes(): Future[Seq[Index]] = {
