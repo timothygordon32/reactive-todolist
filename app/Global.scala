@@ -25,7 +25,7 @@ object Global extends WithFilters(HttpsRedirectFilter) {
       MongoUserService.migrateProfileUsernameToEmail(_ => true)
     }
 
-    Akka.system(app).scheduler.scheduleOnce(10 seconds) {
+    Akka.system(app).scheduler.scheduleOnce(20 seconds) {
       MongoUserService.migrateTaskOwnershipToUserObjectId(_ => true)
     }
   }
