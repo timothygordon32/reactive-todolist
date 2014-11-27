@@ -1,7 +1,7 @@
 import java.lang.reflect.Constructor
 
 import models.User
-import play.api.{Logger, Application}
+import play.api.Application
 import play.api.libs.concurrent.Akka
 import play.api.mvc.WithFilters
 import securesocial.core.RuntimeEnvironment
@@ -18,15 +18,5 @@ object Global extends WithFilters(HttpsRedirectFilter) {
       _.asInstanceOf[Constructor[A]].newInstance(ApplicationRuntimeEnvironment)
     }
     instance.getOrElse(super.getControllerInstance(controllerClass))
-  }
-
-  override def onStart(app: Application): Unit = {
-    Akka.system(app).scheduler.scheduleOnce(10 seconds) {
-      Logger.info("Run after 10 seconds")
-    }
-
-    Akka.system(app).scheduler.schedule(11 seconds, 1 second) {
-      Logger.info("Every second")
-    }
   }
 }
