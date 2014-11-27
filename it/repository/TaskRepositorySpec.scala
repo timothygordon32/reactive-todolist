@@ -107,5 +107,48 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
       // Then
       indexes.filter(_.key == Seq("user" -> IndexType.Ascending)) must not be empty
     }
+
+    "copy all tasks to another user" in {
+      // Given
+      val repo = TaskRepository
+      val oldUser = randomUser
+      val task1 = Task(None, randomString)
+      await(repo.create(task1)(oldUser))
+      val task2 = Task(None, randomString)
+      await(repo.create(task2)(oldUser))
+      val newUser = randomUser
+      // When
+      await(repo.copy(fromUserId = oldUser.username, toUserId = newUser.username))
+      // Then
+      val copied = await(repo.findAll(newUser))
+      copied must have size 2
+      copied(0).text must be equalTo task1.text
+      copied(1).text must be equalTo task2.text
+    }
+
+    "load tasks by user id or userId" in {
+      // Given
+      val repo = TaskRepository
+      implicit val user = randomUser
+      val task1 = await(repo.create(Task(text = randomString), user.username))
+      val task2 = await(repo.create(Task(text = randomString), user.id))
+      // When
+      val tasks = await(repo.findAll)
+      // Then
+      tasks must contain(task1, task2).inOrder.atMost
+    }
+
+    "change ownership from userId to user id" in {
+      // Given
+      val repo = TaskRepository
+      implicit val user = randomUser
+      val task1 = await(repo.create(Task(text = randomString), user.username))
+      val task2 = await(repo.create(Task(text = randomString), user.username))
+      // When
+      await(repo.migrateTaskOwnershipToUserObjectId(user))
+      // Then
+      val tasks = await(repo.findAll(user.id))
+      tasks must contain(task1, task2).inOrder.atMost
+    }
   }
 }
