@@ -16,6 +16,7 @@ import scala.concurrent.Future
 
 object MongoUserService extends UserService[User] with ProfileRepository with TokenRepository {
   def migrateTaskOwnershipToUserObjectId(include: BasicProfile => Boolean) = {
+    Logger.info(s"Migrating tasks to ownership by user ObjectId")
     def migrate(total: Int, profile: BasicProfile): Future[Int] = if (include(profile)) {
       findKnown(profile.userId).flatMap { user =>
         TaskRepository.migrateTaskOwnershipToUserObjectId(user)
@@ -31,6 +32,7 @@ object MongoUserService extends UserService[User] with ProfileRepository with To
   }
 
   def migrateProfileUsernameToEmail(include: BasicProfile => Boolean) = {
+    Logger.info(s"Migrating profiles to use email as username")
     def migrate(total: Int, oldProfile: BasicProfile): Future[Int] = oldProfile.email match {
       case None => Future.successful(total)
       case Some(email) =>
