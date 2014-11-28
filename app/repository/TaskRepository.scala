@@ -48,7 +48,12 @@ object TaskRepository extends Indexed {
   } yield indexes
 
   def create(task: Task)(implicit user: User): Future[Task] = {
-    create(task, user.username)
+    val toCreate = task match {
+      case Task(None, _, _) => task.copy(id = Some(BSONObjectID.generate))
+      case Task(Some(_), _, _) => task
+    }
+
+    collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.id)).map(_ => toCreate)
   }
 
   def create(task: Task, userId: String): Future[Task] = {
@@ -81,24 +86,24 @@ object TaskRepository extends Indexed {
     collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()
 
   def find(id: String)(implicit user: User): Future[Option[Task]] = {
-    val byId = Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)
+    val byId = Json.obj("_id" -> BSONObjectID(id), "user" -> user.id)
     collection.find(byId).cursor[Task].headOption
   }
 
   def update(task: Task)(implicit user: User): Future[Boolean] = {
-    collection.save(Json.toJson(task).as[JsObject] ++ Json.obj("user" -> user.username)).map {
+    collection.save(Json.toJson(task).as[JsObject] ++ Json.obj("user" -> user.id)).map {
       lastError => lastError.updated == 1
     }
   }
 
   def delete(id: String)(implicit user: User): Future[Boolean] = {
-    collection.remove(Json.obj("_id" -> BSONObjectID(id), "user" -> user.username)).map {
+    collection.remove(Json.obj("_id" -> BSONObjectID(id), "user" -> user.id)).map {
       lastError => lastError.updated == 1
     }
   }
 
   def deleteDone(implicit user: User): Future[Int] = {
-    collection.remove(Json.obj("done" -> true, "user" -> user.username)).map {
+    collection.remove(Json.obj("done" -> true, "user" -> user.id)).map {
       lastError => lastError.updated
     }
   }

@@ -109,6 +109,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
     }
 
     "copy all tasks to another user" in {
+      skipped
       // Given
       val repo = TaskRepository
       val oldUser = randomUser
@@ -127,6 +128,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
     }
 
     "load tasks by user id or userId" in {
+      skipped
       // Given
       val repo = TaskRepository
       implicit val user = randomUser
@@ -139,6 +141,7 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
     }
 
     "change ownership from userId to user id" in {
+      skipped
       // Given
       val repo = TaskRepository
       implicit val user = randomUser
