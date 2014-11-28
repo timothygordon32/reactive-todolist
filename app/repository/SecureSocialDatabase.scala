@@ -7,10 +7,12 @@ import reactivemongo.api.DB
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait SecureSocialDatabase {
-  lazy val secureSocialDatabase = Play.current.configuration.getString("secureSocialDatabaseName")
+//  lazy val secureSocialDatabase = Play.current.configuration.getString("secureSocialDatabaseName")
 
-  lazy val db: DB = {
-    val rootDB = ReactiveMongoPlugin.db
-    secureSocialDatabase.map(rootDB.sibling(_)).getOrElse(rootDB)
-  }
+  lazy val db: DB = ReactiveMongoPlugin.db
+
+//  lazy val db: DB = {
+//    val rootDB = ReactiveMongoPlugin.db
+//    secureSocialDatabase.map(rootDB.sibling(_)).getOrElse(rootDB)
+//  }
 }
