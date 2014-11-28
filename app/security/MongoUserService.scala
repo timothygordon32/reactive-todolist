@@ -14,7 +14,7 @@ import securesocial.core.{AuthenticationMethod, BasicProfile, PasswordInfo}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object MongoUserService extends UserService[User] with ProfileRepository with TokenRepository {
+class MongoUserService extends UserService[User] with ProfileRepository with TokenRepository {
   def migrateTaskOwnershipToUserObjectId(include: BasicProfile => Boolean) = {
     Logger.info(s"Migrating tasks to ownership by user ObjectId")
     def migrate(total: Int, profile: BasicProfile): Future[Int] = if (include(profile)) {

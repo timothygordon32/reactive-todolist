@@ -4,10 +4,12 @@ import models.User
 import play.api.Application
 import play.api.libs.concurrent.Akka
 import play.api.mvc.WithFilters
+import play.modules.reactivemongo.ReactiveMongoPlugin
 import securesocial.core.RuntimeEnvironment
-import security.{MongoUserService, ApplicationRuntimeEnvironment}
-import scala.concurrent.duration._
+import security.ApplicationRuntimeEnvironment
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object Global extends WithFilters(HttpsRedirectFilter) {
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
@@ -21,12 +23,14 @@ object Global extends WithFilters(HttpsRedirectFilter) {
   }
 
   override def onStart(app: Application): Unit = {
-    Akka.system(app).scheduler.scheduleOnce(10 seconds) {
-      MongoUserService.migrateProfileUsernameToEmail(_ => true)
+    ReactiveMongoPlugin.db(app)
+
+    Akka.system(app).scheduler.scheduleOnce(60 seconds) {
+      ApplicationRuntimeEnvironment.migrator.migrateProfileUsernameToEmail(_ => true)
     }
 
-    Akka.system(app).scheduler.scheduleOnce(20 seconds) {
-      MongoUserService.migrateTaskOwnershipToUserObjectId(_ => true)
+    Akka.system(app).scheduler.scheduleOnce(80 seconds) {
+      ApplicationRuntimeEnvironment.migrator.migrateTaskOwnershipToUserObjectId(_ => true)
     }
   }
 }
