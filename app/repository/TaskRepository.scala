@@ -74,8 +74,8 @@ object TaskRepository extends Indexed {
     byId <- findAll(user.id)
   } yield byUsername ++ byId
 
-  def findAll(userId: String): Future[Seq[Task]] =
-    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()
+  def findAll(userId: String): Future[Seq[Task]] = Future.successful(Seq.empty)
+//    collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()
 
   def findAll(userId: BSONObjectID): Future[Seq[Task]] =
     collection.find(Json.obj("user" -> userId)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()
