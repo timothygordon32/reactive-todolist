@@ -1,11 +1,10 @@
 package security
 
 import models.User
-import play.api.{Logger, Play}
+import play.api.Play
 import play.api.Play.current
-import play.api.libs.iteratee.{Iteratee, Enumerator}
 import reactivemongo.api.indexes.Index
-import repository.{TaskRepository, ProfileRepository, TokenRepository}
+import repository.{ProfileRepository, TaskRepository, TokenRepository}
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.{SaveMode, UserService}
@@ -15,53 +14,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MongoUserService extends UserService[User] with ProfileRepository with TokenRepository {
-  def migrateTaskOwnershipToUserObjectId(include: BasicProfile => Boolean) = {
-    Logger.info(s"Migrating tasks to ownership by user ObjectId")
-    def migrate(total: Int, profile: BasicProfile): Future[Int] = if (include(profile)) {
-      findKnown(profile.userId).flatMap { user =>
-        TaskRepository.migrateTaskOwnershipToUserObjectId(user)
-      }
-    } else Future.successful(total)
-
-    val profiles = enumerateProfiles
-    val migration = Iteratee.foldM(0)(migrate)
-
-    profiles run migration
-  } map { migrated =>
-    Logger.info(s"Migrated $migrated task(s) to ownership by user ObjectId")
-  } recover {
-    case e => Logger.error(s"Failed to migrate tasks to ownership by user ObjectId", e)
-  }
-
-  def migrateProfileUsernameToEmail(include: BasicProfile => Boolean) = {
-    Logger.info(s"Migrating profiles to use email as username")
-    def migrate(total: Int, oldProfile: BasicProfile): Future[Int] = oldProfile.email match {
-      case None => Future.successful(total)
-      case Some(email) =>
-        if (include(oldProfile)) {
-          find(UsernamePasswordProvider.UsernamePassword, email).flatMap {
-            case Some(_) => delete(oldProfile).map(_ => total + 1)
-            case None => for {
-              _ <- TaskRepository.copy(oldProfile.userId, email)
-              _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
-              _ <- delete(oldProfile)
-            }
-            yield total + 1
-          }
-        } else Future.successful(total)
-    }
-
-    val oldProfiles = Enumerator.generateM(findOldProfile)
-    val migration = Iteratee.foldM(0)(migrate)
-
-    oldProfiles run migration
-  } map { migrated =>
-    Logger.info(s"Migrated $migrated profile(s) to use email as username")
-    migrated
-  } recover {
-    case e => Logger.error(s"Failed to migrate profiles to use email as username", e)
-  }
-
   override def indexes(): Future[Seq[Index]] = {
     val profileIndexes = super[ProfileRepository].indexes()
     val tokenIndexes = super[TokenRepository].indexes()
