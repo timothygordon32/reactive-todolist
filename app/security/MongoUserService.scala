@@ -4,7 +4,7 @@ import models.User
 import play.api.Play
 import play.api.Play.current
 import reactivemongo.api.indexes.Index
-import repository.{ProfileRepository, TaskRepository, TokenRepository}
+import repository.{ProfileRepository, TokenRepository}
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.{SaveMode, UserService}
@@ -18,26 +18,6 @@ class MongoUserService extends UserService[User] with ProfileRepository with Tok
     val profileIndexes = super[ProfileRepository].indexes()
     val tokenIndexes = super[TokenRepository].indexes()
     Future.sequence(Seq(profileIndexes, tokenIndexes)).map(_.flatten)
-  }
-
-  override def find(providerId: String, userId: String): Future[Option[BasicProfile]] = {
-    super.find(providerId, userId).flatMap {
-      case Some(profile) => Future.successful(Some(profile))
-      case None => attemptMigration(providerId, userId)
-    }
-  }
-
-  private def attemptMigration(providerId: String, email: String): Future[Option[BasicProfile]] = {
-    findByEmailAndProvider(email, providerId).flatMap {
-      case None => Future.successful(None)
-      case Some(oldProfile) => for {
-        _ <- TaskRepository.copy(oldProfile.userId, email)
-        _ <- save(oldProfile.copy(userId = email), SaveMode.SignUp)
-        _ <- delete(oldProfile)
-        newProfile <- super.find(providerId, email)
-      }
-      yield newProfile
-    }
   }
 
   private def seedTestUser: Future[_] = find(UsernamePasswordProvider.UsernamePassword, "testuser1@nomail.com").flatMap {
