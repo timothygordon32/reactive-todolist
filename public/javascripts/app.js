@@ -14,6 +14,9 @@ angular.module('todo')
             .when("/signup/:token", {
                 templateUrl: "assets/partials/signup-verified.html",
                 controller: "SignupVerifiedController"})
+            .when("/reset", {
+                templateUrl: "assets/partials/reset.html",
+                controller: "ResetController"})
             .when("/tasks", {
                 templateUrl: "assets/partials/tasks.html",
                 controller: "TodoCtrl"})
