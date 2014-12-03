@@ -120,3 +120,8 @@ angular.module('todo.controllers').controller('ResetController', function ($scop
 
     $scope.formData = {};
 });
+
+angular.module('todo.controllers').controller('PasswordController', function ($scope, $http, $location, $routeParams) {
+
+    $scope.formData = {};
+});

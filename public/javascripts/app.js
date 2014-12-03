@@ -17,6 +17,9 @@ angular.module('todo')
             .when("/reset", {
                 templateUrl: "assets/partials/reset.html",
                 controller: "ResetController"})
+            .when("/password", {
+                templateUrl: "assets/partials/change-password.html",
+                controller: "PasswordController"})
             .when("/tasks", {
                 templateUrl: "assets/partials/tasks.html",
                 controller: "TodoCtrl"})
