@@ -37,8 +37,7 @@ production).
 communication.
 * `SMTP_TLS` - set to `true` by the script - it is assumed that mail traffic to the SMTP server will be encrypted using
 TLS.
-* `MONGODB_INDEX_OPERATION_DELAY` - set to `20s` by the script, since running immediately on Heroku causes
-permission errors.
+* `MONGODB_INDEX_OPERATION_DELAY` - set to `10s` by the script, perform index options after an initial delay.
 
 The script embodies the operations required to set up
 the application as per [this link on adding Heroku as a remote repository](https://devcenter.heroku.com/articles/git).
