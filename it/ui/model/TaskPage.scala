@@ -15,6 +15,8 @@ class TaskPage(val user: User, val driver: WebDriver, val port: Int) extends Flu
     find("#add-task").click()
   }
 
+  def changePassword(from: String, to: String) = ???
+
   def mustHaveTaskWithText(text: String) {
     await atMost(5, TimeUnit.SECONDS) until ".list-group-item span" hasText text
   }
