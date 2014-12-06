@@ -16,8 +16,12 @@ class ChangePasswordSpec extends PlaySpecification {
 
       val taskPage = loginPage.login(User.User1)
 
+      val changePasswordPage = taskPage.changePassword
+
       val newPassword = UUID.randomUUID.toString
-      val changePasswordPage = taskPage.changePassword(from = User.User1.password, to = newPassword)
+      changePasswordPage changePasswordTo newPassword
+
+      browser.await untilPage taskPage isAt()
     }
   }
 }
