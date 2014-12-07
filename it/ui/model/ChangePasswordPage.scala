@@ -7,10 +7,10 @@ import org.openqa.selenium.WebDriver
 
 class ChangePasswordPage(val user: User, val driver: WebDriver, val port: Int) extends FluentPage(driver) {
 
-  def changePasswordTo(newPassword: String): Unit = {
-    fill("#currentPassword").`with`(user.password)
-    fill("#password1").`with`(newPassword)
-    fill("#password2").`with`(newPassword)
+  def changePassword(from: String, to: String): Unit = {
+    fill("#currentPassword").`with`(from)
+    fill("#password1").`with`(to)
+    fill("#password2").`with`(to)
 
     find("#changePassword").click()
   }

@@ -125,4 +125,19 @@ describe('Todo controller', function () {
         expect($rootScope.login).toEqual(jasmine.objectContaining({}));
         expect($location.url()).toBe('/login');
     }));
+
+    it('should navigate to the change password view', inject(function ($controller, $rootScope, $location) {
+        // Given
+        $httpBackend.expectGET("/tasks").respond([]);
+        scope = $rootScope.$new();
+        todoCtrl = $controller('TodoCtrl', {
+            $scope: scope
+        });
+        $httpBackend.flush();
+        // When
+        scope.changePassword();
+        scope.$apply();
+        // Then
+        expect($location.url()).toBe('/password');
+    }));
 });

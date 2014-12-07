@@ -6,11 +6,13 @@ import org.fluentlenium.core.FluentPage
 import org.openqa.selenium.WebDriver
 
 class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver) {
-  def login(user: User): TaskPage = {
+  def login(user: User): TaskPage = login(user, user.password)
+
+  def login(user: User, password: String): TaskPage = {
     await untilPage this isAt()
 
     fill("#username").`with`(user.userId)
-    fill("#password").`with`(user.password)
+    fill("#password").`with`(password)
 
     find("#login").click()
 

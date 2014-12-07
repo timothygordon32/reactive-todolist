@@ -12,16 +12,13 @@ class ChangePasswordSpec extends PlaySpecification {
     "allow changing of password" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19004) {
       skipped
 
-      val loginPage = browser.goTo(new LoginPage(webDriver, port))
-
-      val taskPage = loginPage.login(User.User1)
-
-      val changePasswordPage = taskPage.changePassword
+      val changePasswordPage = browser.goTo(new LoginPage(webDriver, port)).login(User.User1).changePassword
 
       val newPassword = UUID.randomUUID.toString
-      changePasswordPage changePasswordTo newPassword
+      changePasswordPage.changePassword(from = User.User1.password, to = newPassword)
 
-      browser.await untilPage taskPage isAt()
+      val restorePasswordPage = browser.goTo(new LoginPage(webDriver, port)).login(User.User1).changePassword
+      restorePasswordPage.changePassword(from = newPassword, to = User.User1.password)
     }
   }
 }

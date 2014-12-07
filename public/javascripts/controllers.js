@@ -2,7 +2,7 @@
 
 angular.module('todo.controllers', ['ngResource']);
 
-angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $http, $rootScope, $location) {
+angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $http, $rootScope, $location, $log) {
 
     $scope.loaded = false;
 
@@ -68,6 +68,10 @@ angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $res
             $rootScope.login = {};
             $location.path("/login");
         });
+    };
+
+    $scope.changePassword = function () {
+        $location.path("/password");
     };
 });
 
