@@ -1,13 +1,11 @@
 package repository
 
-import java.util.UUID
-
 import models.User
 import org.specs2.specification.Scope
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
-import utils.StartedFakeApplication
+import utils.{StartedFakeApplication, UniqueStrings}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
@@ -78,10 +76,10 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     }
   }
 
-  trait TestCase extends Scope {
+  trait TestCase extends Scope with UniqueStrings {
     lazy val repo = new ProfileRepository {}
     val id = BSONObjectID.generate
-    val userId = UUID.randomUUID.toString
+    val userId = uniqueString
     val firstName = Some(s"Joe-$userId")
     val providerId = UsernamePasswordProvider.UsernamePassword
     val email = s"$userId@somemail.com"

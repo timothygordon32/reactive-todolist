@@ -15,7 +15,7 @@ class TaskPage(val user: User, val driver: WebDriver, val port: Int) extends Flu
     find("#add-task").click()
   }
 
-  def changePassword = {
+  def changePassword() = {
     find("#changePassword").click()
 
     val changePasswordPage = new ChangePasswordPage(user, driver, port)

@@ -1,15 +1,12 @@
 package repository
 
-import java.util.UUID
-
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.test.PlaySpecification
-import play.modules.reactivemongo.ReactiveMongoPlugin
 import reactivemongo.api.indexes.IndexType
 import securesocial.core.providers.MailToken
-import utils.StartedFakeApplication
+import utils.{StartedFakeApplication, UniqueStrings}
 
-class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication {
+class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication with UniqueStrings {
 
   "Token repository" should {
 
@@ -17,7 +14,7 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
       val repo = new TokenRepository {}
       val now = DateTime.now(DateTimeZone.UTC)
       val expireSoon = now.plusMinutes(1)
-      val token = MailToken(UUID.randomUUID.toString, "someone@nomail.com", now, expireSoon, isSignUp = true)
+      val token = MailToken(uniqueString, "someone@nomail.com", now, expireSoon, isSignUp = true)
 
       await(repo.saveToken(token))
 
@@ -32,7 +29,7 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
       val repo = new TokenRepository {}
       val now = DateTime.now(DateTimeZone.UTC)
       val expired = now.minusMinutes(1)
-      val token = MailToken(UUID.randomUUID.toString, "someone@nomail.com", now, expired, isSignUp = true)
+      val token = MailToken(uniqueString, "someone@nomail.com", now, expired, isSignUp = true)
 
       await(repo.saveToken(token))
 

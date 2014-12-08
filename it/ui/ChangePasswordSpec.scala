@@ -1,24 +1,29 @@
 package ui
 
-import java.util.UUID
-
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{User, LoginPage}
+import ui.model.{LoginPage, User}
+import utils.UniqueStrings
 
-class ChangePasswordSpec extends PlaySpecification {
+class ChangePasswordSpec extends PlaySpecification with UniqueStrings {
 
   "Task page" should {
 
-    "allow changing of password" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19004) {
+    "allow changing of password" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19004) with LoginPageSugar {
       skipped
 
-      val changePasswordPage = browser.goTo(new LoginPage(webDriver, port)).login(User.User1).changePassword
+      val changePasswordPage = browser goTo loginPage login User.User1 changePassword()
+      val newPassword = uniqueString
 
-      val newPassword = UUID.randomUUID.toString
-      changePasswordPage.changePassword(from = User.User1.password, to = newPassword)
+      changePasswordPage changePassword(from = User.User1.password, to = newPassword)
 
-      val restorePasswordPage = browser.goTo(new LoginPage(webDriver, port)).login(User.User1).changePassword
-      restorePasswordPage.changePassword(from = newPassword, to = User.User1.password)
+      val restorePasswordPage = browser goTo loginPage login(User.User1, newPassword) changePassword()
+      restorePasswordPage changePassword(from = newPassword, to = User.User1.password)
     }
   }
+}
+
+trait LoginPageSugar {
+  self: WithBrowser[Nothing] =>
+
+  def loginPage = new LoginPage(webDriver, port)
 }
