@@ -2,7 +2,7 @@
 
 angular.module('todo.controllers', ['ngResource']);
 
-angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $http, $rootScope, $location, $log) {
+angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $http, $rootScope, $location) {
 
     $scope.loaded = false;
 
@@ -120,12 +120,23 @@ angular.module('todo.controllers').controller('SignupVerifiedController', functi
     }
 });
 
-angular.module('todo.controllers').controller('ResetController', function ($scope, $http, $location, $routeParams) {
+angular.module('todo.controllers').controller('ResetController', function ($scope, $http, $location) {
 
     $scope.formData = {};
 });
 
-angular.module('todo.controllers').controller('PasswordController', function ($scope, $http, $location, $routeParams) {
+angular.module('todo.controllers').controller('PasswordController', function ($scope, $http, $location) {
 
     $scope.formData = {};
+
+    $scope.change = function() {
+        return $http.post('/users/password', $scope.formData).success(function() {
+            return $location.path('tasks');
+        }).error(function(response) {
+            $scope.form.errors = response;
+            if (response["password"]) {
+                return $scope.form.errors["password.password2"] = response["password"];
+            }
+        });
+    };
 });
