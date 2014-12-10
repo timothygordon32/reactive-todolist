@@ -12,7 +12,7 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
     "validate the user credentials" in {
 
       val login = route(FakeRequest(POST, "/users/authenticate/userpass")
-        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "!secret1"))).get
 
       status(login) must equalTo(SEE_OTHER)
       cookies(login).get("id") must not be None
@@ -29,7 +29,7 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
     "validate the user token" in {
 
       val id = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
-        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get).get("id").head
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "!secret1"))).get).get("id").head
 
       val login = route(FakeRequest(GET, "/login").withCookies(id)).get
 
@@ -49,7 +49,7 @@ class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication 
     "log the user off" in {
       // Given
       val id = cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
-        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "secret1"))).get).get("id").head
+        .withBody(Json.obj("username" -> "testuser1@nomail.com", "password" -> "!secret1"))).get).get("id").head
       // And
       val identity = route(FakeRequest(GET, "/login").withCookies(id)).get
       status(identity) must equalTo(OK)

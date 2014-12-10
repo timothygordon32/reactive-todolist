@@ -1,7 +1,5 @@
 package ui
 
-import java.util.UUID
-
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
 import ui.model._
@@ -19,10 +17,10 @@ class SignUpSpec extends PlaySpecification {
       ),
       port = 19002) {
 
-      val fakeMailServer = new Wiser with SecurityMessages
-      fakeMailServer.setHostname("localhost")
-      fakeMailServer.setPort(10025)
-      fakeMailServer.start()
+      val mailServer = new Wiser with SecurityMessages
+      mailServer.setHostname("localhost")
+      mailServer.setPort(10025)
+      mailServer.start()
 
       val login = browser.goTo(new LoginPage(webDriver, port))
       browser.await untilPage login isAt()
@@ -33,9 +31,9 @@ class SignUpSpec extends PlaySpecification {
       var newUser = User.generate
       signUp signUpWithEmail newUser.userId
 
-      eventually(fakeMailServer messagesFor newUser.userId should have size 1)
+      eventually(mailServer messagesFor newUser.userId should have size 1)
 
-      val message = (fakeMailServer messagesFor newUser.userId).head
+      val message = (mailServer messagesFor newUser.userId).head
 
       val signUpUuid = message signUpUuid()
       signUpUuid must not be None
@@ -47,7 +45,7 @@ class SignUpSpec extends PlaySpecification {
         firstName = newUser.firstName, lastName = "Bloggs",
         password1 = newUser.password, password2 = newUser.password)
 
-      eventually(fakeMailServer messagesFor newUser.userId should have size 2)
+      eventually(mailServer messagesFor newUser.userId should have size 2)
 
       val loginPage = browser.goTo(new LoginPage(webDriver, port))
       val taskPage = loginPage.login(newUser)

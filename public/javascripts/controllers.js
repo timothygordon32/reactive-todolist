@@ -133,9 +133,9 @@ angular.module('todo.controllers').controller('PasswordController', function ($s
         return $http.post('/users/password', $scope.formData).success(function() {
             return $location.path('tasks');
         }).error(function(response) {
-            $scope.form.errors = response;
+            $scope.formData.errors = response;
             if (response["password"]) {
-                return $scope.form.errors["password.password2"] = response["password"];
+                return $scope.formData.errors["password.password2"] = response["password"];
             }
         });
     };

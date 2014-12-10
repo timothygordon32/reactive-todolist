@@ -24,8 +24,9 @@ class MongoUserService extends UserService[User] with ProfileRepository with Tok
     profile =>
       if (!profile.isDefined) {
         for {
-          _ <- save("testuser1@nomail.com", "secret1", "Test1")
-          _ <- save("testuser2@nomail.com", "secret2", "Test2")
+          _ <- save("testuser1@nomail.com", "!secret1", "Test1")
+          _ <- save("testuser2@nomail.com", "!secret2", "Test2")
+          _ <- save("testuser3@nomail.com", "!secret3", "Test3")
         } yield ()
       }
       else Future.successful(())
