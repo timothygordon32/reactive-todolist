@@ -2,7 +2,7 @@ package ui
 
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{SecurityMessageMatchers, SecurityMessages, LoginPage}
+import ui.model.{User, SecurityMessageMatchers, SecurityMessages, LoginPage}
 
 class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers {
 
@@ -17,10 +17,10 @@ class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers
       ),
       port = 19003) {
 
-      val fakeMailServer = new Wiser with SecurityMessages
-      fakeMailServer.setHostname("localhost")
-      fakeMailServer.setPort(10026)
-      fakeMailServer.start()
+      val mailServer = new Wiser with SecurityMessages
+      mailServer.setHostname("localhost")
+      mailServer.setPort(10026)
+      mailServer.start()
 
       val login = browser.goTo(new LoginPage(webDriver, port))
       browser.await untilPage login isAt()
@@ -28,12 +28,12 @@ class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers
       val signUp = login.signUp
       browser.await untilPage signUp isAt()
 
-      var alreadyRegisteredEmail = "testuser1@nomail.com"
+      var alreadyRegisteredEmail = User.User1.email
       signUp signUpWithEmail alreadyRegisteredEmail
 
-      eventually(fakeMailServer.messagesFor(alreadyRegisteredEmail) must have size 1)
+      eventually(mailServer.messagesFor(alreadyRegisteredEmail) must have size 1)
 
-      val message = (fakeMailServer messagesFor alreadyRegisteredEmail).head
+      val message = (mailServer messagesFor alreadyRegisteredEmail).head
 
       message must beAlreadySignedUp
     }

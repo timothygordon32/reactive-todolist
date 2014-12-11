@@ -11,7 +11,7 @@ class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver)
   def login(user: User, password: String): TaskPage = {
     await untilPage this isAt()
 
-    fill("#username").`with`(user.userId)
+    fill("#username").`with`(user.email)
     fill("#password").`with`(password)
 
     find("#login").click()

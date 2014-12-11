@@ -2,7 +2,9 @@ package ui.model
 
 import java.util.UUID
 
-case class User(firstName: String, userId: String, password: String)
+case class User(firstName: String, userId: String, password: String) {
+  def email = userId
+}
 
 object User {
   val User1 = User(firstName = "Test1", userId = "testuser1@nomail.com", password = "!secret1")

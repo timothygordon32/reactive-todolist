@@ -29,11 +29,11 @@ class SignUpSpec extends PlaySpecification {
       browser.await untilPage signUp isAt()
 
       var newUser = User.generate
-      signUp signUpWithEmail newUser.userId
+      signUp signUpWithEmail newUser.email
 
-      eventually(mailServer messagesFor newUser.userId should have size 1)
+      eventually(mailServer messagesFor newUser.email should have size 1)
 
-      val message = (mailServer messagesFor newUser.userId).head
+      val message = (mailServer messagesFor newUser.email).head
 
       val signUpUuid = message signUpUuid()
       signUpUuid must not be None
@@ -45,7 +45,7 @@ class SignUpSpec extends PlaySpecification {
         firstName = newUser.firstName, lastName = "Bloggs",
         password1 = newUser.password, password2 = newUser.password)
 
-      eventually(mailServer messagesFor newUser.userId should have size 2)
+      eventually(mailServer messagesFor newUser.email should have size 2)
 
       val loginPage = browser.goTo(new LoginPage(webDriver, port))
       val taskPage = loginPage.login(newUser)

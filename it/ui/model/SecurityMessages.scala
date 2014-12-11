@@ -22,4 +22,6 @@ trait SecurityMessageMatchers {
   self: PlaySpecification =>
 
   val beAlreadySignedUp: Matcher[SecurityMessage] = (m: SecurityMessage) => (m.underlying.toString.contains("already signed-up"), "message should be already signed-up")
+
+  val bePasswordChanged: Matcher[SecurityMessage] = (m: SecurityMessage) => (m.underlying.toString.contains("password has been changed"), "message should be password change notification")
 }
