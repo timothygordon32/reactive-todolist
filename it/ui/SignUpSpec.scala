@@ -7,7 +7,7 @@ import ui.model._
 
 class SignUpSpec extends PlaySpecification {
 
-  "Security" should {
+  "Sign-up process" should {
 
     "allow user sign-up" in new WithBrowser(
       webDriver = WebDriverFactory(FIREFOX),
