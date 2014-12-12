@@ -1,7 +1,7 @@
 package ui.mail
 
 import org.subethamail.wiser.Wiser
-import ui.model.SecurityMessages
+import ui.mail.SecurityMessages
 
 class FakeMailServer(hostname: String, port: Int) extends Wiser with SecurityMessages {
   setHostname(hostname)

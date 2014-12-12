@@ -2,6 +2,7 @@ package ui
 
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
+import ui.mail.SecurityMessages
 import ui.model._
 
 class SignUpSpec extends PlaySpecification {

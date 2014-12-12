@@ -1,4 +1,4 @@
-package ui.model
+package ui.mail
 
 import org.specs2.matcher.Matcher
 import org.subethamail.wiser.{Wiser, WiserMessage}

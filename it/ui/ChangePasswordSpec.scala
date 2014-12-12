@@ -1,9 +1,9 @@
 package ui
 
 import play.api.test._
-import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
-import ui.model.User.User3
-import ui.model.{LoginPage, SecurityMessageMatchers}
+import ui.mail._
+import ui.model._
+import ui.model.User._
 import utils.UniqueStrings
 
 class ChangePasswordSpec extends PlaySpecification with UniqueStrings with SecurityMessageMatchers {
@@ -31,8 +31,3 @@ class ChangePasswordSpec extends PlaySpecification with UniqueStrings with Secur
   }
 }
 
-trait LoginPageSugar {
-  self: WithBrowser[Nothing] =>
-
-  def loginPage = new LoginPage(webDriver, port)
-}

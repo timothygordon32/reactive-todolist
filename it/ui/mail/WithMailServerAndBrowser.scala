@@ -3,7 +3,7 @@ package ui.mail
 import org.openqa.selenium.WebDriver
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, Helpers, WebDriverFactory, WithBrowser}
-import ui.model.SecurityMessages
+import ui.mail.SecurityMessages
 
 abstract class WithMailServerAndBrowser(
     override val webDriver: WebDriver = WebDriverFactory(Helpers.HTMLUNIT),

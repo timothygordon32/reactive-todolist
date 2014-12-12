@@ -2,7 +2,8 @@ package ui
 
 import org.subethamail.wiser.Wiser
 import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{User, SecurityMessageMatchers, SecurityMessages, LoginPage}
+import ui.mail.{SecurityMessageMatchers, SecurityMessages}
+import ui.model.{User, LoginPage}
 
 class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers {
 
