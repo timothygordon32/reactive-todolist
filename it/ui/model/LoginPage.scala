@@ -22,7 +22,9 @@ class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver)
     tasksPage
   }
 
-  def signUp: SignUpPage = {
+  def signUp(): SignUpPage = {
+    await untilPage this isAt()
+
     find("#signup").click()
 
     val signUpPage = new SignUpPage(driver, port)

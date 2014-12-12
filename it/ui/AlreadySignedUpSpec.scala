@@ -13,10 +13,9 @@ class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers
       mailServer = FakeMailServer("localhost", 10026).started,
       port = 19003) with LoginPageSugar {
 
-      val login = browser.goTo(new LoginPage(webDriver, port))
-      browser.await untilPage login isAt()
+      val login = browser goTo loginPage
 
-      val signUp = login.signUp
+      val signUp = login signUp()
       browser.await untilPage signUp isAt()
 
       var alreadyRegisteredEmail = User.User1.email
