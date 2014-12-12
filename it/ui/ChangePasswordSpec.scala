@@ -1,36 +1,10 @@
 package ui
 
-import org.openqa.selenium.WebDriver
-import org.subethamail.wiser.Wiser
 import play.api.test._
+import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
 import ui.model.User.User3
-import ui.model.{LoginPage, SecurityMessageMatchers, SecurityMessages}
+import ui.model.{LoginPage, SecurityMessageMatchers}
 import utils.UniqueStrings
-
-abstract class WithMailServerAndBrowser(
-    override val webDriver: WebDriver = WebDriverFactory(Helpers.HTMLUNIT),
-    override val port: Int = Helpers.testServerPort,
-    val mailServer: Wiser with SecurityMessages)
-  extends WithBrowser(
-    webDriver = webDriver, app = FakeApplication(
-    additionalConfiguration = Map(
-      "smtp.host" -> mailServer.getServer.getHostName,
-      "smtp.port" -> mailServer.getServer.getPort)),
-    port = port)
-
-class FakeMakeServer(hostname: String, port: Int) extends Wiser with SecurityMessages {
-  setHostname(hostname)
-  setPort(port)
-
-  def started = {
-    start()
-    this
-  }
-}
-
-object FakeMakeServer {
-  def apply(hostname: String, port: Int) = new FakeMakeServer(hostname, port)
-}
 
 class ChangePasswordSpec extends PlaySpecification with UniqueStrings with SecurityMessageMatchers {
 
@@ -38,7 +12,7 @@ class ChangePasswordSpec extends PlaySpecification with UniqueStrings with Secur
 
     "allow changing of password" in new WithMailServerAndBrowser(
       webDriver = WebDriverFactory(FIREFOX),
-      mailServer = FakeMakeServer("localhost", 10027).started,
+      mailServer = FakeMailServer("localhost", 10027).started,
       port = 19004) with LoginPageSugar {
 
       val taskPage = browser goTo loginPage login User3
