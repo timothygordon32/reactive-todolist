@@ -7,6 +7,8 @@ import org.openqa.selenium.WebDriver
 
 class SignUpPage(val driver: WebDriver, val port: Int) extends FluentPage(driver) {
   def signUpWithEmail(address: String): Unit = {
+    await untilPage this isAt()
+
     fill("#email") `with` address
 
     find("#signup").click

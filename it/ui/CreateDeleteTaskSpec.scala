@@ -3,16 +3,16 @@ package ui
 import java.util.UUID
 
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{User, LoginPage}
+import ui.model.{LoginPageSugar, User, LoginPage}
 
 class CreateDeleteTaskSpec extends PlaySpecification {
 
   "Task page" should {
 
-    "allow creating a task, marking it as done and clearing it" in new WithBrowser(webDriver = WebDriverFactory(FIREFOX), port = 19001) {
-      val loginPage = browser.goTo(new LoginPage(webDriver, port))
+    "allow creating a task, marking it as done and clearing it" in new WithBrowser(
+      webDriver = WebDriverFactory(FIREFOX), port = 19001) with LoginPageSugar {
 
-      val taskPage = loginPage.login(User.User1)
+      val taskPage = browser goTo loginPage login User.User1
 
       var taskText = s"text-${UUID.randomUUID}"
 

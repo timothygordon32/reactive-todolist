@@ -7,6 +7,8 @@ import org.openqa.selenium.WebDriver
 
 class SignUpVerifiedPage(val uuid: String, val driver: WebDriver, val port: Int) extends FluentPage(driver) {
   def enterDetails(firstName: String, lastName: String, password1: String, password2: String) = {
+    await untilPage this isAt()
+
     fill("#firstName").`with`(firstName)
     fill("#lastName").`with`(lastName)
     fill("#password1").`with`(password1)

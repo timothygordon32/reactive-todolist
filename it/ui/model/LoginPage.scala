@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.fluentlenium.core.FluentPage
 import org.openqa.selenium.WebDriver
+import play.api.test.WithBrowser
 
 class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver) {
   def login(user: User): TaskPage = login(user, user.password)
@@ -21,7 +22,9 @@ class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver)
     tasksPage
   }
 
-  def signUp: SignUpPage = {
+  def signUp(): SignUpPage = {
+    await untilPage this isAt()
+
     find("#signup").click()
 
     val signUpPage = new SignUpPage(driver, port)
@@ -32,4 +35,10 @@ class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver)
   override def getUrl = s"http://localhost:$port/"
 
   override def isAt() = (await atMost(5, TimeUnit.SECONDS) until "#username").isPresent
+}
+
+trait LoginPageSugar {
+  self: WithBrowser[Nothing] =>
+
+  def loginPage = new LoginPage(webDriver, port)
 }

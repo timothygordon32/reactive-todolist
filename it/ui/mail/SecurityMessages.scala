@@ -1,4 +1,4 @@
-package ui.model
+package ui.mail
 
 import org.specs2.matcher.Matcher
 import org.subethamail.wiser.{Wiser, WiserMessage}
@@ -15,7 +15,7 @@ trait SecurityMessages {
 case class SecurityMessage(underlying: WiserMessage) {
   val SignUpRegEx = "/signup/([-a-f0-9]+)".r
 
-  def signUpUuid() = SignUpRegEx.findFirstMatchIn(underlying.toString).map(_.group(1))
+  def signUpUuid = SignUpRegEx.findFirstMatchIn(underlying.toString).map(_.group(1)).getOrElse("No sign-up UUID found")
 }
 
 trait SecurityMessageMatchers {

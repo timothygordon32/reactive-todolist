@@ -1,32 +1,19 @@
 package ui
 
-import org.subethamail.wiser.Wiser
-import play.api.test.{FakeApplication, PlaySpecification, WebDriverFactory, WithBrowser}
+import play.api.test.{PlaySpecification, WebDriverFactory}
+import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
 import ui.model._
 
 class SignUpSpec extends PlaySpecification {
 
-  "Security" should {
+  "Sign-up process" should {
 
-    "allow user sign-up" in new WithBrowser(
+    "allow user sign-up" in new WithMailServerAndBrowser(
       webDriver = WebDriverFactory(FIREFOX),
-      app = FakeApplication(
-        additionalConfiguration = Map(
-          "smtp.host" -> "localhost",
-          "smtp.port" -> 10025)
-      ),
-      port = 19002) {
+      mailServer = FakeMailServer("localhost", 10025).started,
+      port = 19002) with LoginPageSugar {
 
-      val mailServer = new Wiser with SecurityMessages
-      mailServer.setHostname("localhost")
-      mailServer.setPort(10025)
-      mailServer.start()
-
-      val login = browser.goTo(new LoginPage(webDriver, port))
-      browser.await untilPage login isAt()
-
-      val signUp = login.signUp
-      browser.await untilPage signUp isAt()
+      val signUp = browser goTo loginPage signUp()
 
       var newUser = User.generate
       signUp signUpWithEmail newUser.email
@@ -35,11 +22,9 @@ class SignUpSpec extends PlaySpecification {
 
       val message = (mailServer messagesFor newUser.email).head
 
-      val signUpUuid = message signUpUuid()
-      signUpUuid must not be None
+      val signUpUuid = message.signUpUuid
 
-      val verifiedPage = browser.goTo(new SignUpVerifiedPage(signUpUuid.get, webDriver, port))
-      browser.await untilPage verifiedPage isAt()
+      val verifiedPage = browser goTo new SignUpVerifiedPage(signUpUuid, webDriver, port)
 
       verifiedPage enterDetails(
         firstName = newUser.firstName, lastName = "Bloggs",
@@ -47,10 +32,7 @@ class SignUpSpec extends PlaySpecification {
 
       eventually(mailServer messagesFor newUser.email should have size 2)
 
-      val loginPage = browser.goTo(new LoginPage(webDriver, port))
-      val taskPage = loginPage.login(newUser)
-
-      browser.await untilPage taskPage isAt()
+      browser goTo loginPage login newUser
     }
   }
 }
