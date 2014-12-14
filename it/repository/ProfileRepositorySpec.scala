@@ -1,14 +1,19 @@
 package repository
 
 import models.User
+import org.joda.time.{DateTime, DateTimeZone}
 import org.specs2.specification.Scope
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
+import securesocial.core.authenticator.{Authenticator, AuthenticatorStore, CookieAuthenticator, IdGenerator}
 import utils.{StartedFakeApplication, UniqueStrings}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
+
+import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
@@ -74,6 +79,32 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       val user = User(id, userId, firstName)
       await(repo.link(user, profile)) must be equalTo user
     }
+
+    "find an authenticator" in new TestCase {
+      skipped
+      
+      val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+      val created = DateTime.now(DateTimeZone.UTC)
+      val authenticatorId = await(new IdGenerator.Default().generate)
+      val user = User(id, userId, firstName)
+      store.save(CookieAuthenticator(authenticatorId, user,
+        expirationDate = created.plusHours(1), lastUsed = created, creationDate = created, store), 3600)
+
+      val authenticator = await(store.find(authenticatorId))
+
+      authenticator.get.user must be(user)
+      authenticator.get.expirationDate must be(created.plusHours(1))
+      authenticator.get.lastUsed must be(created)
+      authenticator.get.creationDate must be(created)
+    }
+  }
+
+  trait UserProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorStore[A] {
+    override def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = ???
+
+    override def delete(id: String): Future[Unit] = ???
+
+    override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = ???
   }
 
   trait TestCase extends Scope with UniqueStrings {
