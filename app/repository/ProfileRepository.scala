@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ProfileRepository extends Indexed with SecureSocialDatabase {
-  private lazy val collection = db.collection[JSONCollection]("profiles")
+  protected lazy val collection = db.collection[JSONCollection]("profiles")
 
   case class ProfileWithId(_id: BSONObjectID,
                            providerId: String,

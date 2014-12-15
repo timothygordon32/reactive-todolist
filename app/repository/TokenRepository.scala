@@ -1,30 +1,21 @@
 package repository
 
-import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.DB
-import reactivemongo.api.indexes.{IndexType, Index, CollectionIndexesManager}
+import reactivemongo.api.indexes.{Index, IndexType}
 import securesocial.core.providers.MailToken
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait TokenRepository extends Indexed with SecureSocialDatabase {
   private lazy val collection = db.collection[JSONCollection]("tokens")
 
-  implicit val dateTimeRead: Reads[DateTime] =
-    (__ \ "$date").read[Long].map { dateTime =>
-      new DateTime(dateTime, DateTimeZone.UTC)
-    }
-
-  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
-    def writes(dateTime: DateTime): JsValue = Json.obj(
-      "$date" -> dateTime.getMillis
-    )
+  implicit val tokenFormat = {
+    implicit val dateTimeFormat = Formats.dateTimeFormat
+    Json.format[MailToken]
   }
-
-  implicit val tokenFormat = Json.format[MailToken]
 
   private val emailIndexCreated =
     ensureIndex(collection, Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))

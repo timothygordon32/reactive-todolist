@@ -3,6 +3,7 @@ package repository
 import models.User
 import org.joda.time.{DateTime, DateTimeZone}
 import org.specs2.specification.Scope
+import play.api.libs.json.Json
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
@@ -81,30 +82,73 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     }
 
     "find an authenticator" in new TestCase {
-      skipped
-      
       val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+      val user = await(store.save(profile, SaveMode.SignUp))
       val created = DateTime.now(DateTimeZone.UTC)
+      val expire = created.plusHours(1)
+      val lastUsed = created.plusMillis(1)
       val authenticatorId = await(new IdGenerator.Default().generate)
-      val user = User(id, userId, firstName)
-      store.save(CookieAuthenticator(authenticatorId, user,
-        expirationDate = created.plusHours(1), lastUsed = created, creationDate = created, store), 3600)
+      await(store.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, store), 3600))
 
-      val authenticator = await(store.find(authenticatorId))
+      val authenticator = await(store.find(authenticatorId)).get
 
-      authenticator.get.user must be(user)
-      authenticator.get.expirationDate must be(created.plusHours(1))
-      authenticator.get.lastUsed must be(created)
-      authenticator.get.creationDate must be(created)
+      authenticator.user must be equalTo user
+      authenticator.expirationDate must be equalTo expire
+      authenticator.lastUsed must be equalTo lastUsed
+      authenticator.creationDate must be equalTo created
     }
   }
 
-  trait UserProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorStore[A] {
-    override def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = ???
+  trait UserProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorStore[A] with ProfileRepository {
+
+    case class UserWithAuthenticator(_id: BSONObjectID,
+                                     userId: String,
+                                     firstName: Option[String],
+                                     authenticator: UserAuthenticator) {
+      def toUser = User(_id, userId, firstName)
+    }
+
+    case class UserAuthenticator(id: String, expirationDate: DateTime, lastUsed: DateTime, creationDate: DateTime)
+
+    def userAuthenticator(authenticator: A): UserAuthenticator =
+        UserAuthenticator(
+          authenticator.id,
+          authenticator.expirationDate,
+          authenticator.lastUsed,
+          authenticator.creationDate)
+
+    implicit val userAuthenticatorFormat = {
+      implicit val dateTimeFormat = Formats.dateTimeFormat
+      Json.format[UserAuthenticator]
+    }
+
+    implicit val userWithAuthenticatorReads = Json.reads[UserWithAuthenticator]
+
+    override def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = {
+      collection.find(Json.obj("authenticator.id" -> id)).cursor[UserWithAuthenticator].headOption.map(_.map {
+        userWithAuthenticator =>
+          CookieAuthenticator(
+            id,
+            userWithAuthenticator.toUser,
+            userWithAuthenticator.authenticator.expirationDate,
+            userWithAuthenticator.authenticator.lastUsed,
+            userWithAuthenticator.authenticator.creationDate,
+            this.asInstanceOf[AuthenticatorStore[CookieAuthenticator[User]]]).asInstanceOf[A]
+      })
+    }
 
     override def delete(id: String): Future[Unit] = ???
 
-    override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = ???
+    override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
+      val userId = authenticator.user.username
+      collection.update(
+        Json.obj("userId" -> userId),
+        Json.obj("$set" -> Json.obj("authenticator" -> userAuthenticator(authenticator)))
+      ) map { lastError =>
+        if (lastError.updatedExisting) authenticator
+        else throw new IllegalStateException(s"Could not find user with userId $userId")
+      }
+    }
   }
 
   trait TestCase extends Scope with UniqueStrings {
