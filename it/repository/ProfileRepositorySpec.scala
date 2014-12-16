@@ -81,7 +81,7 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       await(repo.link(user, profile)) must be equalTo user
     }
 
-    "find an authenticator" in new TestCase {
+    "find a cookie authenticator" in new TestCase {
       val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
       val user = await(store.save(profile, SaveMode.SignUp))
       val created = DateTime.now(DateTimeZone.UTC)
@@ -97,6 +97,26 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       authenticator.lastUsed must be equalTo lastUsed
       authenticator.creationDate must be equalTo created
     }
+
+    "delete an authenticator" in new TestCase {
+      val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+      val user = await(store.save(profile, SaveMode.SignUp))
+      val created = DateTime.now(DateTimeZone.UTC)
+      val expire = created.plusHours(1)
+      val lastUsed = created.plusMillis(1)
+      val authenticatorId = await(new IdGenerator.Default().generate)
+      await(store.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, store), 3600))
+
+      await(store.delete(authenticatorId))
+
+      await(store.find(authenticatorId)) must be equalTo None
+    }
+
+    "not find an expired authenticator" in pending
+
+    "find a http header authenticator" in pending
+
+    "have an index on authenticator id" in pending
   }
 
   trait UserProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorStore[A] with ProfileRepository {
@@ -137,7 +157,9 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       })
     }
 
-    override def delete(id: String): Future[Unit] = ???
+    override def delete(id: String): Future[Unit] = for {
+      _ <- collection.update(Json.obj("authenticator.id" -> id), Json.obj("$unset" -> Json.obj("authenticator" -> -1)))
+    } yield ()
 
     override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
       val userId = authenticator.user.username
