@@ -1,7 +1,7 @@
 package repository
 
 import models.User
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.DateTime
 import org.specs2.specification.Scope
 import play.api.libs.json.Json
 import play.api.test.PlaySpecification
@@ -12,6 +12,7 @@ import utils.{StartedFakeApplication, UniqueStrings}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
+import time.DateTimeUtils._
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -84,7 +85,7 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     "find a cookie authenticator" in new TestCase {
       val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
       val user = await(store.save(profile, SaveMode.SignUp))
-      val created = DateTime.now(DateTimeZone.UTC)
+      val created = now
       val expire = created.plusHours(1)
       val lastUsed = created.plusMillis(1)
       val authenticatorId = await(new IdGenerator.Default().generate)
@@ -101,7 +102,7 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     "delete an authenticator" in new TestCase {
       val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
       val user = await(store.save(profile, SaveMode.SignUp))
-      val created = DateTime.now(DateTimeZone.UTC)
+      val created = now
       val expire = created.plusHours(1)
       val lastUsed = created.plusMillis(1)
       val authenticatorId = await(new IdGenerator.Default().generate)
@@ -112,11 +113,25 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       await(store.find(authenticatorId)) must be equalTo None
     }
 
-    "not find an expired authenticator" in pending
+    "not find an expired authenticator" in new TestCase {
+      val store = new UserProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+      val user = await(store.save(profile, SaveMode.SignUp))
+      val created = now.minusHours(1)
+      val expire = created.plusHours(1)
+      val lastUsed = created
+      val authenticatorId = await(new IdGenerator.Default().generate)
+      await(store.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, store), 3600))
+
+      val authenticator = await(store.find(authenticatorId))
+
+      await(store.find(authenticatorId)) must be equalTo None
+    }
 
     "find a http header authenticator" in pending
 
     "have an index on authenticator id" in pending
+
+    "be preserved after profile updates" in pending
   }
 
   trait UserProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorStore[A] with ProfileRepository {
@@ -137,15 +152,15 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
           authenticator.lastUsed,
           authenticator.creationDate)
 
-    implicit val userAuthenticatorFormat = {
-      implicit val dateTimeFormat = Formats.dateTimeFormat
-      Json.format[UserAuthenticator]
-    }
+    implicit val dateTimeFormat = Formats.dateTimeFormat
+
+    implicit val userAuthenticatorFormat = Json.format[UserAuthenticator]
 
     implicit val userWithAuthenticatorReads = Json.reads[UserWithAuthenticator]
 
     override def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = {
-      collection.find(Json.obj("authenticator.id" -> id)).cursor[UserWithAuthenticator].headOption.map(_.map {
+      val selector = Json.obj("authenticator.id" -> id, "authenticator.expirationDate" -> Json.obj("$gte" -> now))
+      collection.find(selector).cursor[UserWithAuthenticator].headOption.map(_.map {
         userWithAuthenticator =>
           CookieAuthenticator(
             id,
