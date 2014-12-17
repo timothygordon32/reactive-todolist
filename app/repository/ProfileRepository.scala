@@ -106,6 +106,4 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
     collection.remove(Json.obj("userId" -> profile.userId)).map {
       lastError => lastError.updated
     }
-
-  def enumerateProfiles: Enumerator[BasicProfile] = collection.find(Json.obj()).cursor[BasicProfile].enumerate()
 }
