@@ -5,6 +5,7 @@ import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import securesocial.core.providers.MailToken
 import utils.{StartedFakeApplication, UniqueStrings}
+import time.DateTimeUtils._
 
 class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication with UniqueStrings {
 
@@ -12,9 +13,9 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
 
     "save and find then delete a token" in {
       val repo = new TokenRepository {}
-      val now = DateTime.now(DateTimeZone.UTC)
-      val expireSoon = now.plusMinutes(1)
-      val token = MailToken(uniqueString, "someone@nomail.com", now, expireSoon, isSignUp = true)
+      val created = now
+      val expireSoon = created.plusMinutes(1)
+      val token = MailToken(uniqueString, "someone@nomail.com", created, expireSoon, isSignUp = true)
 
       await(repo.saveToken(token))
 
@@ -27,9 +28,9 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
 
     "save and find then expire a token" in {
       val repo = new TokenRepository {}
-      val now = DateTime.now(DateTimeZone.UTC)
+      val created = now.minusMinutes(2)
       val expired = now.minusMinutes(1)
-      val token = MailToken(uniqueString, "someone@nomail.com", now, expired, isSignUp = true)
+      val token = MailToken(uniqueString, "someone@nomail.com", created, expired, isSignUp = true)
 
       await(repo.saveToken(token))
 

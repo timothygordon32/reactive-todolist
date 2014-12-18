@@ -1,10 +1,10 @@
 package repository
 
-import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
 import securesocial.core.providers.MailToken
+import time.DateTimeUtils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -12,10 +12,9 @@ import scala.concurrent.Future
 trait TokenRepository extends Indexed with SecureSocialDatabase {
   private lazy val collection = db.collection[JSONCollection]("tokens")
 
-  implicit val tokenFormat = {
-    implicit val dateTimeFormat = Formats.dateTimeFormat
-    Json.format[MailToken]
-  }
+  implicit val dateTimeFormat = Formats.dateTimeFormat
+
+  implicit val tokenFormat = Json.format[MailToken]
 
   private val emailIndexCreated =
     ensureIndex(collection, Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
@@ -39,8 +38,6 @@ trait TokenRepository extends Indexed with SecureSocialDatabase {
     _ <- collection.remove(Json.obj("uuid" -> uuid))
   } yield token
 
-  def deleteExpiredTokens(): Unit = {
-    val now = DateTime.now(DateTimeZone.UTC)
+  def deleteExpiredTokens(): Unit =
     collection.remove(Json.obj("expirationTime" -> Json.obj("$lt" -> now)))
-  }
 }
