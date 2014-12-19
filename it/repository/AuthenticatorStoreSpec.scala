@@ -2,6 +2,7 @@ package repository
 
 import models.User
 import play.api.test.PlaySpecification
+import reactivemongo.api.indexes.IndexType
 import securesocial.core.authenticator.{CookieAuthenticator, IdGenerator}
 import securesocial.core.services.SaveMode
 import time.DateTimeUtils._
@@ -11,13 +12,11 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
 
   "Authenticator store" should {
 
-    "find a cookie authenticator" in new ProfileTestCase {
-      val store = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+    "find a cookie authenticator" in new AuthenticatorTestCase {
       val user = await(store.save(profile, SaveMode.SignUp))
       val created = now
       val expire = created.plusHours(1)
       val lastUsed = created.plusMillis(1)
-      val authenticatorId = await(new IdGenerator.Default().generate)
       await(store.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, store), 3600))
 
       val authenticator = await(store.find(authenticatorId)).get
@@ -28,13 +27,11 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
       authenticator.creationDate must be equalTo created
     }
 
-    "delete an authenticator" in new ProfileTestCase {
-      val store = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+    "delete a cookie authenticator" in new AuthenticatorTestCase {
       val user = await(store.save(profile, SaveMode.SignUp))
       val created = now
       val expire = created.plusHours(1)
       val lastUsed = created.plusMillis(1)
-      val authenticatorId = await(new IdGenerator.Default().generate)
       await(store.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, store), 3600))
 
       await(store.delete(authenticatorId))
@@ -42,13 +39,11 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
       await(store.find(authenticatorId)) must be equalTo None
     }
 
-    "not find an expired authenticator" in new ProfileTestCase {
-      val store = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+    "not find an expired cookie authenticator" in new AuthenticatorTestCase {
       val user = await(store.save(profile, SaveMode.SignUp))
       val created = now.minusHours(1)
       val expire = created.plusHours(1)
       val lastUsed = created
-      val authenticatorId = await(new IdGenerator.Default().generate)
       await(store.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, store), 3600))
 
       val authenticator = await(store.find(authenticatorId))
@@ -56,14 +51,17 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
       await(store.find(authenticatorId)) must be equalTo None
     }
 
+    "have an index on authenticator id" in new AuthenticatorTestCase {
+      val indexes = await(store.indexes())
+      indexes.filter(_.key == Seq("authenticator.id" -> IndexType.Ascending)) must not be empty
+    }
+
     "find a http header authenticator" in pending
+  }
 
-    "have an index on authenticator id" in pending
+  trait AuthenticatorTestCase extends ProfileTestCase {
+    val authenticatorId = await(new IdGenerator.Default().generate)
 
-    "be preserved after profile updates" in pending
+    val store = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {}
   }
 }
-
-
-
-

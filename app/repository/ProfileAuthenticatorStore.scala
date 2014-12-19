@@ -3,6 +3,7 @@ package repository
 import models.User
 import org.joda.time.DateTime
 import play.api.libs.json.Json
+import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 import securesocial.core.authenticator.{Authenticator, AuthenticatorStore, CookieAuthenticator}
 import time.DateTimeUtils.now
@@ -12,6 +13,18 @@ import scala.concurrent.Future
 import scala.reflect.ClassTag
 
 trait ProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorStore[A] with ProfileRepository {
+
+  private val authenticatorIdIndexCreated =
+    ensureIndex(collection, Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
+
+  override def indexes(): Future[Seq[Index]] = {
+    val superIndexes = super.indexes()
+    val storeIndexes = for {
+      _ <- authenticatorIdIndexCreated
+      indexes <- collection.indexesManager.list()
+    } yield indexes
+    Future.sequence(Seq(superIndexes, storeIndexes)).map(_.flatten)
+  }
 
   case class UserWithAuthenticator(_id: BSONObjectID,
                                    userId: String,
