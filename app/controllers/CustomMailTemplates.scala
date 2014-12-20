@@ -1,12 +1,11 @@
 package controllers
 
-import models.User
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import securesocial.controllers.MailTemplates
-import securesocial.core.{IdentityProvider, BasicProfile}
-import views.html.email.{passwordChangedHtml, alreadyRegisteredEmailHtml, welcomeEmailHtml, signUpEmailHtml}
+import securesocial.core.{BasicProfile, IdentityProvider}
+import views.html.email.{alreadyRegisteredEmailHtml, passwordChangedHtml, signUpEmailHtml, welcomeEmailHtml}
 import views.txt.email._
 
 object CustomMailTemplates extends MailTemplates {
