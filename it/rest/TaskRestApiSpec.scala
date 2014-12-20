@@ -2,9 +2,8 @@ package rest
 
 import java.util.UUID
 
-import org.specs2.execute.Pending
 import play.api.http.HeaderNames
-import play.api.libs.json.{JsObject, JsArray, JsString, Json}
+import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 import play.api.test._
 import utils.StartedFakeApplication
 
