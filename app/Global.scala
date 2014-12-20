@@ -3,7 +3,7 @@ import java.lang.reflect.Constructor
 import models.User
 import play.api.mvc.WithFilters
 import securesocial.core.RuntimeEnvironment
-import security.SecurityEnvironment
+import security.{HttpsRedirectFilter, SecurityEnvironment}
 
 object Global extends WithFilters(HttpsRedirectFilter) {
   override def getControllerInstance[A](controllerClass: Class[A]): A = {

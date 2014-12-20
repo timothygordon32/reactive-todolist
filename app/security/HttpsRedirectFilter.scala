@@ -1,7 +1,10 @@
-import play.api.mvc._
-import play.api.mvc.Results._
-import scala.concurrent.Future
+package security
+
 import play.Play
+import play.api.mvc.Results._
+import play.api.mvc._
+
+import scala.concurrent.Future
 
 object HttpsRedirectFilter extends Filter {
 
