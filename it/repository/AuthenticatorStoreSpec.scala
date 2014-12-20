@@ -70,6 +70,30 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
       authenticator.lastUsed must be equalTo lastUsed
       authenticator.creationDate must be equalTo created
     }
+
+    "delete a HTTP authenticator" in new AuthenticatorTestCase {
+      val user = await(httpHeaderStore.save(profile, SaveMode.SignUp))
+      val created = now
+      val expire = created.plusHours(1)
+      val lastUsed = created.plusMillis(1)
+      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, expire, lastUsed, created, httpHeaderStore), 3600))
+
+      await(httpHeaderStore.delete(authenticatorId))
+
+      await(httpHeaderStore.find(authenticatorId)) must be equalTo None
+    }
+
+    "not find an expired HTTP authenticator" in new AuthenticatorTestCase {
+      val user = await(httpHeaderStore.save(profile, SaveMode.SignUp))
+      val created = now.minusHours(1)
+      val expire = created.plusHours(1)
+      val lastUsed = created
+      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, expire, lastUsed, created, httpHeaderStore), 3600))
+
+      val authenticator = await(httpHeaderStore.find(authenticatorId))
+
+      await(httpHeaderStore.find(authenticatorId)) must be equalTo None
+    }
   }
 
   trait AuthenticatorTestCase extends ProfileTestCase {
