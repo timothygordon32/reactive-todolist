@@ -3,9 +3,9 @@ package repository
 import models.User
 import org.joda.time.DateTime
 import play.api.libs.json.Json
-import reactivemongo.api.indexes.{IndexType, Index}
+import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONObjectID
-import securesocial.core.authenticator.{Authenticator, AuthenticatorStore, CookieAuthenticator}
+import securesocial.core.authenticator.{Authenticator, AuthenticatorStore}
 import time.DateTimeUtils.now
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -48,20 +48,6 @@ trait ProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorS
 
   implicit val userWithAuthenticatorReads = Json.reads[UserWithAuthenticator]
 
-  override def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = {
-    val selector = Json.obj("authenticator.id" -> id, "authenticator.expirationDate" -> Json.obj("$gte" -> now))
-    collection.find(selector).cursor[UserWithAuthenticator].headOption.map(_.map {
-      userWithAuthenticator =>
-        CookieAuthenticator(
-          id,
-          userWithAuthenticator.toUser,
-          userWithAuthenticator.authenticator.expirationDate,
-          userWithAuthenticator.authenticator.lastUsed,
-          userWithAuthenticator.authenticator.creationDate,
-          this.asInstanceOf[AuthenticatorStore[CookieAuthenticator[User]]]).asInstanceOf[A]
-    })
-  }
-
   override def delete(id: String): Future[Unit] = for {
     _ <- collection.update(Json.obj("authenticator.id" -> id), Json.obj("$unset" -> Json.obj("authenticator" -> -1)))
   } yield ()
@@ -76,4 +62,11 @@ trait ProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorS
       else throw new IllegalStateException(s"Could not find user with userId $userId")
     }
   }
+
+  def find(id: String)(implicit ct: ClassTag[A]): Future[Option[A]] = {
+    val selector = Json.obj("authenticator.id" -> id, "authenticator.expirationDate" -> Json.obj("$gte" -> now))
+    collection.find(selector).cursor[UserWithAuthenticator].headOption.map(_.map(toAuthenticator))
+  }
+
+  def toAuthenticator(userWithAuthenticator: UserWithAuthenticator): A
 }

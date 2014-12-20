@@ -1,16 +1,12 @@
 package repository
 
 import models.User
-import play.api.libs.json.Json
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import securesocial.core.authenticator.{CookieAuthenticator, HttpHeaderAuthenticator, IdGenerator}
 import securesocial.core.services.SaveMode
 import time.DateTimeUtils._
 import utils.StartedFakeApplication
-
-import scala.concurrent.Future
-import scala.reflect.ClassTag
 
 class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplication {
 
@@ -79,22 +75,26 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
   trait AuthenticatorTestCase extends ProfileTestCase {
     val authenticatorId = await(new IdGenerator.Default().generate)
 
-    val cookieStore = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {}
+    val cookieStore = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {
+      def toAuthenticator(userWithAuthenticator: UserWithAuthenticator): CookieAuthenticator[User] =
+        CookieAuthenticator(
+          userWithAuthenticator.authenticator.id,
+          userWithAuthenticator.toUser,
+          userWithAuthenticator.authenticator.expirationDate,
+          userWithAuthenticator.authenticator.lastUsed,
+          userWithAuthenticator.authenticator.creationDate,
+          this)
+      }
 
     val httpHeaderStore = new ProfileAuthenticatorStore[HttpHeaderAuthenticator[User]] {
-      override def find(id: String)(implicit ct: ClassTag[HttpHeaderAuthenticator[User]]): Future[Option[HttpHeaderAuthenticator[User]]] = {
-        val selector = Json.obj("authenticator.id" -> id, "authenticator.expirationDate" -> Json.obj("$gte" -> now))
-        collection.find(selector).cursor[UserWithAuthenticator].headOption.map(_.map {
-          userWithAuthenticator =>
-            HttpHeaderAuthenticator(
-              id,
-              userWithAuthenticator.toUser,
-              userWithAuthenticator.authenticator.expirationDate,
-              userWithAuthenticator.authenticator.lastUsed,
-              userWithAuthenticator.authenticator.creationDate,
-              this)
-        })
-      }
+      def toAuthenticator(userWithAuthenticator: UserWithAuthenticator): HttpHeaderAuthenticator[User] =
+        HttpHeaderAuthenticator(
+          userWithAuthenticator.authenticator.id,
+          userWithAuthenticator.toUser,
+          userWithAuthenticator.authenticator.expirationDate,
+          userWithAuthenticator.authenticator.lastUsed,
+          userWithAuthenticator.authenticator.creationDate,
+          this)
     }
   }
 }
