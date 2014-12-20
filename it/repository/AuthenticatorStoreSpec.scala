@@ -1,10 +1,10 @@
 package repository
 
-import models.User
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import securesocial.core.authenticator.{CookieAuthenticator, HttpHeaderAuthenticator, IdGenerator}
 import securesocial.core.services.SaveMode
+import security.{ProfileCookieAuthenticatorStore, ProfileHttpHeaderAuthenticatorStore}
 import time.DateTimeUtils._
 import utils.StartedFakeApplication
 
@@ -74,27 +74,7 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
 
   trait AuthenticatorTestCase extends ProfileTestCase {
     val authenticatorId = await(new IdGenerator.Default().generate)
-
-    val cookieStore = new ProfileAuthenticatorStore[CookieAuthenticator[User]] {
-      def toAuthenticator(userWithAuthenticator: UserWithAuthenticator): CookieAuthenticator[User] =
-        CookieAuthenticator(
-          userWithAuthenticator.authenticator.id,
-          userWithAuthenticator.toUser,
-          userWithAuthenticator.authenticator.expirationDate,
-          userWithAuthenticator.authenticator.lastUsed,
-          userWithAuthenticator.authenticator.creationDate,
-          this)
-      }
-
-    val httpHeaderStore = new ProfileAuthenticatorStore[HttpHeaderAuthenticator[User]] {
-      def toAuthenticator(userWithAuthenticator: UserWithAuthenticator): HttpHeaderAuthenticator[User] =
-        HttpHeaderAuthenticator(
-          userWithAuthenticator.authenticator.id,
-          userWithAuthenticator.toUser,
-          userWithAuthenticator.authenticator.expirationDate,
-          userWithAuthenticator.authenticator.lastUsed,
-          userWithAuthenticator.authenticator.creationDate,
-          this)
-    }
+    val cookieStore = new ProfileCookieAuthenticatorStore
+    val httpHeaderStore = new ProfileHttpHeaderAuthenticatorStore
   }
 }
