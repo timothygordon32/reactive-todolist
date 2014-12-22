@@ -129,14 +129,16 @@ angular.module('todo.controllers').controller('PasswordController', function ($s
 
     $scope.formData = {};
 
-    $scope.change = function() {
-        return $http.post('/users/password', $scope.formData).success(function() {
-            return $location.path('tasks');
-        }).error(function(response) {
-            $scope.formData.errors = response;
-            if (response["password"]) {
-                return $scope.formData.errors["password.password2"] = response["password"];
-            }
-        });
+    $scope.change = function () {
+        return $http.post('/users/password', $scope.formData)
+            .success(function () {
+                $location.path('tasks');
+            })
+            .error(function (errors) {
+                $scope.formData.errors = errors;
+                if (errors["newPassword.password1"]) {
+                    $scope.formData.errors["newPassword.password2"] = errors["newPassword.password1"];
+                }
+            });
     };
 });
