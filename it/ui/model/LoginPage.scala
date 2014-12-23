@@ -32,6 +32,16 @@ class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver)
     signUpPage
   }
 
+  def resetPassword(): ResetPasswordPage = {
+    await untilPage this isAt()
+
+    find("#reset").click()
+
+    val resetPasswordPage = new ResetPasswordPage(driver, port)
+    await untilPage resetPasswordPage isAt()
+    resetPasswordPage
+  }
+
   override def getUrl = s"http://localhost:$port/"
 
   override def isAt() = (await atMost(5, TimeUnit.SECONDS) until "#username").isPresent
