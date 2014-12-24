@@ -42,7 +42,7 @@ class MongoUserService extends UserService[User] with ProfileRepository with Tok
       email = Some(userId),
       avatarUrl = None,
       authMethod = AuthenticationMethod.UserPassword,
-      passwordInfo = Some(PasswordInfo(PasswordHasher.id, PasswordHash.hash(password)))),
+      passwordInfo = Some(PasswordInfo(PasswordHasher.id, PasswordHash.hash(password).hashed))),
       SaveMode.SignUp)
   }
 

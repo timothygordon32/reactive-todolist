@@ -5,14 +5,12 @@ import securesocial.core.PasswordInfo
 
 class PasswordHashSpec extends Specification {
 
-  import PasswordHash._
-
   "custom password hasher" should {
 
     "hash a password consistently" in {
-      val hashed = hash("secret1")
+      val hashed = PasswordHash.hash("secret1").hashed
 
-      verify("secret1", hashed) must beTrue
+      PasswordHash.verify("secret1", hashed) must beTrue
     }
   }
 
@@ -20,10 +18,10 @@ class PasswordHashSpec extends Specification {
 
     "match a password info" in {
 
-      val hashed = hash("secret1")
+      val hashed = PasswordHash.hash("secret1")
 
       SecurityEnvironment.currentHasher.matches(
-        PasswordInfo(SecurityEnvironment.currentHasher.id, hashed), "secret1") should beTrue
+        PasswordInfo(SecurityEnvironment.currentHasher.id, hashed.hashed, Some(hashed.salt)), "secret1") should beTrue
     }
   }
 }
