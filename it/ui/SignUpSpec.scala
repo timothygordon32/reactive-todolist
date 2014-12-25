@@ -4,7 +4,7 @@ import play.api.test.{PlaySpecification, WebDriverFactory}
 import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
 import ui.model._
 
-class SignUpSpec extends PlaySpecification {
+class SignUpSpec extends PlaySpecification with Users {
 
   "Sign-up process" should {
 
@@ -15,7 +15,7 @@ class SignUpSpec extends PlaySpecification {
 
       val signUp = browser goTo loginPage signUp()
 
-      var newUser = User.generate
+      var newUser = generateUnregisteredUser
       signUp signUpWithEmail newUser.email
 
       eventually(mailServer messagesFor newUser.email should have size 1)

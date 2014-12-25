@@ -5,7 +5,7 @@ import java.util.UUID
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 import play.api.test._
-import ui.model.User
+import ui.model.{Users, User}
 import utils.StartedFakeApplication
 
 class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with LoggedOnUser {
@@ -87,14 +87,14 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with
   }
 }
 
-trait LoggedOnUser {
+trait LoggedOnUser extends Users {
   self: StartedFakeApplication with PlaySpecification =>
 
   def logon(user: User) =
     cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
       .withBody(Json.obj("username" -> user.userId, "password" -> user.password))).get).get("id").head
 
-  lazy val User1Identity = logon(User.User1)
+  lazy val User1Identity = logon(User1)
 
-  lazy val User2Identity = logon(User.User2)
+  lazy val User2Identity = logon(User2)
 }

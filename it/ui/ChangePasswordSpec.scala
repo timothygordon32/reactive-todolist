@@ -3,10 +3,9 @@ package ui
 import play.api.test._
 import ui.mail._
 import ui.model._
-import ui.model.User._
 import utils.UniqueStrings
 
-class ChangePasswordSpec extends PlaySpecification with UniqueStrings with SecurityMessageMatchers {
+class ChangePasswordSpec extends PlaySpecification with UniqueStrings with SecurityMessageMatchers with Users {
 
   "Task page" should {
 

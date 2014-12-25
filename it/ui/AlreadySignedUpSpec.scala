@@ -4,7 +4,7 @@ import play.api.test._
 import ui.mail._
 import ui.model._
 
-class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers {
+class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers with Users {
 
   "Sign-up process" should {
 
@@ -18,7 +18,7 @@ class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers
       val signUp = login signUp()
       browser.await untilPage signUp isAt()
 
-      var alreadyRegisteredEmail = User.User1.email
+      var alreadyRegisteredEmail = User1.email
       signUp signUpWithEmail alreadyRegisteredEmail
 
       eventually(mailServer.messagesFor(alreadyRegisteredEmail) must have size 1)
