@@ -3,7 +3,8 @@ package ui
 import java.util.UUID
 
 import play.api.test.{PlaySpecification, WebDriverFactory, WithBrowser}
-import ui.model.{LoginPageSugar, Users}
+import security.Users
+import ui.model.LoginPageSugar
 
 class CreateDeleteTaskSpec extends PlaySpecification with Users {
 

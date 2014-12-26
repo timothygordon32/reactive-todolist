@@ -3,7 +3,7 @@ package rest
 import play.api.libs.json.Json
 import play.api.mvc.Cookie
 import play.api.test._
-import ui.model.Users
+import security.Users
 import utils.StartedFakeApplication
 
 class SecurityRestApiSpec extends PlaySpecification with StartedFakeApplication with Users {

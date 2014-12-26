@@ -6,6 +6,7 @@ import com.google.common.base.Predicate
 import org.fluentlenium.core.FluentPage
 import org.fluentlenium.core.filter.FilterConstructor._
 import org.openqa.selenium.WebDriver
+import security.User
 
 import scala.util.{Failure, Success, Try}
 

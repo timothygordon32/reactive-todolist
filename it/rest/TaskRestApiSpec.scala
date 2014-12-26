@@ -5,16 +5,24 @@ import java.util.UUID
 import play.api.http.HeaderNames
 import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 import play.api.test._
-import ui.model.{Users, User}
+import security.{User, Users}
 import utils.StartedFakeApplication
 
-class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with LoggedOnUser {
+class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with Users {
+
+  def logon(user: User) =
+    cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
+      .withBody(Json.obj("username" -> user.userId, "password" -> user.password))).get).get("id").head
+
+  lazy val user1Cookie = logon(User1)
+
+  lazy val user2Cookie = logon(User2)
 
   "User task REST API" should {
 
     "list the tasks in JSON" in {
 
-      val identity = User1Identity
+      val identity = user1Cookie
       val text = "text-" + UUID.randomUUID
       val created = contentAsJson(route(FakeRequest(POST, "/tasks")
         .withBody(Json.obj("text" -> text, "done" -> false))
@@ -35,7 +43,7 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with
 
     "updates a task as done" in {
 
-      val identity = User1Identity
+      val identity = user1Cookie
       val text = "text-" + UUID.randomUUID
       val created = contentAsJson(route(FakeRequest(POST, "/tasks")
         .withBody(Json.obj("text" -> text, "done" -> false))
@@ -59,7 +67,7 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with
 
     "delete all completed tasks for a user" in eventually {
       // Given
-      val identity = User2Identity
+      val identity = user2Cookie
       // And
       val textTodo = "text-" + UUID.randomUUID
       val createdTodo = contentAsJson(route(FakeRequest(POST, "/tasks")
@@ -85,16 +93,4 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with
       tasksJsonArray must not contain Json.obj("id" -> idDone, "text" -> textDone, "done" -> true)
     }
   }
-}
-
-trait LoggedOnUser extends Users {
-  self: StartedFakeApplication with PlaySpecification =>
-
-  def logon(user: User) =
-    cookies(route(FakeRequest(POST, "/users/authenticate/userpass")
-      .withBody(Json.obj("username" -> user.userId, "password" -> user.password))).get).get("id").head
-
-  lazy val User1Identity = logon(User1)
-
-  lazy val User2Identity = logon(User2)
 }
