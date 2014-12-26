@@ -1,7 +1,7 @@
 package rest
 
 import play.api.libs.json._
-import play.api.test.{FakeRequest, PlaySpecification}
+import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits, PlaySpecification}
 import repository.ProfileRepository
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
@@ -29,7 +29,7 @@ class UserGenerationSpec extends PlaySpecification with StartedFakeApplication w
   }
 }
 
-trait UserGeneration extends UniqueStrings {
+trait UserGeneration extends UniqueStrings with FutureAwaits with DefaultAwaitTimeout {
 
   def generateUnregisteredUser = {
     val someUniqueString = uniqueString
@@ -38,7 +38,7 @@ trait UserGeneration extends UniqueStrings {
 
   def generateRegisteredUser: User = registerUser(generateUnregisteredUser)
 
-  def registerUser(user: User) = {
+  def registerUser(user: User): User = {
     val hash = PasswordHash.hash(user.password)
 
     val profile = BasicProfile(
@@ -55,7 +55,7 @@ trait UserGeneration extends UniqueStrings {
       passwordInfo = Some(PasswordInfo(hasher = "bcrypt", password = hash.hashed, salt = Some(hash.salt)))
     )
 
-    new ProfileRepository {}.save(profile, SaveMode.SignUp)
+    await(new ProfileRepository {}.save(profile, SaveMode.SignUp))
 
     user
   }
