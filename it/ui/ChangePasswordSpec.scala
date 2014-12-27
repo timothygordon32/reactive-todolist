@@ -1,6 +1,7 @@
 package ui
 
 import play.api.test._
+import security.Users
 import ui.mail._
 import ui.model._
 import utils.UniqueStrings

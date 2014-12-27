@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import org.fluentlenium.core.FluentPage
 import org.openqa.selenium.WebDriver
+import security.User
 
 class ChangePasswordPage(val user: User, val driver: WebDriver, val port: Int) extends FluentPage(driver) {
 

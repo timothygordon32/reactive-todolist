@@ -1,6 +1,6 @@
-package ui.model
+package security
 
-import rest.UserGeneration
+import security.UserGeneration
 
 case class User(firstName: String, userId: String, password: String) {
   def email = userId

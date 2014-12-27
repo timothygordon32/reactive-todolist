@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 import org.fluentlenium.core.FluentPage
 import org.openqa.selenium.WebDriver
 import play.api.test.WithBrowser
+import security.User
 
 class LoginPage(val driver: WebDriver, val port: Int) extends FluentPage(driver) {
   def login(user: User): TaskPage = login(user, user.password)

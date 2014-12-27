@@ -1,6 +1,7 @@
 package ui
 
 import play.api.test.{PlaySpecification, WebDriverFactory}
+import security.Users
 import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
 import ui.model._
 
