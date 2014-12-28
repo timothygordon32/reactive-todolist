@@ -1,10 +1,12 @@
 package ui
 
-import play.api.test.{WebDriverFactory, PlaySpecification}
+import play.api.test.{PlaySpecification, WebDriverFactory}
+import security.UserGeneration
 import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
-import ui.model.LoginPageSugar
+import ui.model.{LoginPageSugar, ResetPasswordVerifiedPage}
+import utils.UniqueStrings
 
-class ResetPasswordSpec extends PlaySpecification {
+class ResetPasswordSpec extends PlaySpecification with UserGeneration with UniqueStrings {
 
   "Security" should {
 
@@ -15,7 +17,18 @@ class ResetPasswordSpec extends PlaySpecification {
 
       skipped
 
+      val user = generateRegisteredUser
       val resetPassword = browser goTo loginPage resetPassword()
+
+      resetPassword sendResetTokenToEmail user.email
+
+      eventually(mailServer messagesFor user.email should have size 1)
+      val message = (mailServer messagesFor user.email).head
+      val verifiedPage = browser goTo new ResetPasswordVerifiedPage(message.passwordResetUuid, webDriver, port)
+      val newPassword = uniqueString
+      verifiedPage enterPassword newPassword
+      eventually(mailServer messagesFor user.email should have size 2)
+      browser goTo loginPage login(user, password = newPassword)
     }
   }
 }

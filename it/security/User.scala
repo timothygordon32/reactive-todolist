@@ -1,7 +1,5 @@
 package security
 
-import security.UserGeneration
-
 case class User(firstName: String, userId: String, password: String) {
   def email = userId
 }

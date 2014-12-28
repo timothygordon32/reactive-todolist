@@ -15,7 +15,11 @@ trait SecurityMessages {
 case class SecurityMessage(underlying: WiserMessage) {
   val SignUpRegEx = "/signup/([-a-f0-9]+)".r
 
-  def signUpUuid = SignUpRegEx.findFirstMatchIn(underlying.toString).map(_.group(1)).getOrElse("No sign-up UUID found")
+  def signUpUuid = findUuid.getOrElse("No sign-up UUID found")
+
+  def passwordResetUuid = findUuid.getOrElse("No password reset UUID found")
+
+  private def findUuid: Option[String] = SignUpRegEx.findFirstMatchIn(underlying.toString).map(_.group(1))
 }
 
 trait SecurityMessageMatchers {
