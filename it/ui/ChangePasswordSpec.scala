@@ -5,6 +5,7 @@ import security.Users
 import ui.mail._
 import ui.model._
 import utils.UniqueStrings
+import utils.PortAllocator._
 
 class ChangePasswordSpec extends PlaySpecification with UniqueStrings with SecurityMessageMatchers with Users {
 
@@ -12,8 +13,8 @@ class ChangePasswordSpec extends PlaySpecification with UniqueStrings with Secur
 
     "allow changing of password" in new WithMailServerAndBrowser(
       webDriver = WebDriverFactory(FIREFOX),
-      mailServer = FakeMailServer("localhost", 10027).started,
-      port = 19004) with LoginPageSugar {
+      mailServer = FakeMailServer("localhost", mailPort).started,
+      port = appPort) with LoginPageSugar {
 
       val taskPage = browser goTo loginPage login User3
       val changePasswordPage = taskPage changePassword()

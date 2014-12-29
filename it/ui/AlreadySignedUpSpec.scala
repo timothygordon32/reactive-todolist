@@ -4,6 +4,7 @@ import play.api.test._
 import security.Users
 import ui.mail._
 import ui.model._
+import utils.PortAllocator._
 
 class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers with Users {
 
@@ -11,8 +12,8 @@ class AlreadySignedUpSpec extends PlaySpecification with SecurityMessageMatchers
 
     "email an existing user if they are already signed up" in new WithMailServerAndBrowser(
       webDriver = WebDriverFactory(FIREFOX),
-      mailServer = FakeMailServer("localhost", 10026).started,
-      port = 19003) with LoginPageSugar {
+      mailServer = FakeMailServer("localhost", mailPort).started,
+      port = appPort) with LoginPageSugar {
 
       val login = browser goTo loginPage
 

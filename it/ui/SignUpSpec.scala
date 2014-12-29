@@ -4,6 +4,7 @@ import play.api.test.{PlaySpecification, WebDriverFactory}
 import security.Users
 import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
 import ui.model._
+import utils.PortAllocator._
 
 class SignUpSpec extends PlaySpecification with Users {
 
@@ -11,8 +12,8 @@ class SignUpSpec extends PlaySpecification with Users {
 
     "allow user sign-up" in new WithMailServerAndBrowser(
       webDriver = WebDriverFactory(FIREFOX),
-      mailServer = FakeMailServer("localhost", 10025).started,
-      port = 19002) with LoginPageSugar {
+      mailServer = FakeMailServer("localhost", mailPort).started,
+      port = appPort) with LoginPageSugar {
 
       val signUp = browser goTo loginPage signUp()
 

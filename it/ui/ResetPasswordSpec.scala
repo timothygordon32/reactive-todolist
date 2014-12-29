@@ -5,6 +5,7 @@ import security.UserGeneration
 import ui.mail.{FakeMailServer, WithMailServerAndBrowser}
 import ui.model.{LoginPageSugar, ResetPasswordVerifiedPage}
 import utils.UniqueStrings
+import utils.PortAllocator._
 
 class ResetPasswordSpec extends PlaySpecification with UserGeneration with UniqueStrings {
 
@@ -12,8 +13,8 @@ class ResetPasswordSpec extends PlaySpecification with UserGeneration with Uniqu
 
     "allow user to reset their password" in new WithMailServerAndBrowser(
       webDriver = WebDriverFactory(FIREFOX),
-      mailServer = FakeMailServer("localhost", 10028).started,
-      port = 19005) with LoginPageSugar {
+      mailServer = FakeMailServer("localhost", mailPort).started,
+      port = appPort) with LoginPageSugar {
 
       skipped
 
