@@ -66,11 +66,16 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   } yield indexes
 
   def save(profile: BasicProfile, mode: SaveMode): Future[User] = mode match {
-    case SaveMode.SignUp => collection.save(profile).flatMap { _ => findKnown(profile.userId) }
-    case SaveMode.LoggedIn => findKnown(profile.userId)
-    case SaveMode.PasswordChange => updatePasswordInfo(profile.userId, profile.passwordInfo.get).flatMap { _ =>
+    case SaveMode.SignUp =>
+      collection.update(Json.obj("userId" -> profile.userId), profile, upsert = true).flatMap { _ =>
+        findKnown(profile.userId)
+      }
+    case SaveMode.LoggedIn =>
       findKnown(profile.userId)
-    }
+    case SaveMode.PasswordChange =>
+      updatePasswordInfo(profile.userId, profile.passwordInfo.get).flatMap { _ =>
+        findKnown(profile.userId)
+      }
   }
 
   def findByEmailAndProvider(email: String, providerId: String): Future[Option[BasicProfile]] =
