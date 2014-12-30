@@ -110,7 +110,8 @@ angular.module('todo.controllers').controller('SignupVerifiedController', functi
         $http.post('/users/signup/' + $routeParams.token, $scope.formData)
             .success(function () {
                 $location.path("/login");
-            }).error(function (response) {
+            })
+            .error(function (response) {
                 $scope.formData.errors = response;
 
                 if (response["password"]) {
@@ -123,6 +124,16 @@ angular.module('todo.controllers').controller('SignupVerifiedController', functi
 angular.module('todo.controllers').controller('ResetController', function ($scope, $http, $location) {
 
     $scope.formData = {};
+
+    $scope.sendEmail = function () {
+        $http.post('users/reset', $scope.formData)
+            .success(function () {
+                $location.path('login');
+            })
+            .error(function (errors) {
+                $scope.formData.errors = errors;
+            });
+    };
 });
 
 angular.module('todo.controllers').controller('PasswordController', function ($scope, $http, $location) {

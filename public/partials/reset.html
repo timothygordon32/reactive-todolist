@@ -6,6 +6,6 @@
             <label for="email" class="sr-only">Email address</label>
             <input id="email" type="email" class="form-control" placeholder="Your email address" autofocus ng-required="true" ng-model="formData.email">
         </div>
-        <button id="reset" class="btn btn-lg btn-success btn-block" ng-disabled="signupForm.$invalid" type="submit" ng-click="sendEmail()">Reset</button>
+        <button id="reset" class="btn btn-lg btn-success btn-block" ng-disabled="resetForm.$invalid" type="submit" ng-click="sendEmail()">Reset</button>
     </form>
 </div>
