@@ -20,30 +20,29 @@ object CustomMailTemplates extends MailTemplates {
 
   def baseUrl(implicit request: RequestHeader) = s"${routes.Home.index().absoluteURL(IdentityProvider.sslEnabled)}#"
 
-  override def getSignUpEmail(token: String)(implicit request: RequestHeader, lang: Lang) = {
+  def getSignUpEmail(token: String)(implicit request: RequestHeader, lang: Lang) = {
     val link = s"$baseUrl/signup/$token"
     (Some(signUpEmailText(link)), Some(signUpEmailHtml(link)))
   }
 
-  override def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
+  def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
     val signInLink = s"$baseUrl/login"
     (Some(welcomeEmailText(welcomeText(user), signInLink)), Some(welcomeEmailHtml(welcomeHtml(user), signInLink)))
   }
 
-  override def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = ???
+  def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = ???
 
-  override def getSendPasswordResetEmail(user: BasicProfile, token: String)
+  def getSendPasswordResetEmail(user: BasicProfile, token: String)
                                         (implicit request: RequestHeader, lang: Lang) = {
     val link = s"$baseUrl/reset/$token"
     (Some(passwordResetEmailText(helloText(user), link)), Some(passwordResetEmailHtml(helloHtml(user), link)))
   }
 
-
-  override def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
+  def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
     (Some(passwordChangedText(helloText(user))), Some(passwordChangedHtml(helloHtml(user))))
   }
 
-  override def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
+  def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
     (Some(alreadyRegisteredEmailText(helloText(user))), Some(alreadyRegisteredEmailHtml(helloHtml(user))))
   }
 }
