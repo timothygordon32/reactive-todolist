@@ -13,13 +13,13 @@ trait SecurityMessages {
 }
 
 case class SecurityMessage(underlying: WiserMessage) {
-  val SignUpRegEx = "/signup/([-a-f0-9]+)".r
+  def signUpUuid = findUuid("/signup/").getOrElse(throw new IllegalStateException("No sign-up UUID found"))
 
-  def signUpUuid = findUuid.getOrElse("No sign-up UUID found")
+  def passwordResetUuid = findUuid("/reset/").getOrElse(throw new IllegalStateException("No password reset UUID found"))
 
-  def passwordResetUuid = findUuid.getOrElse("No password reset UUID found")
+  private def uuidRegEx(prefix: String) = s"$prefix([-a-f0-9]+)".r
 
-  private def findUuid: Option[String] = SignUpRegEx.findFirstMatchIn(underlying.toString).map(_.group(1))
+  private def findUuid(prefix: String): Option[String] = uuidRegEx(prefix).findFirstMatchIn(underlying.toString).map(_.group(1))
 }
 
 trait SecurityMessageMatchers {
