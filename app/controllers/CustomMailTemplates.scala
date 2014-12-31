@@ -5,7 +5,7 @@ import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import securesocial.controllers.MailTemplates
 import securesocial.core.{BasicProfile, IdentityProvider}
-import views.html.email.{alreadyRegisteredEmailHtml, passwordChangedHtml, signUpEmailHtml, welcomeEmailHtml}
+import views.html.email._
 import views.txt.email._
 
 object CustomMailTemplates extends MailTemplates {
@@ -32,7 +32,12 @@ object CustomMailTemplates extends MailTemplates {
 
   override def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = ???
 
-  override def getSendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang) = ???
+  override def getSendPasswordResetEmail(user: BasicProfile, token: String)
+                                        (implicit request: RequestHeader, lang: Lang) = {
+    val link = s"$baseUrl/reset/$token"
+    (Some(passwordResetEmailText(helloText(user), link)), Some(passwordResetEmailHtml(helloHtml(user), link)))
+  }
+
 
   override def getPasswordChangedNoticeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
     (Some(passwordChangedText(helloText(user))), Some(passwordChangedHtml(helloHtml(user))))
