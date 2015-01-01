@@ -1,7 +1,6 @@
 package security
 
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}
-import repository.ProfileRepository
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
 import securesocial.core.{AuthenticationMethod, BasicProfile, PasswordInfo}
@@ -33,7 +32,7 @@ trait UserGeneration extends UniqueStrings with FutureAwaits with DefaultAwaitTi
       passwordInfo = Some(PasswordInfo(hasher = "bcrypt", password = hash.hashed, salt = Some(hash.salt)))
     )
 
-    await(new ProfileRepository {}.save(profile, SaveMode.SignUp))
+    await(SecurityEnvironment.userService.save(profile, SaveMode.SignUp))
 
     user
   }
