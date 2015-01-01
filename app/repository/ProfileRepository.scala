@@ -1,12 +1,11 @@
 package repository
 
 import models.User
-import play.api.libs.iteratee.Enumerator
 import play.api.libs.json.Json
 import play.modules.reactivemongo.json.BSONFormats
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONObjectID, BSONDocument}
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.core.commands.{FindAndModify, Update}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
