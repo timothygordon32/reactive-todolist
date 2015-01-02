@@ -17,6 +17,9 @@ angular.module('todo')
             .when("/reset", {
                 templateUrl: "assets/partials/reset.html",
                 controller: "ResetController"})
+            .when("/reset/:token", {
+                templateUrl: "assets/partials/reset-verified.html",
+                controller: "ResetVerifiedController"})
             .when("/password", {
                 templateUrl: "assets/partials/change-password.html",
                 controller: "PasswordController"})
@@ -26,16 +29,27 @@ angular.module('todo')
             .otherwise({
                 redirectTo: "/tasks"
             });
-    }]).run(function($location, $http, $rootScope) {
-        if (!$location.path().match(/signup\//)) {
-            $http.get("/login").success(function(login) {
-                $rootScope.login = login;
-                $location.path("/tasks");
-            }).error(function(data, status) {
-                if (status == 401) {
-                    $location.path("/login");
-                }
+    }]).run(function ($location, $http, $rootScope) {
+
+        var whiteList = [/signup\//, /reset\//];
+
+        function whiteListed(path) {
+            _.some(whiteList, function(pattern) {
+                return path.match(pattern);
             });
+        }
+
+        if (!whiteListed($location.path())) {
+            $http.get("/login")
+                .success(function (login) {
+                    $rootScope.login = login;
+                    $location.path("/tasks");
+                })
+                .error(function (data, status) {
+                    if (status == 401) {
+                        $location.path("/login");
+                    }
+                });
 
         }
     });

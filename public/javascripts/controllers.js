@@ -126,7 +126,22 @@ angular.module('todo.controllers').controller('ResetController', function ($scop
     $scope.formData = {};
 
     $scope.sendEmail = function () {
-        $http.post('users/reset', $scope.formData)
+        $http.post('/users/reset', $scope.formData)
+            .success(function () {
+                $location.path('login');
+            })
+            .error(function (errors) {
+                $scope.formData.errors = errors;
+            });
+    };
+});
+
+angular.module('todo.controllers').controller('ResetVerifiedController', function ($scope, $http, $location, $routeParams) {
+
+    $scope.formData = {};
+
+    $scope.reset = function () {
+        $http.post('/users/reset/' + $routeParams.token, $scope.formData)
             .success(function () {
                 $location.path('login');
             })

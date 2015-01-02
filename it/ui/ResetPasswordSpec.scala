@@ -16,8 +16,6 @@ class ResetPasswordSpec extends PlaySpecification with UserGeneration with Uniqu
       mailServer = FakeMailServer("localhost", mailPort).started,
       port = appPort) with LoginPageSugar {
 
-      skipped
-
       val user = generateRegisteredUser
       val resetPassword = browser goTo loginPage resetPassword()
 

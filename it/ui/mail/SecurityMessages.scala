@@ -28,4 +28,6 @@ trait SecurityMessageMatchers {
   val beAlreadySignedUp: Matcher[SecurityMessage] = (m: SecurityMessage) => (m.underlying.toString.contains("already signed-up"), "message should be already signed-up")
 
   val bePasswordChanged: Matcher[SecurityMessage] = (m: SecurityMessage) => (m.underlying.toString.contains("password has been changed"), "message should be password change notification")
+
+  val beUnknownEmailAddress: Matcher[SecurityMessage] = (m: SecurityMessage) => (m.underlying.toString.contains("doesn't belong to a registered account"), "message should be for unknown email address")
 }
