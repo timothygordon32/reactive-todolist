@@ -30,10 +30,7 @@ object CustomMailTemplates extends MailTemplates {
     (Some(welcomeEmailText(welcomeText(user), signInLink)), Some(welcomeEmailHtml(welcomeHtml(user), signInLink)))
   }
 
-  def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = {
-    val link = s"$baseUrl/signup"
-    (Some(unknownEmailText(link)), Some(unknownEmailHtml(link)))
-  }
+  def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = ???
 
   def getSendPasswordResetEmail(user: BasicProfile, token: String)
                                         (implicit request: RequestHeader, lang: Lang) = {
