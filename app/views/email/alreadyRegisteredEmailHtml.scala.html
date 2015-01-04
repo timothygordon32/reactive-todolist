@@ -1,9 +1,9 @@
-@(salutation: Html)
+@(salutation: Html, resetLink: String)
 <html>
 <body>
 <p>@salutation</p>
 
-<p>You're already signed-up up to Tododo using this email address.
-</p>
+<p>You're already signed-up up to Tododo using this email address.</p>
+<p>If you've forgotten your password you can reset it by clicking <a href="@resetLink">here</a>.</p>
 </body>
 </html>

@@ -30,14 +30,11 @@ angular.module('todo')
                 redirectTo: "/tasks"
             });
     }]).run(function ($location, $http, $rootScope) {
-
-        var whiteList = [/signup\//, /reset\//];
-
-        function whiteListed(path) {
-            _.some(whiteList, function(pattern) {
-                return path.match(pattern);
+        var whiteListed = function (path) {
+            return _.some([/signup\//, /reset\//], function (pattern) {
+                return !!path.match(pattern);
             });
-        }
+        };
 
         if (!whiteListed($location.path())) {
             $http.get("/login")
@@ -50,7 +47,6 @@ angular.module('todo')
                         $location.path("/login");
                     }
                 });
-
         }
     });
 
