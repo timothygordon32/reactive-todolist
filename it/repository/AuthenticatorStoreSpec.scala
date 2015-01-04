@@ -12,27 +12,25 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
 
   "Authenticator store" should {
 
-    "find a cookie authenticator" in new AuthenticatorTestCase {
-      val user = await(cookieStore.save(profile, SaveMode.SignUp))
-      val created = now
-      val expire = created.plusHours(1)
-      val lastUsed = created.plusMillis(1)
-      await(cookieStore.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, cookieStore), 3600))
+    "find a valid unexpired cookie authenticator" in new AuthenticatorTestCase {
+      val justCreated = now
+      val notExpired = justCreated.plusHours(1)
+      val justUsed = justCreated
+      await(cookieStore.save(CookieAuthenticator(authenticatorId, user, notExpired, justUsed, justCreated, cookieStore), 3600))
 
       val authenticator = await(cookieStore.find(authenticatorId)).get
 
       authenticator.user must be equalTo user
-      authenticator.expirationDate must be equalTo expire
-      authenticator.lastUsed must be equalTo lastUsed
-      authenticator.creationDate must be equalTo created
+      authenticator.expirationDate must be equalTo notExpired
+      authenticator.lastUsed must be equalTo justUsed
+      authenticator.creationDate must be equalTo justCreated
     }
 
     "delete a cookie authenticator" in new AuthenticatorTestCase {
-      val user = await(cookieStore.save(profile, SaveMode.SignUp))
-      val created = now
-      val expire = created.plusHours(1)
-      val lastUsed = created.plusMillis(1)
-      await(cookieStore.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, cookieStore), 3600))
+      val justCreated = now
+      val notExpired = justCreated.plusHours(1)
+      val justUsed = justCreated
+      await(cookieStore.save(CookieAuthenticator(authenticatorId, user, notExpired, justUsed, justCreated, cookieStore), 3600))
 
       await(cookieStore.delete(authenticatorId))
 
@@ -40,11 +38,10 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
 
     "not find an expired cookie authenticator" in new AuthenticatorTestCase {
-      val user = await(cookieStore.save(profile, SaveMode.SignUp))
-      val created = now.minusHours(1)
-      val expire = created.plusHours(1)
-      val lastUsed = created
-      await(cookieStore.save(CookieAuthenticator(authenticatorId, user, expire, lastUsed, created, cookieStore), 3600))
+      val anHourOld = now.minusHours(1)
+      val justExpired = now.minusMillis(1)
+      val usedAtCreation = anHourOld
+      await(cookieStore.save(CookieAuthenticator(authenticatorId, user, justExpired, usedAtCreation, anHourOld, cookieStore), 3600))
 
       val authenticator = await(cookieStore.find(authenticatorId))
 
@@ -56,27 +53,25 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
       indexes.filter(_.key == Seq("authenticator.id" -> IndexType.Ascending)) must not be empty
     }
 
-    "find a http header authenticator" in new AuthenticatorTestCase {
-      val user = await(httpHeaderStore.save(profile, SaveMode.SignUp))
-      val created = now
-      val expire = created.plusHours(1)
-      val lastUsed = created.plusMillis(1)
-      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, expire, lastUsed, created, httpHeaderStore), 3600))
+    "find a valid unexpired http header authenticator" in new AuthenticatorTestCase {
+      val justCreated = now
+      val notExpired = justCreated.plusHours(1)
+      val justUsed = justCreated
+      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, notExpired, justUsed, justCreated, httpHeaderStore), 3600))
 
       val authenticator = await(httpHeaderStore.find(authenticatorId)).get
 
       authenticator.user must be equalTo user
-      authenticator.expirationDate must be equalTo expire
-      authenticator.lastUsed must be equalTo lastUsed
-      authenticator.creationDate must be equalTo created
+      authenticator.expirationDate must be equalTo notExpired
+      authenticator.lastUsed must be equalTo justUsed
+      authenticator.creationDate must be equalTo justCreated
     }
 
     "delete a HTTP authenticator" in new AuthenticatorTestCase {
-      val user = await(httpHeaderStore.save(profile, SaveMode.SignUp))
-      val created = now
-      val expire = created.plusHours(1)
-      val lastUsed = created.plusMillis(1)
-      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, expire, lastUsed, created, httpHeaderStore), 3600))
+      val justCreated = now
+      val notExpired = justCreated.plusHours(1)
+      val justUsed = justCreated
+      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, notExpired, justUsed, justCreated, httpHeaderStore), 3600))
 
       await(httpHeaderStore.delete(authenticatorId))
 
@@ -84,11 +79,10 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
 
     "not find an expired HTTP authenticator" in new AuthenticatorTestCase {
-      val user = await(httpHeaderStore.save(profile, SaveMode.SignUp))
-      val created = now.minusHours(1)
-      val expire = created.plusHours(1)
-      val lastUsed = created
-      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, expire, lastUsed, created, httpHeaderStore), 3600))
+      val anHourOld = now.minusHours(1)
+      val justExpired = now.minusMillis(1)
+      val usedAtCreation = anHourOld
+      await(httpHeaderStore.save(HttpHeaderAuthenticator(authenticatorId, user, justExpired, usedAtCreation, anHourOld, httpHeaderStore), 3600))
 
       val authenticator = await(httpHeaderStore.find(authenticatorId))
 
@@ -100,5 +94,6 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     val authenticatorId = await(new IdGenerator.Default().generate)
     val cookieStore = new ProfileCookieAuthenticatorStore
     val httpHeaderStore = new ProfileHttpHeaderAuthenticatorStore
+    val user = await(cookieStore.save(profile, SaveMode.SignUp))
   }
 }
