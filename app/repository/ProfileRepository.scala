@@ -19,65 +19,57 @@ import scala.concurrent.Future
 trait ProfileRepository extends Indexed with SecureSocialDatabase {
   protected lazy val collection = db.collection[JSONCollection]("profiles")
 
-  case class ProfileWithId(_id: BSONObjectID,
-                           providerId: String,
-                           userId: String,
-                           firstName: Option[String],
-                           lastName: Option[String],
-                           fullName: Option[String],
-                           email: Option[String],
-                           avatarUrl: Option[String],
-                           authMethod: AuthenticationMethod,
-                           oAuth1Info: Option[OAuth1Info] = None,
-                           oAuth2Info: Option[OAuth2Info] = None,
-                           passwordInfo: Option[PasswordInfo] = None)
+  case class IdentifiedProfile(_id: BSONObjectID,
+                               providerId: String,
+                               userId: String,
+                               firstName: Option[String],
+                               lastName: Option[String],
+                               fullName: Option[String],
+                               email: Option[String],
+                               avatarUrl: Option[String],
+                               authMethod: AuthenticationMethod,
+                               oAuth1Info: Option[OAuth1Info] = None,
+                               oAuth2Info: Option[OAuth2Info] = None,
+                               passwordInfo: Option[PasswordInfo] = None,
+                               authenticator: Option[AuthenticatorDetails]) {
 
-  case class UserWithAuthenticator(_id: BSONObjectID,
-                                   userId: String,
-                                   firstName: Option[String],
-                                   authenticator: AuthenticatorDetails) {
     def toUser = User(_id, userId, firstName)
   }
 
-  implicit def toBasicProfile(profile: ProfileWithId): BasicProfile = BasicProfile(
-      profile.providerId,
-      profile.userId,
-      profile.firstName,
-      profile.lastName,
-      profile.fullName,
-      profile.email,
-      profile.avatarUrl,
-      profile.authMethod,
-      profile.oAuth1Info,
-      profile.oAuth2Info,
-      profile.passwordInfo)
+  implicit def toBasicProfile(profile: IdentifiedProfile): BasicProfile = BasicProfile(
+    profile.providerId,
+    profile.userId,
+    profile.firstName,
+    profile.lastName,
+    profile.fullName,
+    profile.email,
+    profile.avatarUrl,
+    profile.authMethod,
+    profile.oAuth1Info,
+    profile.oAuth2Info,
+    profile.passwordInfo)
 
+  implicit val bsonObjectIdFormat = BSONFormats.BSONObjectIDFormat
+  implicit val dateTimeFormat = Formats.dateTimeFormat
   implicit val oAuth1Format = Json.format[OAuth1Info]
   implicit val oAuth2Format = Json.format[OAuth2Info]
   implicit val passwordInfoFormat = Json.format[PasswordInfo]
   implicit val authMethodFormat = Json.format[AuthenticationMethod]
   implicit val profileFormat = Json.format[BasicProfile]
-  implicit val bsonObjectIdFormat = BSONFormats.BSONObjectIDFormat
-  implicit val profileWithIdFormat = Json.format[ProfileWithId]
-  // TODO Fix over-use of date-time format
-  implicit val userAuthenticatorFormat = {
-    implicit val dateTimeFormat = Formats.dateTimeFormat
-    Json.format[AuthenticatorDetails]
-  }
-  // TODO Fix over-use of date-time format
-  implicit val userWithAuthenticatorReads = {
-    implicit val dateTimeFormat = Formats.dateTimeFormat
-    Json.reads[UserWithAuthenticator]
-  }
+  implicit val authenticatorDetailsFormat = Json.format[AuthenticatorDetails]
+  implicit val profileWithIdFormat = Json.format[IdentifiedProfile]
 
   private val emailIndexCreated =
     ensureIndex(collection, Index(Seq("email" -> IndexType.Ascending), Some("email")))
   private val providerIdUserIdIndexCreated =
-    ensureIndex(collection, Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
+    ensureIndex(
+      collection,
+      Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
   private val authenticatorIdIndexCreated =
     ensureIndex(collection, Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
 
-  implicit def toUser(profile: ProfileWithId): User = User(profile._id, profile.userId, profile.firstName)
+  implicit def toUser(profile: IdentifiedProfile): User =
+    User(profile._id, profile.userId, profile.firstName)
 
   def indexes(): Future[Seq[Index]] = for {
     _ <- emailIndexCreated
@@ -105,8 +97,9 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   def findKnown(userId: String) = findProfileWithId(UsernamePasswordProvider.UsernamePassword, userId)
     .map(_.map(toUser).getOrElse(throw new IllegalStateException(s"userId [$userId] should be known to the system")))
 
-  def findProfileWithId(providerId: String, userId: String): Future[Option[ProfileWithId]] =
-    collection.find(Json.obj("providerId" -> providerId, "userId" -> userId)).cursor[ProfileWithId].headOption
+  def findProfileWithId(providerId: String, userId: String): Future[Option[IdentifiedProfile]] =
+    collection.find(Json.obj("providerId" -> providerId, "userId" -> userId))
+      .cursor[IdentifiedProfile].headOption
 
   def find(providerId: String, userId: String): Future[Option[BasicProfile]] =
     findProfileWithId(providerId, userId).map(_.map(toBasicProfile))
@@ -120,7 +113,7 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   def link(current: User, to: BasicProfile): Future[User] = Future.successful(current)
 
   private def updatePasswordInfo(userId: String, info: PasswordInfo): Future[Option[BasicProfile]] = {
-    import BSONFormats._
+    import play.modules.reactivemongo.json.BSONFormats._
     db.command(FindAndModify(
       collection.name,
       Json.obj("providerId" -> UsernamePasswordProvider.UsernamePassword, "userId" -> userId).as[BSONDocument],
@@ -133,24 +126,20 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
       lastError => lastError.updated
     }
 
-  // TODO Get rid of userId
-  def saveAuthenticator(userId: String, userAuthenticator: AuthenticatorDetails): Future[AuthenticatorDetails] = {
+  def saveAuthenticator(user: User, userAuthenticator: AuthenticatorDetails): Future[AuthenticatorDetails] = {
     collection.update(
-      Json.obj("userId" -> userId),
+      Json.obj("userId" -> user.username),
       Json.obj("$set" -> Json.obj("authenticator" -> userAuthenticator))
     ) map { lastError =>
       if (lastError.updatedExisting) userAuthenticator
-      else throw new IllegalStateException(s"Could not find user with userId $userId")
+      else throw new IllegalStateException(s"Could not find user with userId ${user.username}")
     }
   }
 
-  // TODO Too dense - clarify
   def findAuthenticator(id: String): Future[Option[UserAuthenticatorDetails]] = {
-    // TODO Fix over-use of date-time format
-    implicit val dateTimeFormat = Formats.dateTimeFormat
     val selector = Json.obj("authenticator.id" -> id, "authenticator.expirationDate" -> Json.obj("$gte" -> now))
-    collection.find(selector).cursor[UserWithAuthenticator].headOption.map(_.map { userWithAuthenticator =>
-      UserAuthenticatorDetails(userWithAuthenticator.toUser, userWithAuthenticator.authenticator)
+    collection.find(selector).cursor[IdentifiedProfile].headOption.map(_.map { userWithAuthenticator =>
+      UserAuthenticatorDetails(userWithAuthenticator.toUser, userWithAuthenticator.authenticator.get)
     })
   }
 
@@ -162,4 +151,3 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
 case class AuthenticatorDetails(id: String, expirationDate: DateTime, lastUsed: DateTime, creationDate: DateTime)
 
 case class UserAuthenticatorDetails(user: User, authenticatorDetails: AuthenticatorDetails)
-

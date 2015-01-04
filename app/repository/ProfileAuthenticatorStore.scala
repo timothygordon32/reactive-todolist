@@ -24,7 +24,7 @@ trait ProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorS
     profiles.findAuthenticator(id).map(_.map(ua => toAuthenticator(ua.user, ua.authenticatorDetails)))
 
   def save(authenticator: A, timeoutInSeconds: Int): Future[A] =
-    profiles.saveAuthenticator(authenticator.user.username, authenticatorDetails(authenticator)).map(_ => authenticator)
+    profiles.saveAuthenticator(authenticator.user, authenticatorDetails(authenticator)).map(_ => authenticator)
 
   def toAuthenticator(user: User, authenticator: AuthenticatorDetails): A
 }
