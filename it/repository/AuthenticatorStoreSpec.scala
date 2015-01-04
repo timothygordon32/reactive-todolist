@@ -48,11 +48,6 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
       await(cookieStore.find(authenticatorId)) must be equalTo None
     }
 
-    "have an index on authenticator id" in new AuthenticatorTestCase {
-      val indexes = await(cookieStore.indexes())
-      indexes.filter(_.key == Seq("authenticator.id" -> IndexType.Ascending)) must not be empty
-    }
-
     "find a valid unexpired http header authenticator" in new AuthenticatorTestCase {
       val justCreated = now
       val notExpired = justCreated.plusHours(1)
@@ -92,8 +87,8 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
 
   trait AuthenticatorTestCase extends ProfileTestCase {
     val authenticatorId = await(new IdGenerator.Default().generate)
-    val cookieStore = new ProfileCookieAuthenticatorStore
-    val httpHeaderStore = new ProfileHttpHeaderAuthenticatorStore
-    val user = await(cookieStore.save(profile, SaveMode.SignUp))
+    val cookieStore = new ProfileCookieAuthenticatorStore(repo)
+    val httpHeaderStore = new ProfileHttpHeaderAuthenticatorStore(repo)
+    val user = await(repo.save(profile, SaveMode.SignUp))
   }
 }

@@ -1,16 +1,18 @@
 package security
 
 import models.User
-import repository.ProfileAuthenticatorStore
+import repository.{AuthenticatorDetails, ProfileRepository, ProfileAuthenticatorStore}
 import securesocial.core.authenticator.HttpHeaderAuthenticator
 
-class ProfileHttpHeaderAuthenticatorStore extends ProfileAuthenticatorStore[HttpHeaderAuthenticator[User]] {
-  def toAuthenticator(userWithAuthenticator: UserWithAuthenticator): HttpHeaderAuthenticator[User] =
+class ProfileHttpHeaderAuthenticatorStore(override val profiles: ProfileRepository)
+  extends ProfileAuthenticatorStore[HttpHeaderAuthenticator[User]] {
+
+  def toAuthenticator(user: User, authenticator: AuthenticatorDetails): HttpHeaderAuthenticator[User] =
     HttpHeaderAuthenticator(
-      userWithAuthenticator.authenticator.id,
-      userWithAuthenticator.toUser,
-      userWithAuthenticator.authenticator.expirationDate,
-      userWithAuthenticator.authenticator.lastUsed,
-      userWithAuthenticator.authenticator.creationDate,
+      authenticator.id,
+      user,
+      authenticator.expirationDate,
+      authenticator.lastUsed,
+      authenticator.creationDate,
       this)
 }

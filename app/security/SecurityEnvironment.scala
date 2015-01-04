@@ -9,10 +9,12 @@ import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.{AuthenticatorService, UserService}
 
 object SecurityEnvironment extends RuntimeEnvironment.Default[User] {
-  override lazy val userService: UserService[User] = new MongoUserService
+  private lazy val mongoUserService = new MongoUserService
+
+  override lazy val userService: UserService[User] = mongoUserService
   override lazy val authenticatorService: AuthenticatorService[User] = new AuthenticatorService[User](
-    new CookieAuthenticatorBuilder[User](new ProfileCookieAuthenticatorStore, idGenerator),
-    new HttpHeaderAuthenticatorBuilder[User](new ProfileHttpHeaderAuthenticatorStore, idGenerator)
+    new CookieAuthenticatorBuilder[User](new ProfileCookieAuthenticatorStore(mongoUserService), idGenerator),
+    new HttpHeaderAuthenticatorBuilder[User](new ProfileHttpHeaderAuthenticatorStore(mongoUserService), idGenerator)
   )
   override lazy val currentHasher: PasswordHasher = new PasswordHasher.Default(12)
   override lazy val mailTemplates: MailTemplates = CustomMailTemplates

@@ -2,7 +2,7 @@ package repository
 
 import models.User
 import play.api.test.PlaySpecification
-import reactivemongo.api.indexes.IndexType
+import reactivemongo.api.indexes.{Index, IndexType}
 import utils.StartedFakeApplication
 import securesocial.core._
 import securesocial.core.services.SaveMode
@@ -19,6 +19,11 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     "have an index on providerId and userId" in new ProfileTestCase {
       val indexes = await(repo.indexes())
       indexes.filter(_.key == Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending)) must not be empty
+    }
+
+    "have an index on authenticatorId" in new ProfileTestCase {
+      val indexes = await(repo.indexes())
+      indexes.filter(_.key == Seq("authenticator.id" -> IndexType.Ascending)) must not be empty
     }
 
     "save profile and find a user by provider and email" in new ProfileTestCase {
