@@ -49,15 +49,15 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
     profile.oAuth2Info,
     profile.passwordInfo)
 
-  implicit val bsonObjectIdFormat = BSONFormats.BSONObjectIDFormat
-  implicit val dateTimeFormat = Formats.dateTimeFormat
-  implicit val oAuth1Format = Json.format[OAuth1Info]
-  implicit val oAuth2Format = Json.format[OAuth2Info]
-  implicit val passwordInfoFormat = Json.format[PasswordInfo]
-  implicit val authMethodFormat = Json.format[AuthenticationMethod]
-  implicit val profileFormat = Json.format[BasicProfile]
-  implicit val authenticatorDetailsFormat = Json.format[AuthenticatorDetails]
-  implicit val profileWithIdFormat = Json.format[IdentifiedProfile]
+  private implicit val bsonObjectIdFormat = BSONFormats.BSONObjectIDFormat
+  private implicit val dateTimeFormat = Formats.dateTimeFormat
+  private implicit val oAuth1Format = Json.format[OAuth1Info]
+  private implicit val oAuth2Format = Json.format[OAuth2Info]
+  private implicit val passwordInfoFormat = Json.format[PasswordInfo]
+  private implicit val authMethodFormat = Json.format[AuthenticationMethod]
+  private implicit val profileFormat = Json.format[BasicProfile]
+  private implicit val authenticatorDetailsFormat = Json.format[AuthenticatorDetails]
+  private implicit val profileWithIdFormat = Json.format[IdentifiedProfile]
 
   private val emailIndexCreated =
     ensureIndex(collection, Index(Seq("email" -> IndexType.Ascending), Some("email")))

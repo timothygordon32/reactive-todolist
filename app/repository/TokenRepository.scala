@@ -12,10 +12,8 @@ import scala.concurrent.Future
 trait TokenRepository extends Indexed with SecureSocialDatabase {
   private lazy val collection = db.collection[JSONCollection]("tokens")
 
-  implicit val tokenFormat = {
-    implicit val dateTimeFormat = Formats.dateTimeFormat
-    Json.format[MailToken]
-  }
+  private implicit val dateTimeFormat = Formats.dateTimeFormat
+  private implicit val tokenFormat = Json.format[MailToken]
 
   private val emailIndexCreated =
     ensureIndex(collection, Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
