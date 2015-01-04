@@ -48,11 +48,11 @@ trait ProfileAuthenticatorStore[A <: Authenticator[User]] extends AuthenticatorS
 
   implicit val userWithAuthenticatorReads = Json.reads[UserWithAuthenticator]
 
-  override def delete(id: String): Future[Unit] = for {
+  def delete(id: String): Future[Unit] = for {
     _ <- collection.update(Json.obj("authenticator.id" -> id), Json.obj("$unset" -> Json.obj("authenticator" -> -1)))
   } yield ()
 
-  override def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
+  def save(authenticator: A, timeoutInSeconds: Int): Future[A] = {
     val userId = authenticator.user.username
     collection.update(
       Json.obj("userId" -> userId),
