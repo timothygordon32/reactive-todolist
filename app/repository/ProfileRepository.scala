@@ -59,22 +59,27 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   private implicit val authenticatorDetailsFormat = Json.format[AuthenticatorDetails]
   private implicit val profileWithIdFormat = Json.format[IdentifiedProfile]
 
-  private val emailIndexCreated =
-    ensureIndex(collection, Index(Seq("email" -> IndexType.Ascending), Some("email")))
-  private val providerIdUserIdIndexCreated =
-    ensureIndex(
+  private val emailIndexEnsured = ensureIndex(
+    collection,
+    Index(Seq("email" -> IndexType.Ascending), Some("email")))
+  private val authenticatorIdIndexEnsured = ensureIndex(
+    collection,
+    Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
+  private val providerIdUserIdIndexDropped = dropIndex(
       collection,
       Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
-  private val authenticatorIdIndexCreated =
-    ensureIndex(collection, Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
+  private val userIdIndexEnsured = ensureIndex(
+    collection,
+    Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))
 
   implicit def toUser(profile: IdentifiedProfile): User =
     User(profile._id, profile.userId, profile.firstName)
 
   def indexes(): Future[Seq[Index]] = for {
-    _ <- emailIndexCreated
-    _ <- providerIdUserIdIndexCreated
-    _ <- authenticatorIdIndexCreated
+    _ <- emailIndexEnsured
+    _ <- providerIdUserIdIndexDropped
+    _ <- userIdIndexEnsured
+    _ <- authenticatorIdIndexEnsured
     indexes <- collection.indexesManager.list()
   } yield indexes
 

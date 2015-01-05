@@ -15,14 +15,14 @@ trait TokenRepository extends Indexed with SecureSocialDatabase {
   private implicit val dateTimeFormat = Formats.dateTimeFormat
   private implicit val tokenFormat = Json.format[MailToken]
 
-  private val emailIndexCreated =
+  private val emailIndexEnsured =
     ensureIndex(collection, Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
-  private val providerIdUserIdIndexCreated =
+  private val providerIdUserIdIndexEnsured =
     ensureIndex(collection, Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
 
   def indexes(): Future[Seq[Index]] = for {
-    _ <- emailIndexCreated
-    _ <- providerIdUserIdIndexCreated
+    _ <- emailIndexEnsured
+    _ <- providerIdUserIdIndexEnsured
     indexes <- collection.indexesManager.list()
   } yield indexes
 

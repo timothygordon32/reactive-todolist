@@ -16,9 +16,14 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       indexes.filter(_.key == Seq("email" -> IndexType.Ascending)) must not be empty
     }
 
-    "have an index on providerId and userId" in new ProfileTestCase {
+    "not have an index on providerId and userId" in new ProfileTestCase {
       val indexes = await(repo.indexes())
-      indexes.filter(_.key == Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending)) must not be empty
+      (indexes.filter(_.key == Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending)) must be).empty
+    }
+
+    "have an index on userId" in new ProfileTestCase {
+      val indexes = await(repo.indexes())
+      indexes.filter(_.key == Seq("userId" -> IndexType.Ascending)) must not be empty
     }
 
     "have an index on authenticatorId" in new ProfileTestCase {
