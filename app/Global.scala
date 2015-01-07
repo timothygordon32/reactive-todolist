@@ -1,6 +1,7 @@
 import java.lang.reflect.Constructor
 
 import models.User
+import play.api.Application
 import play.api.mvc.WithFilters
 import securesocial.core.RuntimeEnvironment
 import security.{HttpsRedirectFilter, SecurityEnvironment}
@@ -15,4 +16,6 @@ object Global extends WithFilters(HttpsRedirectFilter) {
     }
     instance.getOrElse(super.getControllerInstance(controllerClass))
   }
+
+  override def onStart(app: Application): Unit = super.onStart(app)
 }

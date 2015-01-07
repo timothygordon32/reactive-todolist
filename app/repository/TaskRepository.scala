@@ -28,20 +28,27 @@ object TaskRepositoryFormats {
     )(Task.apply _)
 }
 
-object TaskRepository extends Indexed {
+object TaskRepository {
   import play.api.Play.current
   import repository.TaskRepositoryFormats._
 
   def db = ReactiveMongoPlugin.db
 
-  private lazy val collection = db[JSONCollection]("userTasks")
+  private lazy val indexedCollection = new Indexed {
+    val collection = db[JSONCollection]("userTasks")
 
-  private val indexesCreated = ensureIndex(collection, Index(Seq("user" -> IndexType.Ascending), Some("user")))
+    val indexesCreated = ensureIndex(collection, Index(Seq("user" -> IndexType.Ascending), Some("user")))
 
-  def indexes(): Future[Seq[Index]] = for {
-    _ <- indexesCreated
-    indexes <- collection.indexesManager.list()
-  } yield indexes
+    def indexes(): Future[Seq[Index]] = for {
+      _ <- indexesCreated
+      indexes <- collection.indexesManager.list()
+    } yield indexes
+
+  }
+
+  private lazy val collection = indexedCollection.collection
+
+  def indexes() = indexedCollection.indexes()
 
   def create(task: Task)(implicit user: User): Future[Task] = {
     val toCreate = task match {

@@ -16,8 +16,35 @@ import time.DateTimeUtils.now
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ProfileRepository extends Indexed with SecureSocialDatabase {
-  protected lazy val collection = db.collection[JSONCollection]("profiles")
+trait ProfileRepository extends SecureSocialDatabase {
+  private lazy val indexedCollection = new Indexed {
+    val collection = db.collection[JSONCollection]("profiles")
+
+    private val emailIndexEnsured = ensureIndex(
+      collection,
+      Index(Seq("email" -> IndexType.Ascending), Some("email")))
+    private val authenticatorIdIndexEnsured = ensureIndex(
+      collection,
+      Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
+    private val providerIdUserIdIndexDropped = dropIndex(
+      collection,
+      Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
+    private val userIdIndexEnsured = ensureIndex(
+      collection,
+      Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))
+
+    def indexes(): Future[Seq[Index]] = for {
+      _ <- emailIndexEnsured
+      _ <- providerIdUserIdIndexDropped
+      _ <- userIdIndexEnsured
+      _ <- authenticatorIdIndexEnsured
+      indexes <- collection.indexesManager.list()
+    } yield indexes
+  }
+
+  private lazy val collection = indexedCollection.collection
+
+  def indexes() = indexedCollection.indexes()
 
   case class IdentifiedProfile(_id: BSONObjectID,
                                providerId: String,
@@ -59,29 +86,8 @@ trait ProfileRepository extends Indexed with SecureSocialDatabase {
   private implicit val authenticatorDetailsFormat = Json.format[AuthenticatorDetails]
   private implicit val profileWithIdFormat = Json.format[IdentifiedProfile]
 
-  private val emailIndexEnsured = ensureIndex(
-    collection,
-    Index(Seq("email" -> IndexType.Ascending), Some("email")))
-  private val authenticatorIdIndexEnsured = ensureIndex(
-    collection,
-    Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
-  private val providerIdUserIdIndexDropped = dropIndex(
-      collection,
-      Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
-  private val userIdIndexEnsured = ensureIndex(
-    collection,
-    Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))
-
   implicit def toUser(profile: IdentifiedProfile): User =
     User(profile._id, profile.userId, profile.firstName)
-
-  def indexes(): Future[Seq[Index]] = for {
-    _ <- emailIndexEnsured
-    _ <- providerIdUserIdIndexDropped
-    _ <- userIdIndexEnsured
-    _ <- authenticatorIdIndexEnsured
-    indexes <- collection.indexesManager.list()
-  } yield indexes
 
   def save(profile: BasicProfile, mode: SaveMode): Future[User] = mode match {
     case SaveMode.SignUp =>
