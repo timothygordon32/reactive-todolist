@@ -19,18 +19,18 @@ trait Indexed {
     case _ => throw new IllegalArgumentException("unsupported index type")
   }
 
-  def ensureIndex(collection: JSONCollection, index: Index): Future[Unit] =
-    collection.indexesManager.ensure(index).map {
-      case true => Logger.info(s"Created index ${toDescription(index)} on ${collection.name}")
-      case false => Logger.info(s"Index ${toDescription(index)} already exists on ${collection.name}")
-    }
+  def ensureIndex(collection: JSONCollection, index: Index): Future[Unit] = Future.successful(())
+//    collection.indexesManager.ensure(index).map {
+//      case true => Logger.info(s"Created index ${toDescription(index)} on ${collection.name}")
+//      case false => Logger.info(s"Index ${toDescription(index)} already exists on ${collection.name}")
+//    }
 
-  def dropIndex(collection: JSONCollection, index: Index): Future[Unit] =
-    collection.db.command(DropIndex(collection.name, index.eventualName)).map { indexNo =>
-      Logger.info(s"Dropped index ${toDescription(index)} on ${collection.name}, was: $indexNo")
-    } recoverWith {
-      case e: CommandError => Future.successful(Logger.warn(e.message))
-    }
+  def dropIndex(collection: JSONCollection, index: Index): Future[Unit] = Future.successful(())
+//    collection.db.command(DropIndex(collection.name, index.eventualName)).map { indexNo =>
+//      Logger.info(s"Dropped index ${toDescription(index)} on ${collection.name}, was: $indexNo")
+//    } recoverWith {
+//      case e: CommandError => Future.successful(Logger.warn(e.message))
+//    }
 }
 
 case class DropIndex(collection: String,
