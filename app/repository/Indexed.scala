@@ -1,6 +1,7 @@
 package repository
 
 import play.api.Logger
+import play.api.libs.concurrent.Promise
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONDouble, BSONInteger, BSONString}
@@ -8,8 +9,11 @@ import reactivemongo.core.commands.{BSONCommandResultMaker, Command, CommandErro
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 trait Indexed {
+  val IndexOperationDelay = 10.seconds
+
   def toDescription(index: Index): String = index.name.fold("")(name => s"$name ") +
     index.key.map { case (field, indexType) => (field, toDescription(indexType))}.mkString("[", ",", "]")
 
@@ -19,18 +23,24 @@ trait Indexed {
     case _ => throw new IllegalArgumentException("unsupported index type")
   }
 
-  def ensureIndex(collection: JSONCollection, index: Index): Future[Unit] = //Future.successful(())
-    collection.indexesManager.ensure(index).map {
-      case true => Logger.info(s"Created index ${toDescription(index)} on ${collection.name}")
-      case false => Logger.info(s"Index ${toDescription(index)} already exists on ${collection.name}")
-    }
+  def ensureIndex(collection: JSONCollection, index: Index): Future[Unit] =
+    for {
+      _ <- Promise.timeout(Nil, IndexOperationDelay)
+      _ <- collection.indexesManager.ensure(index).map {
+        case true => Logger.info(s"Created index ${toDescription(index)} on ${collection.name}")
+        case false => Logger.info(s"Index ${toDescription(index)} already exists on ${collection.name}")
+      }
+    } yield ()
 
-  def dropIndex(collection: JSONCollection, index: Index): Future[Unit] = //Future.successful(())
-    collection.db.command(DropIndex(collection.name, index.eventualName)).map { indexNo =>
-      Logger.info(s"Dropped index ${toDescription(index)} on ${collection.name}, was: $indexNo")
-    } recoverWith {
-      case e: CommandError => Future.successful(Logger.warn(e.message))
-    }
+  def dropIndex(collection: JSONCollection, index: Index): Future[Unit] =
+    for {
+      _ <- Promise.timeout(Nil, IndexOperationDelay)
+      _ <- collection.db.command(DropIndex(collection.name, index.eventualName)).map { indexNo =>
+        Logger.info(s"Dropped index ${toDescription(index)} on ${collection.name}, was: $indexNo")
+      } recoverWith {
+        case e: CommandError => Future.successful(Logger.warn(e.message))
+      }
+    } yield ()
 }
 
 case class DropIndex(collection: String,
