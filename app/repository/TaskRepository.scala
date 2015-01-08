@@ -13,6 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object TaskRepositoryFormats {
+
   import play.modules.reactivemongo.json.BSONFormats._
 
   implicit val taskWrites: Writes[Task] = (
@@ -28,23 +29,16 @@ object TaskRepositoryFormats {
     )(Task.apply _)
 }
 
-object TaskRepository {
+object TaskRepository extends DelayedIndexOperations {
+
   import play.api.Play.current
   import repository.TaskRepositoryFormats._
 
   def db = ReactiveMongoPlugin.db
 
-  private lazy val indexedCollection = new Indexed {
-    val collection = db[JSONCollection]("userTasks")
-
-    val indexesCreated = ensureIndex(collection, Index(Seq("user" -> IndexType.Ascending), Some("user")))
-
-    def indexes(): Future[Seq[Index]] = for {
-      _ <- indexesCreated
-      indexes <- collection.indexesManager.list()
-    } yield indexes
-
-  }
+  private lazy val indexedCollection = new IndexedCollection(
+    db[JSONCollection]("userTasks"),
+    Seq(Ensure(Index(Seq("user" -> IndexType.Ascending), Some("user")))))
 
   private lazy val collection = indexedCollection.collection
 

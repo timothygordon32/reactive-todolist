@@ -9,22 +9,13 @@ import time.DateTimeUtils._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait TokenRepository extends SecureSocialDatabase {
-  private lazy val indexedCollection = new Indexed {
-    val collection = db.collection[JSONCollection] ("tokens")
-
-    val emailIndexEnsured =
-      ensureIndex(collection, Index(Seq("uuid" -> IndexType.Ascending), Some("uuid")))
-
-    val providerIdUserIdIndexEnsured =
-      ensureIndex(collection, Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
-
-    def indexes(): Future[Seq[Index]] = for {
-      _ <- emailIndexEnsured
-      _ <- providerIdUserIdIndexEnsured
-      indexes <- collection.indexesManager.list()
-    } yield indexes
-  }
+trait TokenRepository extends SecureSocialDatabase with DelayedIndexOperations {
+  private lazy val indexedCollection = new IndexedCollection(
+    db.collection[JSONCollection] ("tokens"),
+    Seq(
+      Ensure(Index(Seq("uuid" -> IndexType.Ascending), Some("uuid"))),
+      Ensure(Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
+    ))
 
   private lazy val collection = indexedCollection.collection
 

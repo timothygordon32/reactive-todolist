@@ -16,31 +16,14 @@ import time.DateTimeUtils.now
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ProfileRepository extends SecureSocialDatabase {
-  private lazy val indexedCollection = new Indexed {
-    val collection = db.collection[JSONCollection]("profiles")
-
-    private val emailIndexEnsured = ensureIndex(
-      collection,
-      Index(Seq("email" -> IndexType.Ascending), Some("email")))
-    private val authenticatorIdIndexEnsured = ensureIndex(
-      collection,
-      Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId")))
-    private val providerIdUserIdIndexDropped = dropIndex(
-      collection,
-      Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId")))
-    private val userIdIndexEnsured = ensureIndex(
-      collection,
-      Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))
-
-    def indexes(): Future[Seq[Index]] = for {
-      _ <- emailIndexEnsured
-      _ <- providerIdUserIdIndexDropped
-      _ <- userIdIndexEnsured
-      _ <- authenticatorIdIndexEnsured
-      indexes <- collection.indexesManager.list()
-    } yield indexes
-  }
+trait ProfileRepository extends SecureSocialDatabase with DelayedIndexOperations {
+  private lazy val indexedCollection = new IndexedCollection(
+    db.collection[JSONCollection]("profiles"),
+    Seq(
+      Ensure(Index(Seq("email" -> IndexType.Ascending), Some("email"))),
+      Ensure(Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId"))),
+      Drop(Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId"))),
+      Ensure(Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))))
 
   private lazy val collection = indexedCollection.collection
 
