@@ -1,4 +1,4 @@
-@(link: String)
+@(signUpTokenLink: String)
 Hello,
 
-Click this link or copy it into your browser address bar to confirm your email address and complete signup: @link
+Click this link or copy it into your browser address bar to confirm your email address and complete signup: @signUpTokenLink
