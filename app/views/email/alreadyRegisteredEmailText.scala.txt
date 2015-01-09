@@ -1,4 +1,6 @@
-@(salutation: String)
+@(salutation: String, resetLink: String)
 @salutation
 
 You're already signed-up up to Tododo using this email address.
+
+If you've forgotten your password you can reset it by clicking this link: @resetLink
