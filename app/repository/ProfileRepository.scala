@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ProfileRepository extends SecureSocialDatabase with DelayedIndexOperations {
-  private lazy val indexedCollection = new IndexedCollection(
+  private val indexedCollection = new IndexedCollection(
     db.collection[JSONCollection]("profiles"),
     Seq(
       Ensure(Index(Seq("email" -> IndexType.Ascending), Some("email"))),
@@ -26,7 +26,7 @@ trait ProfileRepository extends SecureSocialDatabase with DelayedIndexOperations
       Drop(Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId"))),
       Ensure(Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))))
 
-  private lazy val collection = indexedCollection.collection
+  private val collection = indexedCollection.collection
 
   def indexes() = indexedCollection.indexes()
 

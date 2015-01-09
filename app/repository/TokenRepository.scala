@@ -11,14 +11,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait TokenRepository extends SecureSocialDatabase with DelayedIndexOperations {
-  private lazy val indexedCollection = new IndexedCollection(
+  private val indexedCollection = new IndexedCollection(
     db.collection[JSONCollection] ("tokens"),
     Seq(
       Ensure(Index(Seq("uuid" -> IndexType.Ascending), Some("uuid"))),
       Ensure(Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
     ))
 
-  private lazy val collection = indexedCollection.collection
+  private val collection = indexedCollection.collection
 
   def indexes() = indexedCollection.indexes()
 

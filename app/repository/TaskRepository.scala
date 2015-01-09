@@ -37,11 +37,11 @@ object TaskRepository extends DelayedIndexOperations {
 
   def db = ReactiveMongoPlugin.db
 
-  private lazy val indexedCollection = new IndexedCollection(
+  private val indexedCollection = new IndexedCollection(
     db[JSONCollection]("userTasks"),
     Seq(Ensure(Index(Seq("user" -> IndexType.Ascending), Some("user")))))
 
-  private lazy val collection = indexedCollection.collection
+  private val collection = indexedCollection.collection
 
   def indexes() = indexedCollection.indexes()
 
