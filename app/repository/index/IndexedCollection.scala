@@ -1,4 +1,4 @@
-package repository
+package repository.index
 
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.Index

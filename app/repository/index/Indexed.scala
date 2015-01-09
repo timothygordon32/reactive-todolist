@@ -1,4 +1,4 @@
-package repository
+package repository.index
 
 import play.api.Logger
 import play.api.libs.concurrent.Promise
@@ -7,9 +7,7 @@ import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONDouble, BSONInteger, BSONString}
 import reactivemongo.core.commands.{BSONCommandResultMaker, Command, CommandError}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 trait Indexed {
   def delay: IndexOperationDelay
@@ -23,7 +21,7 @@ trait Indexed {
     case _ => throw new IllegalArgumentException("unsupported index type")
   }
 
-  def ensureIndex(collection: JSONCollection, index: Index): Future[Unit] =
+  def ensureIndex(collection: JSONCollection, index: Index)(implicit ec: ExecutionContext): Future[Unit] =
     for {
       _ <- Promise.timeout(Nil, delay.duration)
       _ <- collection.indexesManager.ensure(index).map {
@@ -32,7 +30,7 @@ trait Indexed {
       }
     } yield ()
 
-  def dropIndex(collection: JSONCollection, index: Index): Future[Unit] =
+  def dropIndex(collection: JSONCollection, index: Index)(implicit ec: ExecutionContext): Future[Unit] =
     for {
       _ <- Promise.timeout(Nil, delay.duration)
       _ <- collection.db.command(DropIndex(collection.name, index.eventualName)).map { indexNo =>
@@ -63,4 +61,3 @@ trait Indexed {
     }
   }
 }
-

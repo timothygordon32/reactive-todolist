@@ -8,6 +8,7 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.core.commands.{FindAndModify, Update}
+import repository.index.{IndexedCollection, DelayedIndexOperations, Drop, Ensure}
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode

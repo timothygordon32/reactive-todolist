@@ -1,4 +1,4 @@
-package repository
+package repository.index
 
 import play.api.Play
 

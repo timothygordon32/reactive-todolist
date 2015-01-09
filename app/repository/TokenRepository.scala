@@ -3,6 +3,7 @@ package repository
 import play.api.libs.json._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
+import repository.index.{IndexedCollection, Ensure, DelayedIndexOperations}
 import securesocial.core.providers.MailToken
 import time.DateTimeUtils._
 
