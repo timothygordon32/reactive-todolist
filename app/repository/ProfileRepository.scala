@@ -21,9 +21,9 @@ trait ProfileRepository extends SecureSocialDatabase with DelayedIndexOperations
   private val indexedCollection = new IndexedCollection(
     db.collection[JSONCollection]("profiles"),
     Seq(
-      Ensure(Index(Seq("email" -> IndexType.Ascending), Some("email"))),
-      Ensure(Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId"))),
-      Drop(Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId"))),
+      Ensure(Index(Seq("email" -> IndexType.Ascending), Some("email"), background = true)),
+      Ensure(Index(Seq("authenticator.id" -> IndexType.Ascending), Some("authenticatorId"), background = true)),
+      Drop(Index(Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending), Some("userIdProviderId"), background = true)),
       Ensure(Index(Seq("userId" -> IndexType.Ascending), Some("userId"), unique = true, background = true))))
 
   private val collection = indexedCollection.collection
