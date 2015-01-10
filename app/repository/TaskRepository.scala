@@ -39,7 +39,7 @@ object TaskRepository extends DelayedIndexOperations {
 
   private val indexedCollection = new IndexedCollection(
     db[JSONCollection]("userTasks"),
-    Seq(Ensure(Index(Seq("user" -> IndexType.Ascending), Some("user")))))
+    Seq(Ensure(Index(Seq("user" -> IndexType.Ascending), Some("user"), background = true))))
 
   private val collection = indexedCollection.collection
 

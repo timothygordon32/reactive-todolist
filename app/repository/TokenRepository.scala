@@ -14,8 +14,8 @@ trait TokenRepository extends SecureSocialDatabase with DelayedIndexOperations {
   private val indexedCollection = new IndexedCollection(
     db.collection[JSONCollection] ("tokens"),
     Seq(
-      Ensure(Index(Seq("uuid" -> IndexType.Ascending), Some("uuid"))),
-      Ensure(Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime")))
+      Ensure(Index(Seq("uuid" -> IndexType.Ascending), Some("uuid"), background = true)),
+      Ensure(Index(Seq("expirationTime" -> IndexType.Ascending), Some("expirationTime"), background = true))
     ))
 
   private val collection = indexedCollection.collection
