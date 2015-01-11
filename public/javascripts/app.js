@@ -31,7 +31,7 @@ angular.module('todo')
             });
     }]).run(function ($location, $http, $rootScope) {
         var whiteListed = function (path) {
-            return _.some([/signup\//, /reset\//], function (pattern) {
+            return _.some([/signup\//, /reset/, /reset\//], function (pattern) {
                 return !!path.match(pattern);
             });
         };
