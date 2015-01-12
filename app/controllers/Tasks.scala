@@ -7,12 +7,12 @@ import play.api.libs.json._
 import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
 import repository.TaskRepository
-import securesocial.core.{RuntimeEnvironment, SecureSocial}
+import securesocial.core.SecureSocial
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-class Tasks(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
+abstract class Tasks extends Controller with SecureSocial[User] {
 
   implicit def toUser(implicit request: SecuredRequest[_]): User = request.user
 

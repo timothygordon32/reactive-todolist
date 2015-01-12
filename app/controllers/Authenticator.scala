@@ -3,11 +3,11 @@ package controllers
 import models.User
 import play.api.libs.json.Json
 import play.api.mvc._
-import securesocial.core.{LogoutEvent, Events, RuntimeEnvironment, SecureSocial}
+import securesocial.core.{Events, LogoutEvent, SecureSocial}
 
 import scala.concurrent.Future
 
-class Authenticator(override implicit val env: RuntimeEnvironment[User]) extends Controller with SecureSocial[User] {
+abstract class Authenticator extends Controller with SecureSocial[User] {
 
   def getLogin = SecuredAction { request =>
     Ok(Json.toJson[User](request.user))
