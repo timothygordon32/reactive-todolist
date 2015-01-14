@@ -6,8 +6,12 @@ import utils.UniqueStrings
 import securesocial.core._
 import securesocial.core.providers.UsernamePasswordProvider
 
-trait ProfileTestCase extends Scope with UniqueStrings {
-  lazy val repo = new ProfileRepository {}
+trait ProfileTestCase
+  extends Scope
+  with UniqueStrings
+  with MongoProfileRepositoryComponent {
+
+  lazy val profileRepository: ProfileRepository = new MongoProfileRepository {}
   val id = BSONObjectID.generate
   val userId = uniqueString
   val firstName = Some(s"Joe-$userId")

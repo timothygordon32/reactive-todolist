@@ -7,7 +7,7 @@ import securesocial.core.providers.MailToken
 import time.DateTimeUtils._
 import utils.{StartedFakeApplication, UniqueStrings}
 
-class MongoTokenRepositorySpec extends PlaySpecification with StartedFakeApplication with UniqueStrings {
+class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication with UniqueStrings {
 
   "Token repository" should {
 

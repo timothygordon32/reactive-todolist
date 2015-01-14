@@ -2,22 +2,22 @@ package security
 
 import models.User
 import reactivemongo.api.indexes.Index
-import repository.{MongoTokenRepositoryComponent, ProfileRepository}
+import repository.{MongoProfileRepositoryComponent, MongoTokenRepositoryComponent}
 import securesocial.core.services.UserService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait SecureSocialUserServiceComponent {
+trait UserServiceComponent {
   val userService: UserService[User]
 }
 
-trait MongoSecureSocialUserServiceComponent extends SecureSocialUserServiceComponent {
-  self: MongoTokenRepositoryComponent =>
+trait MongoUserServiceComponent extends UserServiceComponent {
+  self: MongoTokenRepositoryComponent with MongoProfileRepositoryComponent =>
 
-  class MongoUserService extends UserService[User] with ProfileRepository with MongoTokenRepository {
+  class MongoUserService extends UserService[User] with MongoProfileRepository with MongoTokenRepository {
     override def indexes(): Future[Seq[Index]] = {
-      val profileIndexes = super[ProfileRepository].indexes()
+      val profileIndexes = super[MongoProfileRepository].indexes()
       val tokenIndexes = super[MongoTokenRepository].indexes()
       Future.sequence(Seq(profileIndexes, tokenIndexes)).map(_.flatten)
     }
