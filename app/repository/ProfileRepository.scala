@@ -17,10 +17,7 @@ import time.DateTimeUtils.now
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ProfileRepositoryComponent {
-  val profileRepository: ProfileRepository
-
-  trait ProfileRepository {
+trait ProfileRepository {
     def indexes(): Future[Seq[Index]]
 
     def save(profile: BasicProfile, mode: SaveMode): Future[User]
@@ -45,10 +42,8 @@ trait ProfileRepositoryComponent {
 
     def deleteAuthenticator(id: String): Future[Unit]
   }
-}
 
-trait MongoProfileRepositoryComponent extends ProfileRepositoryComponent {
-  trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase with DelayedIndexOperations {
+trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase with DelayedIndexOperations {
     private val indexedCollection = new IndexedCollection(
       db.collection[JSONCollection]("profiles"),
       Seq(
@@ -173,7 +168,6 @@ trait MongoProfileRepositoryComponent extends ProfileRepositoryComponent {
       _ <- collection.update(Json.obj("authenticator.id" -> id), Json.obj("$unset" -> Json.obj("authenticator" -> -1)))
     } yield ()
   }
-}
 
 case class AuthenticatorDetails(id: String, expirationDate: DateTime, lastUsed: DateTime, creationDate: DateTime)
 

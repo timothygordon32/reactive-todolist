@@ -3,7 +3,7 @@ package repository
 import play.api.test.PlaySpecification
 import securesocial.core.authenticator.{CookieAuthenticator, HttpHeaderAuthenticator, IdGenerator}
 import securesocial.core.services.SaveMode
-import security.{ProfileCookieAuthenticatorStoreComponent, ProfileHttpHeaderAuthenticatorStoreComponent}
+import security.{ProfileCookieAuthenticatorStore, ProfileHttpHeaderAuthenticatorStore}
 import time.DateTimeUtils._
 import utils.StartedFakeApplication
 
@@ -84,15 +84,15 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
   }
 
-  trait AuthenticatorTestCase
-    extends ProfileTestCase
-    with ProfileCookieAuthenticatorStoreComponent
-    with ProfileHttpHeaderAuthenticatorStoreComponent
-  {
+  trait AuthenticatorTestCase extends ProfileTestCase {
     val authenticatorId = await(new IdGenerator.Default().generate)
 
-    val profileCookieAuthenticatorStore: ProfileCookieAuthenticatorStore = new ProfileCookieAuthenticatorStore
-    val profileHttpHeaderAuthenticatorStore: ProfileHttpHeaderAuthenticatorStore = new ProfileHttpHeaderAuthenticatorStore
+    val profileCookieAuthenticatorStore: ProfileCookieAuthenticatorStore = new ProfileCookieAuthenticatorStore {
+      def profiles: ProfileRepository = profileRepository
+    }
+    val profileHttpHeaderAuthenticatorStore: ProfileHttpHeaderAuthenticatorStore = new ProfileHttpHeaderAuthenticatorStore {
+      def profiles: ProfileRepository = profileRepository
+    }
     val user = await(profileRepository.save(profile, SaveMode.SignUp))
   }
 }

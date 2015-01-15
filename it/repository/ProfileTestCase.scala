@@ -8,8 +8,7 @@ import securesocial.core.providers.UsernamePasswordProvider
 
 trait ProfileTestCase
   extends Scope
-  with UniqueStrings
-  with MongoProfileRepositoryComponent {
+  with UniqueStrings {
 
   lazy val profileRepository: ProfileRepository = new MongoProfileRepository {}
   val id = BSONObjectID.generate

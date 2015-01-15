@@ -12,7 +12,6 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
   "Token repository" should {
 
     "save and find then delete a token" in new MongoTokenRepositoryComponent with Scope {
-      val tokenRepository = new MongoTokenRepository {}
       val created = now
       val expireSoon = created.plusMinutes(1)
       val token = MailToken(uniqueString, "someone@nomail.com", created, expireSoon, isSignUp = true)
@@ -27,7 +26,6 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
     }
 
     "save and find then expire a token" in new MongoTokenRepositoryComponent with Scope {
-      val tokenRepository = new MongoTokenRepository {}
       val created = now.minusMinutes(2)
       val expired = now.minusMinutes(1)
       val token = MailToken(uniqueString, "someone@nomail.com", created, expired, isSignUp = true)
@@ -44,15 +42,17 @@ class TokenRepositorySpec extends PlaySpecification with StartedFakeApplication 
     }
 
     "have an index on uuid" in new MongoTokenRepositoryComponent with Scope {
-      val tokenRepository = new MongoTokenRepository {}
       val indexes = await(tokenRepository.indexes())
       indexes.filter(_.key == Seq("uuid" -> IndexType.Ascending)) must not be empty
     }
 
     "have an index on expiration time" in new MongoTokenRepositoryComponent with Scope {
-      val tokenRepository = new MongoTokenRepository {}
       val indexes = await(tokenRepository.indexes())
       indexes.filter(_.key == Seq("expirationTime" -> IndexType.Ascending)) must not be empty
     }
+  }
+
+  trait MongoTokenRepositoryComponent extends Scope {
+    val tokenRepository = new MongoTokenRepository {}
   }
 }
