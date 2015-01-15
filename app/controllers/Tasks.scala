@@ -8,18 +8,19 @@ import play.api.mvc._
 import reactivemongo.bson.BSONObjectID
 import repository.TaskRepository
 import securesocial.core.SecureSocial
+import security.SecuredComponent
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-abstract class Tasks extends Controller with SecureSocial[User] {
+class Tasks(taskRepository: TaskRepository) extends Controller with SecureSocial[User] with SecuredComponent {
 
   implicit def toUser(implicit request: SecuredRequest[_]): User = request.user
 
   def create = SecuredAction.async(parse.json) { implicit request =>
     request.body.validate[Task].fold(
       valid = {
-        task => TaskRepository.create(task).map(result => Ok(Json.toJson(result)))
+        task => taskRepository.create(task).map(result => Ok(Json.toJson(result)))
       },
       invalid = {
         errors => Future.successful(BadRequest(JsError.toFlatJson(errors)))
@@ -28,11 +29,11 @@ abstract class Tasks extends Controller with SecureSocial[User] {
   }
 
   def list = SecuredAction.async { implicit request =>
-    TaskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
+    taskRepository.findAll.map{ tasks => Ok(Json.toJson(tasks)) }
   }
 
   def get(id: String) = SecuredAction.async { implicit request =>
-    TaskRepository.find(id).map {
+    taskRepository.find(id).map {
       case Some(task) => Ok(Json.toJson(task))
       case None => NotFound
     }
@@ -42,7 +43,7 @@ abstract class Tasks extends Controller with SecureSocial[User] {
     request.body.validate[Task].fold(
       valid = {
         task => BSONObjectID.parse(id) match {
-          case Success(bsonId) => TaskRepository.update(task.copy(id = Some(bsonId))).map {
+          case Success(bsonId) => taskRepository.update(task.copy(id = Some(bsonId))).map {
             case true => NoContent
             case false => NotFound
           }
@@ -56,14 +57,15 @@ abstract class Tasks extends Controller with SecureSocial[User] {
   }
 
   def delete(id: String) = SecuredAction.async { implicit request =>
-    TaskRepository.delete(id).map {
+    taskRepository.delete(id).map {
       deleted => if (deleted) NoContent else NotFound
     }
   }
 
   def deleteDone() = SecuredAction.async { implicit request =>
-    TaskRepository.deleteDone.map {
+    taskRepository.deleteDone.map {
       deleted => Redirect(controllers.routes.Tasks.list())
     }
   }
 }
+

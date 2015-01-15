@@ -30,7 +30,24 @@ object TaskRepositoryFormats {
     )(Task.apply _)
 }
 
-object TaskRepository extends DelayedIndexOperations {
+trait TaskRepository {
+
+  def indexes(): Future[Seq[Index]]
+
+  def create(task: Task)(implicit user: User): Future[Task]
+
+  def findAll(implicit user: User): Future[Seq[Task]]
+
+  def find(id: String)(implicit user: User): Future[Option[Task]]
+
+  def update(task: Task)(implicit user: User): Future[Boolean]
+
+  def delete(id: String)(implicit user: User): Future[Boolean]
+
+  def deleteDone(implicit user: User): Future[Int]
+}
+
+object MongoTaskRepository extends TaskRepository with DelayedIndexOperations {
 
   import play.api.Play.current
   import repository.TaskRepositoryFormats._

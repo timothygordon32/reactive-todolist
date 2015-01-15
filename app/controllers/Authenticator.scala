@@ -4,10 +4,11 @@ import models.User
 import play.api.libs.json.Json
 import play.api.mvc._
 import securesocial.core.{Events, LogoutEvent, SecureSocial}
+import security.SecuredComponent
 
 import scala.concurrent.Future
 
-abstract class Authenticator extends Controller with SecureSocial[User] {
+class Authenticator extends Controller with SecureSocial[User] with SecuredComponent {
 
   def getLogin = SecuredAction { request =>
     Ok(Json.toJson[User](request.user))

@@ -1,25 +1,34 @@
 import java.lang.reflect.Constructor
 
-import controllers.{Home, Authenticator, Tasks}
+import controllers.{Authenticator, Home, Tasks}
 import models.User
 import play.api.mvc.WithFilters
+import repository.MongoTaskRepository
 import securesocial.core.RuntimeEnvironment
-import security.{SecurityEnvironment, HttpsRedirectFilter, SecuredComponent}
+import security.{HttpsRedirectFilter, SecurityEnvironment}
+
+import scala.reflect.ClassTag
 
 object Global extends WithFilters(HttpsRedirectFilter) {
 
-  val home: Home = new Home
-  val authenticator: Authenticator = new Authenticator with SecuredComponent
-  val tasks: Tasks = new Tasks with SecuredComponent
+  lazy val taskRepository = MongoTaskRepository
+
+  lazy val home = new Home
+  lazy val authenticator = new Authenticator
+  lazy val tasks = new Tasks(taskRepository)
 
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
-    controllerClass match {
-      case c if c == classOf[Home] => home
-      case c if c == classOf[Authenticator] => authenticator
-      case c if c == classOf[Tasks] => tasks
-      case _ => createSecureSocialController(controllerClass).getOrElse(super.getControllerInstance(controllerClass))
-    }
-  }.asInstanceOf[A]
+
+    def bind[T](value: T)(implicit ct: ClassTag[T]): Option[A] =
+      if (controllerClass == ct.runtimeClass) Some(value.asInstanceOf[A]) else None
+
+    val instance = bind(home) orElse
+      bind(authenticator) orElse
+      bind(tasks) orElse
+      createSecureSocialController(controllerClass)
+
+    instance.getOrElse(super.getControllerInstance(controllerClass))
+  }
 
   def createSecureSocialController[A](controllerClass: Class[A]): Option[A] =
     controllerClass.getConstructors.find { c =>

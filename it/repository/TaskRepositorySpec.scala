@@ -3,6 +3,7 @@ package repository
 import java.util.UUID
 
 import models.{Task, User}
+import org.specs2.specification.Scope
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
@@ -16,96 +17,100 @@ class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
 
   "User task repository" should {
 
-    "list tasks" in {
+    "list tasks" in new TaskRepositoryTestCase {
       // Given
       implicit val user = randomUser
       val first = Task(Some(BSONObjectID.generate), "first")
       val second = Task(Some(BSONObjectID.generate), "second")
       // And
-      val created2 = await(TaskRepository.create(second))
-      val created1 = await(TaskRepository.create(first))
+      val created2 = await(taskRepository.create(second))
+      val created1 = await(taskRepository.create(first))
 
       // When
-      val list = await(TaskRepository.findAll)
+      val list = await(taskRepository.findAll)
 
       // Then
       list must contain(created1, created2).inOrder.atMost
 
       // Cleanup
-      await(TaskRepository.delete(created1.id.get.stringify)) must be equalTo true
-      await(TaskRepository.delete(created2.id.get.stringify)) must be equalTo true
+      await(taskRepository.delete(created1.id.get.stringify)) must be equalTo true
+      await(taskRepository.delete(created2.id.get.stringify)) must be equalTo true
     }
 
-    "retrieve and delete a saved task" in {
+    "retrieve and delete a saved task" in new TaskRepositoryTestCase {
       // Given
       implicit val user = randomUser
       val text = s"text-${UUID.randomUUID()}"
 
       // When
-      val created = await(TaskRepository.create(Task(None, text)))
+      val created = await(taskRepository.create(Task(None, text)))
 
       // Then
       val id = created.id.get.stringify
-      val found = await(TaskRepository.find(id))
+      val found = await(taskRepository.find(id))
       found.get must be equalTo created
 
       // Cleanup
-      await(TaskRepository.delete(id)) must be equalTo true
-      await(TaskRepository.find(id)) must be equalTo None
-      await(TaskRepository.delete(id)) must be equalTo false
+      await(taskRepository.delete(id)) must be equalTo true
+      await(taskRepository.find(id)) must be equalTo None
+      await(taskRepository.delete(id)) must be equalTo false
     }
 
-    "update a task" in {
+    "update a task" in new TaskRepositoryTestCase {
       // Given
       implicit val user = randomUser
       val text = s"text-${UUID.randomUUID()}"
-      val created = await(TaskRepository.create(Task(None, text)))
+      val created = await(taskRepository.create(Task(None, text)))
       created.done must beFalse
 
       // When
       val update = created.copy(done = true)
-      await(TaskRepository.update(update))
+      await(taskRepository.update(update))
 
       // Then
       val id = created.id.get.stringify
-      val reRead = await(TaskRepository.find(id))
+      val reRead = await(taskRepository.find(id))
       reRead.get.done must beTrue
 
       // Cleanup
-      await(TaskRepository.delete(id)) must be equalTo true
+      await(taskRepository.delete(id)) must be equalTo true
     }
 
-    "batch delete tasks" in {
+    "batch delete tasks" in new TaskRepositoryTestCase {
       // Given
       implicit val user = randomUser
       val doneTask = Task(Some(BSONObjectID.generate), "done", done = true)
       val notDoneTask = Task(Some(BSONObjectID.generate), "not-done", done = false)
       // And
-      val createdDoneTask = await(TaskRepository.create(doneTask))
-      val createdNotDoneTask = await(TaskRepository.create(notDoneTask))
+      val createdDoneTask = await(taskRepository.create(doneTask))
+      val createdNotDoneTask = await(taskRepository.create(notDoneTask))
       // And
-      val created = await(TaskRepository.findAll)
+      val created = await(taskRepository.findAll)
       created must contain(createdDoneTask, createdNotDoneTask)
 
       // When
-      await(TaskRepository.deleteDone)
+      await(taskRepository.deleteDone)
 
       // Then
-      val remaining = await(TaskRepository.findAll)
+      val remaining = await(taskRepository.findAll)
       remaining must contain(createdNotDoneTask).atMostOnce
       remaining must not contain createdDoneTask
 
       // Cleanup
-      await(TaskRepository.delete(createdNotDoneTask.id.get.stringify)) must be equalTo true
+      await(taskRepository.delete(createdNotDoneTask.id.get.stringify)) must be equalTo true
     }
 
-    "have an index on user" in {
+    "have an index on user" in new TaskRepositoryTestCase {
       // Given
-      val repo = TaskRepository
+      val repo = taskRepository
       // When
       val indexes = await(repo.indexes())
       // Then
       indexes.filter(_.key == Seq("user" -> IndexType.Ascending)) must not be empty
     }
+  }
+
+  trait TaskRepositoryTestCase extends Scope {
+    val taskRepository = MongoTaskRepository
   }
 }
