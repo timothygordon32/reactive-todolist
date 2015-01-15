@@ -33,7 +33,6 @@ class TaskRestApiSpec extends PlaySpecification with StartedFakeApplication with
         .withCookies(identity)).get
       status(tasksWithCreated) must be equalTo OK
       contentType(tasksWithCreated) must beSome.which(_ == "application/json")
-      println(contentAsJson(tasksWithCreated))
       contentAsJson(tasksWithCreated).as[JsArray].value must contain(Json.obj("id" -> id, "text" -> text, "done" -> false))
 
       await(route(FakeRequest(DELETE, s"/tasks/$id").withCookies(identity)).get)
