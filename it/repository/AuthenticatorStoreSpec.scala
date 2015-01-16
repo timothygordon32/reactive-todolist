@@ -85,8 +85,6 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
   }
 
   trait AuthenticatorTestCase extends ProfileTestCase {
-    val authenticatorId = await(new IdGenerator.Default().generate)
-
     val profileCookieAuthenticatorStore: ProfileCookieAuthenticatorStore = new ProfileCookieAuthenticatorStore {
       def profiles: ProfileRepository = profileRepository
     }

@@ -3,6 +3,7 @@ package repository
 import models.User
 import play.api.test.PlaySpecification
 import reactivemongo.api.indexes.IndexType
+import time.DateTimeUtils._
 import utils.StartedFakeApplication
 import securesocial.core._
 import securesocial.core.services.SaveMode
@@ -80,6 +81,34 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     "link the user to the profile" in new ProfileTestCase {
       val user = User(id, userId, firstName)
       await(profileRepository.link(user, profile)) must be equalTo user
+    }
+
+    "be able to store multiple authentication details per user" in new ProfileTestCase {
+      skipped // failing test to drive out functionality
+
+      await(profileRepository.save(profile, SaveMode.SignUp)).username must be equalTo userId
+      val user = await(profileRepository.findKnown(profile.userId))
+
+      val justCreated = now
+      val notExpired = justCreated.plusHours(1)
+      val justUsed = justCreated
+      val authenticatorDetails = AuthenticatorDetails(authenticatorId, notExpired, justUsed, justCreated)
+      val anotherAuthenticatorId = generateAuthenticatorId
+      val anotherAuthenticatorDetails = authenticatorDetails.copy(id = anotherAuthenticatorId)
+      await(profileRepository.saveAuthenticator(user, authenticatorDetails))
+      await(profileRepository.saveAuthenticator(user, anotherAuthenticatorDetails))
+
+      val userAuthenticatorDetails = await(profileRepository.findAuthenticator(authenticatorId)).get
+      val anotherUserAuthenticatorDetails = await(profileRepository.findAuthenticator(anotherAuthenticatorId)).get
+
+      userAuthenticatorDetails.user must be equalTo user
+      userAuthenticatorDetails.authenticatorDetails.expirationDate must be equalTo notExpired
+      userAuthenticatorDetails.authenticatorDetails.lastUsed must be equalTo justUsed
+      userAuthenticatorDetails.authenticatorDetails.creationDate must be equalTo justCreated
+      anotherUserAuthenticatorDetails.user must be equalTo user
+      anotherUserAuthenticatorDetails.authenticatorDetails.expirationDate must be equalTo notExpired
+      anotherUserAuthenticatorDetails.authenticatorDetails.lastUsed must be equalTo justUsed
+      anotherUserAuthenticatorDetails.authenticatorDetails.creationDate must be equalTo justCreated
     }
   }
 }
