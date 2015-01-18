@@ -7,7 +7,7 @@ case class Task(id: Option[BSONObjectID] = None, text: String, done: Boolean = f
 
 object Task {
   implicit val taskFormat = {
-    import BSONFormats.BSONObjectIDFormat
+    implicit val bsonObjectIdFormat = BSONFormats.BSONObjectIDFormat
     Json.format[Task]
   }
 }

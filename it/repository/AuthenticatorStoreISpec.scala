@@ -1,17 +1,18 @@
 package repository
 
 import play.api.test.PlaySpecification
-import securesocial.core.authenticator.{CookieAuthenticator, HttpHeaderAuthenticator, IdGenerator}
+import securesocial.core.authenticator.{CookieAuthenticator, HttpHeaderAuthenticator}
 import securesocial.core.services.SaveMode
 import security.{ProfileCookieAuthenticatorStore, ProfileHttpHeaderAuthenticatorStore}
 import time.DateTimeUtils._
 import utils.StartedFakeApplication
 
-class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplication {
+class AuthenticatorStoreISpec extends PlaySpecification with StartedFakeApplication {
 
   "Authenticator store" should {
 
     "find a valid unexpired cookie authenticator" in new AuthenticatorTestCase {
+      val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val justCreated = now
       val notExpired = justCreated.plusHours(1)
       val justUsed = justCreated
@@ -26,6 +27,7 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
 
     "delete a cookie authenticator" in new AuthenticatorTestCase {
+      val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val justCreated = now
       val notExpired = justCreated.plusHours(1)
       val justUsed = justCreated
@@ -37,6 +39,7 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
 
     "not find an expired cookie authenticator" in new AuthenticatorTestCase {
+      val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val anHourOld = now.minusHours(1)
       val justExpired = now.minusMillis(1)
       val usedAtCreation = anHourOld
@@ -44,10 +47,11 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
 
       val authenticator = await(profileCookieAuthenticatorStore.find(authenticatorId))
 
-      await(profileCookieAuthenticatorStore.find(authenticatorId)) must be equalTo None
+      authenticator must be equalTo None
     }
 
     "find a valid unexpired http header authenticator" in new AuthenticatorTestCase {
+      val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val justCreated = now
       val notExpired = justCreated.plusHours(1)
       val justUsed = justCreated
@@ -62,6 +66,7 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
 
     "delete a HTTP authenticator" in new AuthenticatorTestCase {
+      val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val justCreated = now
       val notExpired = justCreated.plusHours(1)
       val justUsed = justCreated
@@ -73,6 +78,7 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     }
 
     "not find an expired HTTP authenticator" in new AuthenticatorTestCase {
+      val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val anHourOld = now.minusHours(1)
       val justExpired = now.minusMillis(1)
       val usedAtCreation = anHourOld
@@ -80,7 +86,7 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
 
       val authenticator = await(profileHttpHeaderAuthenticatorStore.find(authenticatorId))
 
-      await(profileHttpHeaderAuthenticatorStore.find(authenticatorId)) must be equalTo None
+      authenticator must be equalTo None
     }
   }
 
@@ -91,6 +97,5 @@ class AuthenticatorStoreSpec extends PlaySpecification with StartedFakeApplicati
     val profileHttpHeaderAuthenticatorStore: ProfileHttpHeaderAuthenticatorStore = new ProfileHttpHeaderAuthenticatorStore {
       def profiles: ProfileRepository = profileRepository
     }
-    val user = await(profileRepository.save(profile, SaveMode.SignUp))
   }
 }

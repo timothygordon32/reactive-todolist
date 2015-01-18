@@ -8,7 +8,7 @@ import utils.StartedFakeApplication
 import securesocial.core._
 import securesocial.core.services.SaveMode
 
-class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplication {
+class ProfileRepositoryISpec extends PlaySpecification with StartedFakeApplication {
 
   "Profile repository" should {
 
@@ -17,19 +17,19 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
       indexes.filter(_.key == Seq("email" -> IndexType.Ascending)) must not be empty
     }
 
-    "not have an index on providerId and userId" in new ProfileTestCase {
-      val indexes = await(profileRepository.indexes())
-      (indexes.filter(_.key == Seq("userId" -> IndexType.Ascending, "providerId" -> IndexType.Ascending)) must be).empty
-    }
-
     "have an index on userId" in new ProfileTestCase {
       val indexes = await(profileRepository.indexes())
       indexes.filter(_.key == Seq("userId" -> IndexType.Ascending)) must not be empty
     }
 
-    "have an index on authenticatorId" in new ProfileTestCase {
+    "not have an index on authenticatorId" in new ProfileTestCase {
       val indexes = await(profileRepository.indexes())
-      indexes.filter(_.key == Seq("authenticator.id" -> IndexType.Ascending)) must not be empty
+      (indexes.filter(_.key == Seq("authenticator.id" -> IndexType.Ascending)) must be).empty
+    }
+
+    "have an index on authenticator ids" in new ProfileTestCase {
+      val indexes = await(profileRepository.indexes())
+      indexes.filter(_.key == Seq("authenticators.id" -> IndexType.Ascending)) must not be empty
     }
 
     "save profile and find a user by provider and email" in new ProfileTestCase {
@@ -84,8 +84,6 @@ class ProfileRepositorySpec extends PlaySpecification with StartedFakeApplicatio
     }
 
     "be able to store multiple authentication details per user" in new ProfileTestCase {
-      skipped // failing test to drive out functionality
-
       await(profileRepository.save(profile, SaveMode.SignUp)).username must be equalTo userId
       val user = await(profileRepository.findKnown(profile.userId))
 

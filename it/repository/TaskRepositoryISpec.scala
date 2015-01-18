@@ -9,7 +9,7 @@ import reactivemongo.api.indexes.IndexType
 import reactivemongo.bson.BSONObjectID
 import utils.StartedFakeApplication
 
-class TaskRepositorySpec extends PlaySpecification with StartedFakeApplication {
+class TaskRepositoryISpec extends PlaySpecification with StartedFakeApplication {
 
   def randomString = UUID.randomUUID().toString
 
