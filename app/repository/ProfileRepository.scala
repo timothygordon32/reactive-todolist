@@ -130,12 +130,21 @@ trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase
     }
 
   def saveAuthenticator(user: User, userAuthenticator: AuthenticatorDetails): Future[AuthenticatorDetails] = {
-    collection.update(
+    def updateExistingUserAuthenticator() = collection.update(
+      Json.obj("userId" -> user.username, "authenticators" -> Json.obj("$elemMatch" -> Json.obj("id" -> userAuthenticator.id))),
+      Json.obj("$set" -> Json.obj("authenticators.$" -> userAuthenticator))
+    )
+
+    def insertNewUserAuthenticator() = collection.update(
       Json.obj("userId" -> user.username),
-      Json.obj("$push" -> Json.obj("authenticators" -> userAuthenticator))
-    ) map { lastError =>
-      if (lastError.updatedExisting) userAuthenticator
-      else throw new IllegalStateException(s"Could not find user with userId ${user.username}")
+      Json.obj("$push" -> Json.obj("authenticators" -> userAuthenticator)))
+
+    updateExistingUserAuthenticator flatMap { updateExistingLastError =>
+      if (updateExistingLastError.updatedExisting) Future.successful(userAuthenticator)
+      else insertNewUserAuthenticator map { insertNewLastError =>
+        if (insertNewLastError.updatedExisting) userAuthenticator
+        else throw new IllegalStateException(s"Could not find user with userId ${user.username}")
+      }
     }
   }
 
