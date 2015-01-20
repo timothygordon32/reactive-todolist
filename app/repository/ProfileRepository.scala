@@ -9,6 +9,7 @@ import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.{FindAndModify, Update}
 import repository.index.{Drop, DelayedIndexOperations, Ensure, IndexedCollection}
 import securesocial.core._
+import securesocial.core.authenticator.CookieAuthenticator
 import securesocial.core.providers.UsernamePasswordProvider
 import securesocial.core.services.SaveMode
 import time.DateTimeUtils.now
@@ -139,9 +140,16 @@ trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase
       Json.obj("userId" -> user.username),
       Json.obj("$push" -> Json.obj("authenticators" -> userAuthenticator)))
 
+    def deleteExpiredAuthenticators() = collection.update(
+      Json.obj("userId" -> user.username),
+      Json.obj("$pull" -> Json.obj("authenticators" -> Json.obj("$or" -> Seq(
+        Json.obj("expirationDate" -> Json.obj("$lte" -> now)),
+        Json.obj("lastUsed" -> Json.obj("$lte" -> now.minusMinutes(CookieAuthenticator.idleTimeout))))))))
+
     updateExistingUserAuthenticator flatMap { updateExistingLastError =>
       if (updateExistingLastError.updatedExisting) Future.successful(userAuthenticator)
       else insertNewUserAuthenticator map { insertNewLastError =>
+        deleteExpiredAuthenticators()
         if (insertNewLastError.updatedExisting) userAuthenticator
         else throw new IllegalStateException(s"Could not find user with userId ${user.username}")
       }
@@ -151,9 +159,7 @@ trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase
   def findAuthenticator(id: String): Future[Option[UserAuthenticatorDetails]] = {
     val selector = Json.obj("authenticators.id" -> id)
     collection.find(selector).cursor[IdentifiedProfile].headOption.map(_.flatMap { profile =>
-      profile.authenticators
-        .find(a => a.id == id && a.expirationDate.isAfter(now))
-        .map(UserAuthenticatorDetails(profile.toUser, _))
+      profile.authenticators.find(a => a.id == id).map(UserAuthenticatorDetails(profile.toUser, _))
     })
   }
 

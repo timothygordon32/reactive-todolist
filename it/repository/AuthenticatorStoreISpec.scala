@@ -38,7 +38,7 @@ class AuthenticatorStoreISpec extends PlaySpecification with StartedFakeApplicat
       await(profileCookieAuthenticatorStore.find(authenticatorId)) must be equalTo None
     }
 
-    "not find an expired cookie authenticator" in new AuthenticatorTestCase {
+    "expired cookie authenticators should be evicted on save" in new AuthenticatorTestCase {
       val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val anHourOld = now.minusHours(1)
       val justExpired = now.minusMillis(1)
@@ -77,7 +77,7 @@ class AuthenticatorStoreISpec extends PlaySpecification with StartedFakeApplicat
       await(profileHttpHeaderAuthenticatorStore.find(authenticatorId)) must be equalTo None
     }
 
-    "not find an expired HTTP authenticator" in new AuthenticatorTestCase {
+    "expired HTTP authenticators should be evicted on save" in new AuthenticatorTestCase {
       val user = await(profileRepository.save(profile, SaveMode.SignUp))
       val anHourOld = now.minusHours(1)
       val justExpired = now.minusMillis(1)
