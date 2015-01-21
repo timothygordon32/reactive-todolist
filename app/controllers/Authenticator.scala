@@ -3,15 +3,20 @@ package controllers
 import models.User
 import play.api.libs.json.Json
 import play.api.mvc._
+import repository.TaskRepository
 import securesocial.core.{Events, LogoutEvent, SecureSocial}
 import security.SecuredComponent
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class Authenticator extends Controller with SecureSocial[User] with SecuredComponent {
+class Authenticator(taskRepository: TaskRepository) extends Controller with SecureSocial[User] with SecuredComponent {
 
-  def getLogin = SecuredAction.async { implicit request =>
-    Future.successful(Ok(Json.toJson(request.user)))
+  // Workaround to waiting for ReactiveMongoDB to authenticate with MongoLabs
+  def getLogin = SecuredAction.async { implicit request => implicit val user = request.user
+    taskRepository.count.map { count =>
+      Ok(Json.toJson(request.user))
+    }
   }
 
   def logoff = UserAwareAction.async { implicit request =>

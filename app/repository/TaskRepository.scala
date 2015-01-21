@@ -7,7 +7,8 @@ import play.modules.reactivemongo.ReactiveMongoPlugin
 import play.modules.reactivemongo.json.BSONFormats._
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.BSONObjectID
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
+import reactivemongo.core.commands.Count
 import repository.index.{IndexedCollection, DelayedIndexOperations, Ensure}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,6 +36,8 @@ trait TaskRepository {
   def indexes(): Future[Seq[Index]]
 
   def create(task: Task)(implicit user: User): Future[Task]
+
+  def count(implicit user: User): Future[Int]
 
   def findAll(implicit user: User): Future[Seq[Task]]
 
@@ -70,6 +73,13 @@ object MongoTaskRepository extends TaskRepository with DelayedIndexOperations {
 
     collection.insert(Json.toJson(toCreate).as[JsObject] ++ Json.obj("user" -> user.id)).map(_ => toCreate)
   }
+
+  def count(implicit user: User): Future[Int] =
+    collection.db.command(
+      Count(
+        collection.name,
+        Some(Json.obj("user" -> user.id).as[BSONDocument])
+      ))
 
   def findAll(implicit user: User): Future[Seq[Task]] =
     collection.find(Json.obj("user" -> user.id)).sort(Json.obj("_id" -> 1)).cursor[Task].collect[Seq]()

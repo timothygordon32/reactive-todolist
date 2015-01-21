@@ -14,7 +14,7 @@ object Global extends WithFilters(HttpsRedirectFilter) {
   lazy val taskRepository = MongoTaskRepository
 
   lazy val home = new Home
-  lazy val authenticator = new Authenticator
+  lazy val authenticator = new Authenticator(taskRepository)
   lazy val tasks = new Tasks(taskRepository)
 
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
