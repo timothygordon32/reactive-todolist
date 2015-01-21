@@ -13,9 +13,9 @@ import scala.concurrent.Future
 class Authenticator(taskRepository: TaskRepository) extends Controller with SecureSocial[User] with SecuredComponent {
 
   def getLogin = SecuredAction.async { implicit request =>
-    taskRepository.findAll(request.user).map { tasks =>
-      Ok(Json.toJson(request.user))
-    }
+//    taskRepository.findAll(request.user).map { tasks =>
+      Future.successful(Ok(Json.toJson(request.user)))
+//    }
   }
 
   def logoff = UserAwareAction.async { implicit request =>
