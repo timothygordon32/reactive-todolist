@@ -23,8 +23,11 @@ trait Indexed {
 
   def ensureIndex(collection: JSONCollection, index: Index)(implicit ec: ExecutionContext): Future[Unit] =
     for {
-      _ <- Promise.timeout(Nil, delay.duration)
-      _ <- collection.indexesManager.ensure(index).map {
+      message <- Promise.timeout(s"Ensuring index ${toDescription(index)} on ${collection.name} after waiting ${delay.duration}", delay.duration)
+      _ <- {
+        Logger.info(message)
+        collection.indexesManager.ensure(index)
+      }.map {
         case true => Logger.info(s"Created index ${toDescription(index)} on ${collection.name}")
         case false => Logger.info(s"Index ${toDescription(index)} already exists on ${collection.name}")
       }
@@ -32,8 +35,11 @@ trait Indexed {
 
   def dropIndex(collection: JSONCollection, index: Index)(implicit ec: ExecutionContext): Future[Unit] =
     for {
-      _ <- Promise.timeout(Nil, delay.duration)
-      _ <- collection.db.command(DropIndex(collection.name, index.eventualName)).map { indexNo =>
+      message <- Promise.timeout(s"Dropping index ${toDescription(index)} on ${collection.name} after waiting ${delay.duration}", delay.duration)
+      _ <- {
+        Logger.info(message)
+        collection.db.command(DropIndex(collection.name, index.eventualName))
+      }.map { indexNo =>
         Logger.info(s"Dropped index ${toDescription(index)} on ${collection.name}, was: $indexNo")
       } recoverWith {
         case e: CommandError => Future.successful(Logger.warn(e.message))
