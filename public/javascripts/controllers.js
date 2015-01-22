@@ -128,7 +128,7 @@ angular.module('todo.controllers').controller('ResetController', function ($scop
     $scope.sendEmail = function () {
         $http.post('/users/reset', $scope.formData)
             .success(function () {
-                $location.path('login');
+                $location.path('/login');
             })
             .error(function (errors) {
                 $scope.formData.errors = errors;
@@ -143,7 +143,7 @@ angular.module('todo.controllers').controller('ResetVerifiedController', functio
     $scope.reset = function () {
         $http.post('/users/reset/' + $routeParams.token, $scope.formData)
             .success(function () {
-                $location.path('login');
+                $location.path('/login');
             })
             .error(function (errors) {
                 $scope.formData.errors = errors;
@@ -158,7 +158,7 @@ angular.module('todo.controllers').controller('PasswordController', function ($s
     $scope.change = function () {
         return $http.post('/users/password', $scope.formData)
             .success(function () {
-                $location.path('tasks');
+                $location.path('/tasks');
             })
             .error(function (errors) {
                 $scope.formData.errors = errors;
