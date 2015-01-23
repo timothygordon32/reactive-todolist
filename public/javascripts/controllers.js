@@ -125,10 +125,12 @@ angular.module('todo.controllers').controller('ResetController', function ($scop
 
     $scope.formData = {};
 
+    $scope.emailSent = false;
+
     $scope.sendEmail = function () {
         $http.post('/users/reset', $scope.formData)
             .success(function () {
-                $location.path('/login');
+                $scope.emailSent = true;
             })
             .error(function (errors) {
                 $scope.formData.errors = errors;

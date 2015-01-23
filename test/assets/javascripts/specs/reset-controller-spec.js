@@ -14,7 +14,6 @@ describe('Reset controller', function () {
         loginCtrl = $controller('ResetController', {
             $scope: scope
         });
-        $location.path("/reset");
     }));
 
     it('should submit the reset request', inject(function ($location) {
@@ -25,7 +24,7 @@ describe('Reset controller', function () {
         scope.sendEmail();
         $httpBackend.flush();
 
-        expect($location.url()).toBe('/login');
+        expect(scope.emailSent).toBe(true);
     }));
 
     it('should return any errors to the page', inject(function ($location) {
@@ -38,6 +37,6 @@ describe('Reset controller', function () {
         $httpBackend.flush();
 
         expect(scope.formData.errors).toEqual(errors);
-        expect($location.url()).toBe('/reset');
+        expect(scope.emailSent).toBe(false);
     }));
 });

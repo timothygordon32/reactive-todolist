@@ -1,5 +1,5 @@
 <div id="reset-page" class="container">
-    <form name="resetForm" class="form-auth" role="form">
+    <form ng-hide="emailSent" name="resetForm" class="form-auth" role="form">
         <h2 class="form-auth-heading">Reset Password</h2>
         <p class="leading">Enter your email address and click reset - you should receive an email with a link to reset your password.</p>
         <div class="form-group">
@@ -8,4 +8,9 @@
         </div>
         <button id="reset" class="btn btn-lg btn-success btn-block" ng-disabled="resetForm.$invalid" type="submit" ng-click="sendEmail()">Reset</button>
     </form>
+    <div class="form-auth" ng-show="emailSent">
+        <h2 class="form-auth-heading">Now Check Your Inbox!</h2>
+        <p class="leading">We've sent an email with a link in it to {{formData.email}} that you can use to reset your password.</p>
+        <p><a id="login" href="#/login">Oh - I've suddenly remembered my password.</a></p>
+    </div>
 </div>
