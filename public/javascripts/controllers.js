@@ -121,7 +121,7 @@ angular.module('todo.controllers').controller('SignupVerifiedController', functi
     }
 });
 
-angular.module('todo.controllers').controller('ResetController', function ($scope, $http, $location) {
+angular.module('todo.controllers').controller('ResetController', function ($scope, $http) {
 
     $scope.formData = {};
 
