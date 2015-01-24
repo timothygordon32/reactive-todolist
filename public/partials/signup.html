@@ -1,11 +1,16 @@
 <div id="signup-page" class="container">
-    <form name="signUpForm" class="form-auth" role="form">
+    <form ng-hide="emailSent" name="signUpForm" class="form-auth" role="form">
         <h2 class="form-auth-heading">Sign Up!</h2>
         <p class="leading">Enter your email address. Wait for the link to arrive in your inbox, then follow it to complete signing up.</p>
         <div class="form-group">
             <label for="email" class="sr-only">Email address</label>
             <input id="email" type="email" class="form-control" placeholder="Your email address" autofocus ng-required="true" ng-model="formData.email">
         </div>
-        <button id="signup" class="btn btn-lg btn-success btn-block" ng-disabled="signUpForm.$invalid" type="submit" ng-click="setEmail()">Send email</button>
+        <button id="signup" class="btn btn-lg btn-success btn-block" ng-disabled="signUpForm.$invalid" type="submit" ng-click="sendEmail()">Send email</button>
     </form>
+    <div class="form-auth" ng-show="emailSent">
+        <h2 class="form-auth-heading">Now Check Your Inbox!</h2>
+        <p class="leading">We've sent an email with a link in it to {{formData.email}} so that you can sign up to use Tododo.</p>
+        <p><a id="login" href="#/login">Oops - I think I'm already signed-up.</a></p>
+    </div>
 </div>

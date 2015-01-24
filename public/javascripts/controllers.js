@@ -91,15 +91,21 @@ angular.module('todo.controllers').controller('LoginController', function ($root
     }
 });
 
-angular.module('todo.controllers').controller('SignupController', function ($scope, $http, $location) {
+angular.module('todo.controllers').controller('SignupController', function ($scope, $http) {
 
     $scope.formData = {};
 
-    $scope.setEmail = function () {
-        $http.post('/users/signup', $scope.formData).success(function () {
-            $location.path("/login");
-        });
-    }
+    $scope.emailSent = false;
+
+    $scope.sendEmail = function () {
+        $http.post('/users/signup', $scope.formData)
+            .success(function () {
+                $scope.emailSent = true;
+            })
+            .error(function (errors) {
+                $scope.formData.errors = errors;
+            });
+    };
 });
 
 angular.module('todo.controllers').controller('SignupVerifiedController', function ($scope, $http, $location, $routeParams) {
