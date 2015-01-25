@@ -39,4 +39,35 @@ describe('Sign-up controller', function () {
         expect(scope.formData.errors).toEqual(errors);
         expect(scope.emailSent).toBe(false);
     });
+
+    it('should indicate submitting during a successful send of the email', function () {
+        expect(scope.submitting).toBe(false);
+        scope.formData = {email: "user@nomail.com"};
+        $httpBackend.expectPOST('/users/signup', scope.formData)
+            .respond(204);
+
+        scope.sendEmail();
+
+        expect(scope.submitting).toBe(true);
+
+        $httpBackend.flush();
+
+        expect(scope.submitting).toBe(false);
+    });
+
+    it('should indicate submitting during a failure to send the email', function () {
+        expect(scope.submitting).toBe(false);
+        var errors = {errors: {email: ['Email is garbled']}};
+        scope.formData = {email: "garbled"};
+        $httpBackend.expectPOST('/users/signup', scope.formData)
+            .respond(400, errors);
+
+        scope.sendEmail();
+
+        expect(scope.submitting).toBe(true);
+
+        $httpBackend.flush();
+
+        expect(scope.submitting).toBe(false);
+    });
 });

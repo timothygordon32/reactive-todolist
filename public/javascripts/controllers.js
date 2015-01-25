@@ -95,15 +95,19 @@ angular.module('todo.controllers').controller('SignupController', function ($sco
 
     $scope.formData = {};
 
+    $scope.submitting = false;
     $scope.emailSent = false;
 
     $scope.sendEmail = function () {
+        $scope.submitting = true;
         $http.post('/users/signup', $scope.formData)
             .success(function () {
                 $scope.emailSent = true;
+                $scope.submitting = false;
             })
             .error(function (errors) {
                 $scope.formData.errors = errors;
+                $scope.submitting = false;
             });
     };
 });
