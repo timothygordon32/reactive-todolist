@@ -79,14 +79,19 @@ angular.module('todo.controllers').controller('LoginController', function ($root
 
     $scope.formData = {};
 
+    $scope.submitting = false;
+
     $scope.setUsername = function () {
+        $scope.submitting = true;
         $http.post('/users/authenticate/userpass', $scope.formData)
             .success(function (login) {
                 $rootScope.login = login;
                 $location.path("/tasks");
+                $scope.submitting = false;
             })
             .error(function (errors) {
                 $scope.formData.errors = errors;
+                $scope.submitting = false;
             });
     }
 });

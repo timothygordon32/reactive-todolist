@@ -1,22 +1,24 @@
 <div id="login-page" class="container">
     <form name="loginForm" class="form-auth" role="form">
-        <h2 class="form-auth-heading">Hello! Who are you?</h2>
-        <form-group errors="formData.errors['username']">
-            <label for="username" class="sr-only">Username</label>
-            <input id="username" type="email" class="form-control" placeholder="Email address" autofocus ng-required="true"
-                   autocorrect="off" autocomplete="off" autocapitalize="none" ng-model="formData.username">
-        </form-group>
-        <form-group errors="formData.errors['password']">
-            <label for="password" class="sr-only">Password</label>
-            <input id="password" type="password" class="form-control"
-                   ng-class='{"has-error": formData.errors["password"].length > 0}' ng-required="true"
-                   placeholder="And password" autocomplete="off" ng-model="formData.password">
-        </form-group>
-        <div ng-show="formData.errors.message" class="text-center alert alert-danger">
-            {{formData.errors.message}}
-        </div>
-        <p><a id="signup" href="#/signup">Don't have an account? Sign up for one!</a></p>
-        <p><a id="reset" href="#/reset">Dang it - what <em>is</em> my password?</a></p>
-        <button id="login" ng-disabled="loginForm.$invalid" class="btn btn-lg btn-primary btn-block" type="submit" ng-click="setUsername()">Sign in</button>
+        <fieldset ng-disabled="submitting">
+            <h2 class="form-auth-heading">Hello! Who are you?</h2>
+            <form-group errors="formData.errors['username']">
+                <label for="username" class="sr-only">Username</label>
+                <input id="username" type="email" class="form-control" placeholder="Email address" autofocus ng-required="true"
+                       autocorrect="off" autocomplete="off" autocapitalize="none" ng-model="formData.username">
+            </form-group>
+            <form-group errors="formData.errors['password']">
+                <label for="password" class="sr-only">Password</label>
+                <input id="password" type="password" class="form-control"
+                       ng-class='{"has-error": formData.errors["password"].length > 0}' ng-required="true"
+                       placeholder="And password" autocomplete="off" ng-model="formData.password">
+            </form-group>
+            <div ng-show="formData.errors.message" class="text-center alert alert-danger">
+                {{formData.errors.message}}
+            </div>
+            <p><a id="signup" href="#/signup">Don't have an account? Sign up for one!</a></p>
+            <p><a id="reset" href="#/reset">Dang it - what <em>is</em> my password?</a></p>
+            <button id="login" ng-disabled="loginForm.$invalid" class="btn btn-lg btn-primary btn-block" type="submit" ng-click="setUsername()">Sign in</button>
+        </fieldset>
     </form>
 </div>
