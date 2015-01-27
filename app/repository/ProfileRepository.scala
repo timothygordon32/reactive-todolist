@@ -7,10 +7,11 @@ import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.core.commands.{FindAndModify, Update}
-import repository.index.{Drop, DelayedIndexOperations, Ensure, IndexedCollection}
+import repository.index.{DelayedIndexOperations, Drop, Ensure, IndexedCollection}
 import securesocial.core._
 import securesocial.core.authenticator.CookieAuthenticator
 import securesocial.core.providers.UsernamePasswordProvider
+import securesocial.core.providers.utils.PasswordHasher
 import securesocial.core.services.SaveMode
 import time.DateTimeUtils.now
 
@@ -44,6 +45,12 @@ trait ProfileRepository {
 }
 
 trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase with DelayedIndexOperations {
+  val ConfoundLoginFailures = BasicProfile(providerId = UsernamePasswordProvider.UsernamePassword, userId = "",
+    firstName = None, lastName = None, fullName = None, email = None, avatarUrl = None,
+    authMethod = AuthenticationMethod.UserPassword, oAuth1Info = None, oAuth2Info = None,
+    passwordInfo = Some(
+      PasswordInfo(PasswordHasher.id, "$2a$12$Suvu6.IOv9FDvW8wSY1K5uTnTV7qtHnKWD8Bhh9ShWKOg8GtsN9kG", None)))
+
   private val indexedCollection = new IndexedCollection(
     db.collection[JSONCollection]("profiles"),
     Seq(
@@ -106,7 +113,8 @@ trait MongoProfileRepository extends ProfileRepository with SecureSocialDatabase
       .cursor[IdentifiedProfile].headOption
 
   def find(providerId: String, userId: String): Future[Option[BasicProfile]] =
-    findProfileWithId(providerId, userId).map(_.map(toBasicProfile))
+    findProfileWithId(providerId, userId).map(maybeProfile =>
+      Some(maybeProfile.map(toBasicProfile).getOrElse(ConfoundLoginFailures)))
 
   def passwordInfoFor(user: User): Future[Option[PasswordInfo]] =
     find(UsernamePasswordProvider.UsernamePassword, user.username).map(_.flatMap(_.passwordInfo))
