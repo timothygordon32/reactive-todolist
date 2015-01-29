@@ -1,16 +1,17 @@
 <div id="reset-verified-page" class="container">
     <form name="resetPasswordForm" class="form-auth" role="form">
-        <h2 class="form-auth-heading">Reset Your Password</h2>
-        <p class="leading">You forgot your old password - now enter a new one.</p>
-        <form-group errors="formData.errors['password.password1']">
-            <label for="password1">Password</label>
-            <input type="password" class="form-control" id="password1" name="password.password1" placeholder="Password" required ng-model="formData.password.password1">
-        </form-group>
-        <form-group errors="formData.errors['password.password2']">
-            <label for="password2">Repeat Password</label>
-            <input type="password" class="form-control" id="password2" name="password.password2" placeholder="Repeat Password" required ng-model="formData.password.password2">
-        </form-group>
-
-        <button id="reset" ng-disabled="resetPasswordForm.$invalid" class="btn btn-success btn-lg btn-block" type="submit" ng-click="reset()"><span class="glyphicon glyphicon-repeat"></span> Reset</button>
+        <fieldset ng-disabled="submitting">
+            <h2 class="form-auth-heading">Reset Your Password</h2>
+            <p class="leading">You forgot your old password - now enter a new one.</p>
+            <form-group errors="formData.errors['password.password1']">
+                <label for="password1">Password</label>
+                <input type="password" class="form-control" id="password1" name="password.password1" placeholder="Password" required ng-model="formData.password.password1">
+            </form-group>
+            <form-group errors="formData.errors['password.password2']">
+                <label for="password2">Repeat Password</label>
+                <input type="password" class="form-control" id="password2" name="password.password2" placeholder="Repeat Password" required ng-model="formData.password.password2">
+            </form-group>
+            <button id="reset" ng-disabled="resetPasswordForm.$invalid" class="btn btn-success btn-lg btn-block" type="submit" ng-click="reset()"><span class="glyphicon glyphicon-repeat"></span> Reset</button>
+        </fieldset>
     </form>
 </div>

@@ -168,14 +168,14 @@ angular.module('todo.controllers').controller('SignupVerifiedController', functi
     }
 });
 
-angular.module('todo.controllers').controller('ResetController', function ($scope, $http) {
+angular.module('todo.controllers').controller('ResetController', function ($scope, $http, form) {
 
     $scope.formData = {};
 
     $scope.emailSent = false;
 
     $scope.sendEmail = function () {
-        $http.post('/users/reset', $scope.formData)
+        form.submission($http.post('/users/reset', $scope.formData))
             .success(function () {
                 $scope.emailSent = true;
             })
@@ -185,12 +185,12 @@ angular.module('todo.controllers').controller('ResetController', function ($scop
     };
 });
 
-angular.module('todo.controllers').controller('ResetVerifiedController', function ($scope, $http, $location, $routeParams) {
+angular.module('todo.controllers').controller('ResetVerifiedController', function ($scope, $http, $location, $routeParams, form) {
 
     $scope.formData = {};
 
     $scope.reset = function () {
-        $http.post('/users/reset/' + $routeParams.token, $scope.formData)
+        form.submission($http.post('/users/reset/' + $routeParams.token, $scope.formData))
             .success(function () {
                 $location.path('/login');
             })
