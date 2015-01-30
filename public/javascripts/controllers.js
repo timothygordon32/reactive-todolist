@@ -149,12 +149,12 @@ angular.module('todo.controllers').controller('SignupController', function ($sco
     };
 });
 
-angular.module('todo.controllers').controller('SignupVerifiedController', function ($scope, $http, $location, $routeParams) {
+angular.module('todo.controllers').controller('SignupVerifiedController', function ($scope, $http, $location, $routeParams, form) {
 
     $scope.formData = {};
 
     $scope.signUp = function () {
-        $http.post('/users/signup/' + $routeParams.token, $scope.formData)
+        form.submission($scope, $http.post('/users/signup/' + $routeParams.token, $scope.formData))
             .success(function () {
                 $location.path("/login");
             })
@@ -175,7 +175,7 @@ angular.module('todo.controllers').controller('ResetController', function ($scop
     $scope.emailSent = false;
 
     $scope.sendEmail = function () {
-        form.submission($http.post('/users/reset', $scope.formData))
+        form.submission($scope, $http.post('/users/reset', $scope.formData))
             .success(function () {
                 $scope.emailSent = true;
             })
@@ -190,7 +190,7 @@ angular.module('todo.controllers').controller('ResetVerifiedController', functio
     $scope.formData = {};
 
     $scope.reset = function () {
-        form.submission($http.post('/users/reset/' + $routeParams.token, $scope.formData))
+        form.submission($scope, $http.post('/users/reset/' + $routeParams.token, $scope.formData))
             .success(function () {
                 $location.path('/login');
             })
@@ -200,12 +200,12 @@ angular.module('todo.controllers').controller('ResetVerifiedController', functio
     };
 });
 
-angular.module('todo.controllers').controller('PasswordController', function ($scope, $http, $location) {
+angular.module('todo.controllers').controller('PasswordController', function ($scope, $http, $location, form) {
 
     $scope.formData = {};
 
     $scope.change = function () {
-        return $http.post('/users/password', $scope.formData)
+        form.submission($scope, $http.post('/users/password', $scope.formData))
             .success(function () {
                 $location.path('/tasks');
             })
