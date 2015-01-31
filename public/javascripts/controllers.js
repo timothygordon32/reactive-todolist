@@ -2,7 +2,7 @@
 
 angular.module('todo.controllers', ['ngResource']);
 
-angular.module('todo.controllers').controller('TodoCtrl', function ($scope, $resource, $http, $rootScope, $location) {
+angular.module('todo.controllers').controller('TasksController', function ($scope, $resource, $http, $rootScope, $location) {
 
     $scope.loaded = false;
 

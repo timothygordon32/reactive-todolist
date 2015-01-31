@@ -25,7 +25,7 @@ angular.module('todo')
                 controller: "PasswordController"})
             .when("/tasks", {
                 templateUrl: "assets/partials/tasks.html",
-                controller: "TodoCtrl"})
+                controller: "TasksController"})
             .otherwise({
                 redirectTo: "/tasks"
             });

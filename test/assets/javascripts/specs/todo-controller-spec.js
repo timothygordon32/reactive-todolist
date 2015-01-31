@@ -23,7 +23,7 @@ describe('Todo controller', function () {
         ]);
 
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
 
@@ -35,7 +35,7 @@ describe('Todo controller', function () {
     it('should create a task', inject(function ($controller, $rootScope) {
         $httpBackend.expectGET("/tasks").respond([]);
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
         $httpBackend.flush();
@@ -54,7 +54,7 @@ describe('Todo controller', function () {
             {id: 1, text: 'task1', done: false}
         ]);
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
         $httpBackend.flush();
@@ -71,7 +71,7 @@ describe('Todo controller', function () {
             {id: 1, text: 'task1', done: false}
         ]);
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
         $httpBackend.flush();
@@ -88,7 +88,7 @@ describe('Todo controller', function () {
             {id: 1, text: 'task1', done: false}
         ]);
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
         $httpBackend.flush();
@@ -113,7 +113,7 @@ describe('Todo controller', function () {
         // Given
         $httpBackend.expectGET("/tasks").respond([]);
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
         $httpBackend.flush();
@@ -130,7 +130,7 @@ describe('Todo controller', function () {
         // Given
         $httpBackend.expectGET("/tasks").respond([]);
         scope = $rootScope.$new();
-        todoCtrl = $controller('TodoCtrl', {
+        todoCtrl = $controller('TasksController', {
             $scope: scope
         });
         $httpBackend.flush();
