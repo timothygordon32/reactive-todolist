@@ -1,0 +1,6 @@
+mails.sendAlreadyRegisteredEmail.subject=Already registered for Tododo
+mails.sendSignUpEmail.subject=You're signing-up for Tododo - awesome!
+mails.welcomeEmail.subject=Welcome to Tododo
+mails.passwordResetEmail.subject=Tododo password reset instructions
+mails.unknownEmail.subject=Tododo password reset request
+mails.passwordResetOk.subject=Tododo password change confirmation
