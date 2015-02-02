@@ -1,4 +1,4 @@
 @(signUpTokenLink: String)
-Hello,
+Hi,
 
-Click this link or copy it into your browser address bar to confirm your email address and complete signup: @signUpTokenLink
+Click this link or copy it into your browser address bar to finish signing-up for Tododo - the best online task management app EVER: @signUpTokenLink

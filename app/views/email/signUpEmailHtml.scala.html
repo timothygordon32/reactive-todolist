@@ -1,9 +1,9 @@
-@(signUpLink: String)
+@(signUpLink: String, logoUrl: String)
 <html>
 <body>
 
 <div>
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-bottom:1px solid #dcdad8">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#ffffff">
         <tbody>
         <tr>
             <td>
@@ -12,7 +12,7 @@
                     <tr>
                         <td>
                         <td align="left" valign="bottom" height="30">
-                            <img border="0" src="https://dl.dropboxusercontent.com/u/9175521/tododo.gif" alt="Reactive Tododo" style="text-decoration:none;display:block;outline:none;color:#cb2027;font-size:20px" class="CToWUd">
+                            <img border="0" src="@logoUrl" alt="Reactive Tododo" style="text-decoration:none;display:block;outline:none;color:#cb2027;font-size:20px">
                         </td>
                         </td>
                     </tr>
@@ -22,7 +22,7 @@
         </tr>
         </tbody>
     </table>
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#f5f3f0">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color:#f5f3f0;border-radius:3px;">
         <tbody>
         <tr>
             <td>
@@ -38,14 +38,10 @@
                                         <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                             <tbody>
                                             <tr>
-                                                <td align="center" style="font-family:helvetica neue,helvetica,sans-serif;font-size:18px;line-height:24px;font-weight:bold;color:#454545">
-                                                    Hi,
-                                                </td>
+                                                <td style="font-family:helvetica neue,helvetica,sans-serif;font-size:18px;line-height:24px;font-weight:bold;color:#454545">Hi,</td>
                                             </tr>
                                             <tr>
-                                                <td align="center" style="font-family:helvetica neue,helvetica,sans-serif;font-size:16px;color:#666666;line-height:24px;padding-top:0px">
-                                                    Welcome to Tododo, the best online task management app EVER!
-                                                </td>
+                                                <td style="font-family:helvetica neue,helvetica,sans-serif;font-size:16px;color:#666666;line-height:24px;padding-top:5px">Click the button to finish signing-up to Tododo, the best online task management app EVER!</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -56,8 +52,8 @@
                                         <table height="40" border="0" cellpadding="0" cellspacing="0">
                                             <tbody>
                                             <tr>
-                                                <td height="38" style="background-color:#cb2027;padding:2px 15px 0px 15px;border-bottom:2px solid #971e25;border-radius:3px">
-                                                    <a href="@signUpLink" style="font-family:helvetica neue,helvetica,sans-serif;font-size:16px;color:#ffffff;text-decoration:none;display:block">Complete Registration</a>
+                                                <td height="38" style="background-color:#5cb85c;padding:2px 15px 0px 15px;border-bottom:2px solid #4cae4c;border-radius:3px">
+                                                    <a href="@signUpLink" style="font-family:helvetica neue,helvetica,sans-serif;font-size:16px;color:#ffffff;text-decoration:none;display:block">Complete Sign-up</a>
                                                 </td>
                                             </tr>
                                             </tbody>

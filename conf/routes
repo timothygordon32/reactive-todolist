@@ -22,3 +22,11 @@ DELETE      /tasks/:id               @controllers.Tasks.delete(id: String)
 
 # Secure Social
 ->          /users                   securesocial.Routes
+
+# Preview security email templates (dev only)
+GET         /emails/signup           controllers.PreviewMailTemplates.signUpEmail
+GET         /emails/registered       controllers.PreviewMailTemplates.alreadyRegisteredEmail
+GET         /emails/welcome          controllers.PreviewMailTemplates.welcomeEmail
+GET         /emails/unknown          controllers.PreviewMailTemplates.unknownEmailNotice
+GET         /emails/reset            controllers.PreviewMailTemplates.sendPasswordResetEmail
+GET         /emails/changed          controllers.PreviewMailTemplates.passwordChangedNoticeEmail
