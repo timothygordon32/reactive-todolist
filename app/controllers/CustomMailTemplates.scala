@@ -76,13 +76,13 @@ trait CustomMailTemplates extends MailTemplates {
   def getAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
     val resetTokenLink = s"$baseUrl/reset"
     (Some(alreadyRegisteredEmailText(helloText(user), resetTokenLink)),
-      Some(alreadyRegisteredEmailHtml(helloHtml(user), resetTokenLink)))
+      Some(alreadyRegisteredEmailHtml(helloHtml(user), resetTokenLink, logoUrl)))
   }
 
   def getWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, lang: Lang) = {
     val loginLink = s"$baseUrl/login"
     (Some(welcomeEmailText(welcomeText(user), loginLink)),
-      Some(welcomeEmailHtml(welcomeHtml(user), loginLink)))
+      Some(welcomeEmailHtml(welcomeHtml(user), loginLink, logoUrl)))
   }
 
   def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = {
