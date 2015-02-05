@@ -88,7 +88,7 @@ trait CustomMailTemplates extends MailTemplates {
   def getUnknownEmailNotice()(implicit request: RequestHeader, lang: Lang) = {
     val signUpLink = s"$baseUrl/signup"
     (Some(unknownEmailText(signUpLink)),
-      Some(unknownEmailHtml(signUpLink)))
+      Some(unknownEmailHtml(signUpLink, logoUrl)))
   }
 
   def getSendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, lang: Lang) = {

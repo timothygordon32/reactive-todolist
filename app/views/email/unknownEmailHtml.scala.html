@@ -1,14 +1,6 @@
-@(signUpLink: String)
-<html>
-<body>
-<p>Hmmmm...</p>
-
-<p>You tried to reset your password on Tododo, but your email address doesn't belong to a registered account.</p>
-<p>If you want to you can sign up for a Tododo account <a href="@signUpLink">here</a>.</p>
-</body>
-</html>
-
-
-
-
-
+@(signUpLink: String, logoUrl: String)
+@emailHtml(
+Html("Er... Hello"),
+Html("<p>You tried to reset your password on Tododo, but your email address doesn't belong to a registered account.</p><p>If you want to you can sign up for a Tododo account using the button below.</p>"),
+Some(views.email.Button(signUpLink, "Sign Up")),
+logoUrl)

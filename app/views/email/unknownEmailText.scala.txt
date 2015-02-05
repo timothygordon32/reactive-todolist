@@ -1,5 +1,5 @@
 @(signUpLink: String)
-Hmmmm...
+Er... Hello
 
 You tried to reset your password on Tododo, but your email address doesn't belong to a registered account.
 
