@@ -4,7 +4,7 @@ import play.api.Logger
 import play.api.libs.concurrent.Promise
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.indexes.{Index, IndexType}
-import reactivemongo.bson.{BSONDocument, BSONDouble, BSONInteger, BSONString}
+import reactivemongo.bson._
 import reactivemongo.core.commands.{BSONCommandResultMaker, Command, CommandError}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,7 +56,7 @@ trait Indexed {
           }
 
         CommandError.checkOk(document, Some("dropIndexes"), error)
-          .toLeft(document.getAs[BSONDouble]("nIndexesWas").map(_.value.toInt).get)
+          .toLeft(document.getAs[BSONInteger]("nIndexesWas").map(_.value.toInt).get)
       }
     }
   }
